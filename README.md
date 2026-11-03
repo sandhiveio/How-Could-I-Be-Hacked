@@ -30,7 +30,7 @@ and detection improvements have not yet been benchmarked.
 
 ## Use with an agent
 
-![Local investigation workflow: your code → retrieve hypotheses → check applicability → run local tests → add regression checks for verified findings. Observations guide the next round.](assets/illustrations/workflow.svg)
+![Illustrative file-containment investigation: reject a traversal input, separately inspect a symlink, and test the resolved path against the authorized root.](assets/illustrations/investigation-map.svg)
 
 Copy or clone this repository into a folder named `how-could-i-be-hacked` inside your agent's
 skills directory, or give your agent the absolute path to [SKILL.md](SKILL.md).
