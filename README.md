@@ -64,3 +64,4 @@ Use only within the target's actual authorized scope and permissions.
 
 - GitHub: [sandhiveio](https://github.com/sandhiveio)
 - Website: [SandHive](https://sandhive.io)
+- Telegram: [@sandhive](https://t.me/sandhive)

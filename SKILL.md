@@ -85,3 +85,4 @@ or interrupted review must remain labeled partial; a schema check is not securit
 
 - GitHub: [sandhiveio](https://github.com/sandhiveio)
 - Website: [SandHive](https://sandhive.io)
+- Telegram: [@sandhive](https://t.me/sandhive)
