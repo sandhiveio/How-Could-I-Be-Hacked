@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="620" viewBox="0 0 680 620" role="img" aria-labelledby="title desc">
+  <title id="title">Follow the boundary, not just the input</title>
+  <desc id="desc">Illustrative investigation of file containment. A traversal input may be rejected while a symlink warrants a separate local test. Test observations determine whether to reject the hypothesis, investigate further, or add a regression for a verified finding. This is not an executed case.</desc>
+  <rect width="680" height="620" fill="#f5f5f0"/>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#202821">
+    <text x="34" y="52" font-size="30" font-weight="700">Where does the file actually resolve?</text>
+    <text x="34" y="87" font-size="20" fill="#505b51">File containment / illustrative investigation</text>
+    <path d="M34 109H646" stroke="#202821"/>
+    <g fill="none" stroke="#8a9388" stroke-width="2">
+      <path d="M58 161V242H305"/>
+      <path d="M58 242V327H305"/>
+    </g>
+    <g font-size="24">
+      <text x="78" y="167">User-controlled path</text>
+      <text x="78" y="228" font-family="Consolas, monospace">../outside.txt</text>
+      <text x="78" y="313" font-family="Consolas, monospace">public/link.txt</text>
+    </g>
+    <circle cx="58" cy="159" r="5" fill="#202821"/>
+    <path d="M312 236l12 12m0-12-12 12" stroke="#687164" stroke-width="2"/>
+    <text x="342" y="249" font-size="22" fill="#505b51">Rejected by input check</text>
+    <path d="M305 327H352V386H78V433" fill="none" stroke="#bf3d24" stroke-width="3"/>
+    <circle cx="305" cy="327" r="5" fill="#bf3d24"/>
+    <text x="374" y="334" font-size="22" fill="#a3321e">Follow the symlink</text>
+    <rect x="34" y="423" width="612" height="85" fill="#202821"/>
+    <text x="54" y="457" font-size="24" font-weight="600" fill="#f5f5f0">Test the resolved path against the root.</text>
+    <text x="54" y="487" font-size="21" fill="#d4dacf">Record the observed result in a local fixture.</text>
+    <path d="M58 508V546H96" fill="none" stroke="#202821" stroke-width="2"/>
+    <text x="111" y="554" font-size="23">Observe. Reassess. Keep the evidence.</text>
+    <text x="34" y="596" font-size="19" fill="#505b51">Verified finding / regression test</text>
+  </g>
+</svg>
