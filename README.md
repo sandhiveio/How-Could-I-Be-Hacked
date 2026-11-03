@@ -1,18 +1,20 @@
 # How Could I Be Hacked
 
-![Investigation paths branch from source code; one path leads to verified evidence and a regression check.](assets/illustrations/investigation-cover.png)
-
 Explore how your code could be attacked using real security investigation trajectories.
 Find applicable hypotheses, run targeted checks, and turn verified findings into regression
 tests — all locally, without API access.
 
-**As of November 3, 2026 · 6 cases · 20 investigation steps · 115 searchable hypotheses · Offline use · No API keys · Daily updates planned**
+## 115 searchable hypotheses
 
-Our commitment: a creative security agent searching for new attack trajectories 24/7,
-with daily updates to the skill and its hypothesis library.
+| Cases | Investigation steps | Searchable hypotheses |
+| --- | --- | --- |
+| **6** | **20** | **115** |
 
-This is the project's operating commitment. The continuous producer and daily delivery
-pipeline are not yet configured in this initial release; the bundled library is a snapshot.
+**Works offline. No API keys required.**
+
+Snapshot: November 3, 2026. Daily library updates are planned; the update pipeline is not yet configured.
+
+![Investigation paths branch from source code; one path leads to verified evidence and a regression check.](assets/illustrations/investigation-cover.png)
 
 ## Spend fewer tokens. Reuse investigation paths.
 
@@ -55,7 +57,7 @@ On Windows without a native Python installation, run these commands using Python
 
 ## What is included
 
-- Six anonymous cases, twenty independent steps and 115 searchable candidate records.
+- Anonymous cases with independently readable investigation steps.
 - Local lexical search, full trajectory inspection and artifact hash verification.
 - Iterative planning, candidate evaluation, incumbent comparison and backtracking guidance.
 - Private assessment scaffolding and evidence/step validation.
