@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/illustrations/sandhive-emblem.jpg" width="180" height="180" alt="SandHive emblem" />
+</p>
+
 # How Could I Be Hacked
 
 Explore how your code could be attacked using real security investigation trajectories.
