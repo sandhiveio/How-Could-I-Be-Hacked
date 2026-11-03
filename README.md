@@ -14,7 +14,7 @@ tests — all locally, without API access.
 
 Snapshot: November 3, 2026. Daily library updates are planned; the update pipeline is not yet configured.
 
-![Investigation paths branch from source code; one path leads to verified evidence and a regression check.](assets/illustrations/investigation-cover.png)
+![Branching investigation: competing hypotheses, discarded paths, a local experiment, evidence, and a regression test. Conceptual illustration.](assets/illustrations/investigation-cover.svg)
 
 ## Spend fewer tokens. Reuse investigation paths.
 
@@ -30,7 +30,7 @@ and detection improvements have not yet been benchmarked.
 
 ## Use with an agent
 
-![Illustrative file-containment investigation: reject a traversal input, separately inspect a symlink, and test the resolved path against the authorized root.](assets/illustrations/investigation-map.svg)
+![General investigation workflow: retrieve trajectories, check applicability, run a bounded experiment, record evidence, and iterate. Verified findings receive regression checks.](assets/illustrations/investigation-workflow.svg)
 
 Copy or clone this repository into a folder named `how-could-i-be-hacked` inside your agent's
 skills directory, or give your agent the absolute path to [SKILL.md](SKILL.md).
