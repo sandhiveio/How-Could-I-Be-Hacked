@@ -4,7 +4,7 @@ Explore how your code could be attacked using real security investigation trajec
 Find applicable hypotheses, run targeted checks, and turn verified findings into regression
 tests — all locally, without API access.
 
-**6 cases · 20 investigation steps · 115 searchable hypotheses · Offline use · No API keys**
+**As of November 3, 2026 · 6 cases · 20 investigation steps · 115 searchable hypotheses · Offline use · No API keys · Daily updates planned**
 
 Our commitment: a creative security agent searching for new attack trajectories 24/7,
 with daily updates to the skill and its hypothesis library.
