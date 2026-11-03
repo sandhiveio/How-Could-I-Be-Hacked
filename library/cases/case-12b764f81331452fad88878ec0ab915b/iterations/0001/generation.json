@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a bare-LF chunk-data footer followed immediately by a zero-chunk line makes the parser consume the zero digit as the second footer byte, so the terminating chunk is missed and the body ends elsewhere. Prerequisites: raw chunked bytes under attacker control and a local server connection. Bounded test: feed `5\\r\\nhello\\n0\\r\\n\\r\\n` and record the EndOfMessage offset against a strict CRLF reference; the falsifier is an EndOfMessage at the strict reference offset. Cleanup: discard the connection object; limitation: only a zero-size next line is tested."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the two-byte swallow causes a silent body-boundary shift only when the first byte of the next chunk-size line is a hex digit; a non-hex byte makes the next chunk header invalid and produces an error. Prerequisites: raw chunked bytes, local parser and strict reference. Bounded test: vary the first byte of the next size line over `1`, `A`, `f`, `g` and `z` and compare accept/reject plus trailing offsets; expected is shifted acceptance for hex and an error for non-hex, with identical class behavior as the falsifier. Cleanup: remove temporary byte fixtures; limitation: one chunk shape per class."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: Content-Length plus Transfer-Encoding precedence is an independent boundary-selection divergence: the parser prefers Transfer-Encoding while a proxy may prefer Content-Length, so a request with both headers hides a second request. Prerequisites: attacker-controlled headers and a local parser. Bounded test: send a chunked request with an additional Content-Length and a request suffix, compare the parser body with the Content-Length interpretation; the falsifier is identical body and trailing data. Cleanup: reset the fixture; limitation: this is a different mechanism from chunk-footer validation."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: parsing, re-serializing canonical chunked output and parsing again is non-idempotent whenever a bare-LF footer was accepted, providing a self-contained oracle without a reference dechunker. Prerequisites: local parser and its writer. Bounded test: parse a bare-LF stream, re-encode the Data events as canonical chunked bytes, reparse and compare body and event sequence; the falsifier is a stable round-trip for bare-LF input. Cleanup: discard temporary blobs; limitation: the writer may legitimately normalize chunk boundaries."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a saved pre-patch and post-patch baseline plus focused error assertions closes repair validation: every bare-LF input raises a footer error while every valid CRLF input keeps identical body and trailing data. Prerequisites: a patch candidate and a clean copy for each run. Bounded test: run the same input corpus on both copies and compare JSON results; the falsifier is any accepted bare-LF case or changed valid output. Cleanup: remove the temporary copy; limitation: premature before a patch exists."
+    }
+  ]
+}

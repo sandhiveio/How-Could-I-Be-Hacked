@@ -1,0 +1,13 @@
+{
+  "id": "case-12b764f81331452fad88878ec0ab915b",
+  "kind": "curated_case",
+  "hint": "A generic Python HTTP/1.1 server parser accepts chunked request bodies. After each chunk-data block it discards exactly two bytes as the chunk footer without checking that they are CRLF. An attacker controls a raw request behind a lenient front-end proxy that accepts a bare line feed as a chunk-data terminator but reads the following chunk-size line from its true first byte. Determine how the parser's body boundary can diverge from the proxy boundary, whether a complete second request can be left as trailing data, and the minimal validation that removes the divergence without breaking valid chunked traffic.",
+  "surface": "Python HTTP/1.1 connection state machine with a receive buffer, a chunked-body reader, a public event iterator and writer, and raw-byte fixtures. The attacker and the lenient intermediary are simulated locally; no network peers or public targets are used.",
+  "assumptions": [
+    "The staged source is a local disposable copy; testing uses local Python, pytest and raw bytes only.",
+    "The attacker controls the complete raw HTTP/1.1 byte stream sent to the parser, including chunk footers, chunk-size lines and any pipelined request.",
+    "A front-end intermediary may accept a bare LF as a chunk-data terminator while the parser is the back end.",
+    "Permissions: create and delete temporary files under the run directory, import the local source, and run local tests; no Docker, host evaluator or external service.",
+    "Official patch-benchmark evaluation is separate and host-side; local checks are not an official pass."
+  ]
+}

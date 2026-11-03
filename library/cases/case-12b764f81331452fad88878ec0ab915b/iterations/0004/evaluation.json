@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.8,
+      "rationale": "Deferred as a standalone selection but incorporated into the selected verification: the clean apply exited 0 and a recursive diff showed only the reader file changed."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.74,
+      "rationale": "Deferred but incorporated: the focused verification and full suite were run after removing all bytecode caches from the clean copy."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.78,
+      "rationale": "Deferred but incorporated: the full suite passed on the clean patched tree, confirming no functional breakage."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.76,
+      "rationale": "Deferred but incorporated: zero-chunk and trailer bare-LF edge cases were identical before and after the clean patch, confirming the documented residual was not changed."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.72,
+      "rationale": "Deferred but incorporated: the artifact is a single-file diff touching only the chunked-reader module; the proposal's `_events.py` name was a factual error, corrected during execution."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.9,
+      "rationale": "Selected incumbent. The matrix already established the required behavior and valid-corpus equivalence; the clean-room apply, cold-cache focused run, full suite and unchanged edge behavior are its natural closure."
+    }
+  ]
+}

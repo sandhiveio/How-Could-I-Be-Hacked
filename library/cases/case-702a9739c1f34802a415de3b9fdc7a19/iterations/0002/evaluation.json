@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.7583,
+      "rationale": "Reproduction is complete and saved; the containment gate is the discriminating action, and all new probes can run as its regression cases."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.7175,
+      "rationale": "Boundary equality plus body-hash equality is exactly the regression needed to prove the gate does not reject valid nested files."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.6833,
+      "rationale": "Sibling-suffix bypass is the classic failure of a prefix check without a separator; directly discriminable with the existing fixture."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.6775,
+      "rationale": "Placement before the append is the planned design; the extensionless sibling-directory probe is a cheap confirmation."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.6533,
+      "rationale": "Behavioral parity for encoded shapes is relevant because a decoding layer would broaden the patch; secondary to the gate itself."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": false,
+      "score": 0.05,
+      "rationale": "The generated text is incoherent and supplies no concrete fixture, request shape, expected result, or executable falsifier."
+    }
+  ]
+}

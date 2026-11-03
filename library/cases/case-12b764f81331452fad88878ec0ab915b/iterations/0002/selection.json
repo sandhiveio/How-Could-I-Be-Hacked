@@ -1,0 +1,4 @@
+{
+  "selected_id": "plan-1",
+  "selected_text": "Wire-first differential reproduction then footer validation: construct a raw chunked request whose chunk-data footer is a bare line feed followed by a next-chunk size whose leading hex digit is swallowed by a two-byte discard; parse it with the staged parser and with a strict CRLF-requiring reference dechunker; compare body and trailing bytes; then add chunk-footer validation and rerun the differential and full suite."
+}

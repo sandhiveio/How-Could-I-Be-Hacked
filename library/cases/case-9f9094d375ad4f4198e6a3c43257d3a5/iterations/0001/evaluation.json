@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.676,
+      "rationale": "The incumbent's first step is exactly the prepared wire-level reproduction; no generated vector establishes the baseline leak itself, so every repair-oriented vector lacks its causal anchor until the plaintext target is observed receiving the header. Fixture pieces are all available locally."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.591,
+      "rationale": "Distinct normalization mechanism and feasible on loopback, but it refines the repair's comparison rather than proving the leak: under the hostname-only rule a case-varied host is already unequal, so this is a better later regression edge."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.5895,
+      "rationale": "Clear and cheap: shows the predicate ignores ports entirely and tests default-port normalization. Narrower than the baseline leak and it presupposes the scheme-change leak exists; strong second-round material."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.5335,
+      "rationale": "Counterexample angle on host-case normalization for the repair; feasible, but its pre-patch expectation is muddled because a case-only host difference is unequal under the current rule."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": false,
+      "score": 0.0,
+      "rationale": "Incoherent as delivered: self-announced unfinished text that conflates two hypotheses and names no single falsifiable experiment or expected result, so it is retained but ineligible this round."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.5035,
+      "rationale": "Interpretable core: 307 method and body preservation plus a header-set probe as a truth-table driver, but it is a repair-validation check, not a leak baseline, and the text shows mid-generation editing."
+    }
+  ]
+}

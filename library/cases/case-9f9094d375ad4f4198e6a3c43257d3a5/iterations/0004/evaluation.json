@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.738,
+      "rationale": "The incumbent now has directly observed evidence across matrix, contract neutrality and multi-hop persistence; its remaining explicit step is the clean-apply replay, which one of the vectors instantiates, so continuing the plan does not pretend closure is done."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.5175,
+      "rationale": "Closure action exactly matching the incumbent's final step: pristine extraction, git apply check then apply, replay and a checksum manifest; high feasibility and it catches diff-context, mode and missing-file risks the working-tree copy cannot."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.5075,
+      "rationale": "Mixed scheme-and-host change with a target-host netrc entry probes whether the re-lookup below the patched branch can re-attach credentials over plaintext; genuinely distinct and cheap, though the expected netrc behavior is already strongly suggested by earlier observations."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.5,
+      "rationale": "Distinct userinfo surface, testable with the existing fixture, but narrower than closure and its expected result is partly confusable with the target-side userinfo question it leaves open."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.399,
+      "rationale": "Wire default-port equivalence needs an actual default-port listener (privileged availability unverified) while the predicate table already proves the normalization logic; real but lower marginal value."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.354,
+      "rationale": "Host case-fold counterexample is largely pre-established: URL parsing already lowercases the host, as the predicate table shows, so a wire variant adds little at closure time."
+    }
+  ]
+}

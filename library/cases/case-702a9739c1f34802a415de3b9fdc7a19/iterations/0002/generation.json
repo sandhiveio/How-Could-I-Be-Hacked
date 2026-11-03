@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a containment check fails if the configured root is not fully normalized, allowing a sibling path that shares the root name as a prefix. Prerequisite: configure the root with a trailing separator or relative component and place a sibling file whose name extends the root name. Action: request a traversal target aimed at that sibling and a near-miss sibling that should not exist, then repeat with a normalized root. Expected: both return 404 after repair. Falsifier: the name-extended sibling returns 200. Defense: resolve and normalize the root before comparing."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the containment check rejects valid nested files because it requires strictly more than the root prefix and does not admit boundary equality. Prerequisite: repaired handler, a root index, and a nested file with distinct contents. Action: request the root index and the nested file, then compare response-body hashes with the source files; also request an extensionless in-root directory without an index. Expected: both legal files return 200 with matching hashes and the indexless directory returns 404. Falsifier: a 404 or hash mismatch for a legal file. Defense: accept exact root equality in addition to the separator-strict prefix."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: placing the containment check after the extensionless index append allows an outside directory to be served through its index file. Prerequisite: repaired handler, a sibling directory outside the root containing an index with marker bytes, and a version of the gate placed after the append. Action: request an extensionless traversal target aimed at the sibling directory with and without a trailing separator. Expected: 404 with no marker bytes when the gate precedes the append. Falsifier: 200 returning sibling index content. Defense: perform containment before any conditional path mutation."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a repair that adds percent-decoding accidentally activates previously inert encoded traversal shapes. Prerequisite: vulnerable and repaired copies, an outside marker file, and separate ephemeral ports. Action: send percent-encoded dot segments and an encoded slash to both copies; also send an ordinary nested file with an encoded character as a control. Expected: encoded traversal stays 404 on the repaired copy, matching pre-fix behavior. Falsifier: a 200 leak appears only after repair. Defense: keep the repair limited to path containment and do not change URL parsing semantics."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a case-sensitivity or separator mismatch in the containment comparison could admit an outside target on another platform. Prerequisite: simulate a different platform by intercepting the join routine in the local runner. Action: dynamically replace the join behavior and inspect comparison outcomes. A falsifier would be an outside target accepted, but the generation names no request shape, fixture layout, or expected observation, so it is not executable as written."
+    }
+  ]
+}

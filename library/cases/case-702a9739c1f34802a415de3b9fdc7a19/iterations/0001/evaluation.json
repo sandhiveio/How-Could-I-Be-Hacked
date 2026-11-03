@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.7142,
+      "rationale": "Reproduction is feasible and targets the observed join boundary; a discriminating pre-fix run is available, and the repair can be inserted before the append branch."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.6833,
+      "rationale": "Directly tests the extensionless append branch and legitimate directory serving; executable alongside the reproduction and likely to expose both a leak and a regression."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.6425,
+      "rationale": "Encoding audit is relevant but predicted inert on this parser; cheap to fold into the same request set, weaker as the next action."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.5917,
+      "rationale": "Absolute and doubled-slash shapes probe a real second mechanism, but the doubled-slash variant overlaps the traversal set; useful as a control."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.5833,
+      "rationale": "Over-strict false-block counterexample is a sound repair-validation test, but it only discriminates once a patched handler exists."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.5825,
+      "rationale": "Symlink escape is beyond the stated URL-path flaw and belongs to a later robustness layer rather than the minimal repair."
+    }
+  ]
+}

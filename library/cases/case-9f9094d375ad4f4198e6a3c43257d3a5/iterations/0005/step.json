@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A generic Python HTTP client repair that keeps Basic credentials only across identical scheme, hostname and effective port has passed: wire leak reproduction, keep/strip matrix, contract-neutral package test subset, multi-hop persistence, and clean-apply replay of the standalone diff on a pristine tree. An evaluator bundle (JSON lines containing the diff as a string) has been exported but not yet consumed. Permissions: parse the bundle, write scratch files under an approved temporary directory, apply to a fresh pristine tree, hash files, and run the local loopback scripts.",
+    "surface": "Generic Python HTTP client library with an automatic redirect policy layer; disposable loopback TLS and plaintext servers, one short-lived self-signed certificate for a fixed loopback hostname, and header/body-logging targets.",
+    "assumptions": [
+      "The observer can read the client source, run it locally, mint a short-lived self-signed certificate, bind disposable loopback servers on a reserved high-port range, and issue ordinary HTTP calls; no write access to a deployed service is assumed.",
+      "The attacker controls or can influence the redirect target returned by a server the client already talks to, and the redirect Location is followed automatically (library default).",
+      "The caller supplies HTTP Basic credentials per request or session; the client keeps them in an Authorization header across hops unless the redirect policy strips them.",
+      "The package ships a test suite, but its test dependencies are not installed in the local environment; the suite is era-appropriate and does not by itself cover same-host cross-scheme redirects.",
+      "Only loopback ports are used and no public target is contacted. The official verdict comes from an external harness on an exported patch, so all local checks are supporting evidence only."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first reproduction then origin-based repair: stand up a loopback TLS origin with a self-signed certificate for one fixed hostname plus a header-logging plaintext target; first prove the leak at wire level (a same-hostname secure-to-plaintext 302 forwards the Authorization header in the vulnerable copy), then apply the minimal repair in the redirect-auth rebuild step so credentials are kept only when scheme, hostname and effective port are identical, substituting the implicit default ports 80/443 when omitted and leaving the netrc re-lookup untouched. Finally run a keep/strip regression matrix on both copies: same-origin plaintext and secure keep, cross-host strip, same-host port change strip, explicit versus implicit default ports, 307/308 method and body integrity, and the netrc interaction."
+  },
+  "candidates": [
+    {
+      "id": "r5-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the exported bundle's diff string, once JSON-decoded, applies to a fresh pristine tree exactly as the standalone patch did. Test: load the bundle, write the embedded diff verbatim to a scratch file, run git apply --check then apply on a new tree extracted from the baseline, compare the modified file hash with the repaired copy, and replay the leak check. Falsifier: any hunk rejection or hash mismatch. Cleanup removes the scratch tree and file."
+    },
+    {
+      "id": "r5-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the patch survives CRLF and missing-trailing-newline variance because it targets one file with stable context. Test: convert a pristine copy of the source file to CRLF and separately strip its final newline, then attempt git apply and record accept or reject per variant. Falsifier: silent application with corrupted whitespace or a rejected hunk. Cleanup restores the pristine copies."
+    },
+    {
+      "id": "r5-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the repair adds only module-level helpers in the same file, so an evaluator that applies only that file cannot break imports. Test: parse the diff headers and assert exactly one source file appears, then replay on a tree where every other file matches the baseline hash. Falsifier: a second file in the diff, or an import-time error after application. Cleanup removes the replay tree."
+    },
+    {
+      "id": "r5-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: bracketed IPv6 hosts and uppercase schemes hit parser edge cases not exercised by the matrix. Test: same-origin keep versus scheme-change strip on both copies with bracketed host forms if the loopback range can bind the needed addresses, else direct predicate calls on parsed strings. Falsifier: kept credentials across a real origin change, or stripped credentials for an equivalent origin. Cleanup stops servers."
+    },
+    {
+      "id": "r5-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the tamper-evident manifest is closure evidence only if recomputable independently of the bundle. Test: recompute the baseline, repaired, replay and patch hashes fresh from disk and compare with the recorded values, plus a negative control that mutates one line in a copied source file and confirms detection. Falsifier: a recorded hash that does not match recomputation, or an undetected mutation. Cleanup removes the mutated copy."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.7875,
+      "rationale": "Every phase except bundle round-trip is executed with saved evidence; the one remaining explicit step is verifying the exported payload itself, which the top vectors instantiate, so the incumbent is the correct final selection under heavy evidence weighting."
+    },
+    {
+      "id": "r5-v1",
+      "eligible": true,
+      "score": 0.515,
+      "rationale": "Exactly the remaining uncertainty: JSON-decode the bundle, apply the embedded diff to a fresh pristine tree, compare hashes and replay the leak check; concrete falsifier and high relevance to the external evaluator action."
+    },
+    {
+      "id": "r5-v5",
+      "eligible": true,
+      "score": 0.445,
+      "rationale": "Recompute the manifest hashes independently and add a mutation negative control; directly validates that provenance is recomputable rather than self-asserted, and is feasible in one command."
+    },
+    {
+      "id": "r5-v3",
+      "eligible": true,
+      "score": 0.43,
+      "rationale": "Assert a single-file diff and replay on an otherwise baseline-identical tree; cheap and precise, complementing the bundle round-trip."
+    },
+    {
+      "id": "r5-v2",
+      "eligible": true,
+      "score": 0.3825,
+      "rationale": "CRLF and trailing-newline transport variance is a real robustness question, but the external payload is built from the LF source tree and the bundle already applied once; moderate value."
+    },
+    {
+      "id": "r5-v4",
+      "eligible": true,
+      "score": 0.325,
+      "rationale": "IPv6 and uppercase-scheme edges are predictable from parsing behavior and the matrix table; low-yield at closure and the fixture feasibility is hedged."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "The exported JSON-lines bundle was parsed as the external evaluator would: the embedded diff string was written verbatim and had the same hash as the standalone patch; the diff headers showed exactly one target source file; git apply --check and git apply succeeded on a fresh pristine tree and the applied file hash equaled the repaired working copy. Every manifest hash recomputed independently from disk matched its recorded value, and a deliberate one-line mutation of a copied baseline file was detected. Runtime replay on the bundle-patched tree showed no credential on the plaintext hop, zero failing matrix wire cases and predicate rows, and a multi-hop chain with credentials stripped at both hops. The evaluator payload reproduces the exact verified tree and behavior.",
+    "next_hint": "Local closure is complete: the exported bundle reproduces the verified tree and behavior. The only remaining verdict is the external harness run of the bundle. Residual behavior to document: the redirect-auth rebuild step re-runs the netrc lookup below the strip branch, so a netrc entry for the target host can re-attach credentials on a stripped hop when trust_env is enabled (observed identically before and after the repair); this matches the library's documented design and is not a regression."
+  },
+  "lineage": {
+    "case_id": "case-9f9094d375ad4f4198e6a3c43257d3a5",
+    "iteration_id": "iteration-0005",
+    "previous_iteration_id": "iteration-0004",
+    "step_id": "iteration-0005",
+    "parent_step_id": "iteration-0004",
+    "branch_id": "main"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "plans": [
+    "Wire-first differential reproduction then footer validation: construct a raw chunked request whose chunk-data footer is a bare line feed followed by a next-chunk size whose leading hex digit is swallowed by a two-byte discard; parse it with the staged parser and with a strict CRLF-requiring reference dechunker; compare body and trailing bytes; then add chunk-footer validation and rerun the differential and full suite.",
+    "Parser-state-first: drive the receive buffer and the internal chunked-body reader with a table of chunk-data terminators (CRLF, LF, CR, LF plus first header byte, fragmented feeds); map which sequence advances chunk state and which produces an error; encode that state machine as a regression, then implement the minimal footer check.",
+    "Two-parser proxy simulation: implement a tiny lenient front-end proxy that accepts a bare-LF chunk-data terminator and forwards a fixed body to a back-end parser; show that front end and back end disagree on the message boundary and that the back end sees an extra request; then remove the front-end leniency and patch the parser.",
+    "Differential property corpus: generate a matrix of chunked messages varying chunk-size line terminators, chunk-data footers, zero-chunk trailers and pipelined request suffixes; compare parser event streams with a strict reference dechunker; select the smallest accepted-divergence case; patch only the chunk-footer rule; rerun the corpus.",
+    "Regression-test-first: write executable assertions for a valid CRLF footer, a bare-LF footer, split delivery of the two footer bytes, and a pipelined request after a valid body; confirm the bare-LF case fails on the staged source; patch the reader; accept only when the new assertions and the existing suite pass."
+  ],
+  "selected_id": "plan-1"
+}

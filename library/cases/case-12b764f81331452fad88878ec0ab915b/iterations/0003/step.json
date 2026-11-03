@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A local Python HTTP/1.1 parser now accumulates the two bytes after each chunk-data block and rejects any footer other than CRLF; the existing suite passes. Before the repair, a bare-LF footer plus a next size line whose leading digit was swallowed shifted the body boundary and left a complete request as trailing data. Open questions are whether another footer byte class or next-size shape still produces an accepted divergence, whether every split point behaves like whole-stream parsing, and whether valid chunked traffic changes. Build a differential matrix against a strict reference and a valid-corpus equivalence run.",
+    "surface": "Python HTTP/1.1 connection state machine with a receive buffer, a chunked-body reader, a public event iterator and writer, and raw-byte fixtures. The attacker and the lenient intermediary are simulated locally; no network peers or public targets are used.",
+    "assumptions": [
+      "The staged source is a local disposable copy; testing uses local Python, pytest and raw bytes only.",
+      "The attacker controls the complete raw HTTP/1.1 byte stream sent to the parser, including chunk footers, chunk-size lines and any pipelined request.",
+      "A front-end intermediary may accept a bare LF as a chunk-data terminator while the parser is the back end.",
+      "Permissions: create and delete temporary files under the run directory, import the local source, and run local tests; no Docker, host evaluator or external service.",
+      "Official patch-benchmark evaluation is separate and host-side; local checks are not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first differential reproduction then footer validation: construct a raw chunked request whose chunk-data footer is a bare line feed followed by a next-chunk size whose leading hex digit is swallowed by a two-byte discard; parse it with the staged parser and with a strict CRLF-requiring reference dechunker; compare body and trailing bytes; then add chunk-footer validation and rerun the differential and full suite."
+  },
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an exhaustive footer-pair by next-shape matrix after the footer-only patch exposes any surviving accepted divergence or over-rejection. Prerequisites: patched local copy and strict reference dechunker. Bounded test: enumerate footer pairs (CRLF, LF plus hex/non-hex/space, CR plus digit, CR-CR, NUL-NUL, LF-LF, LF-CR) against next shapes (zero chunk, 1-byte, 5-byte, shifted `0x101` chunk, trailer); expected is a footer error for every non-CRLF pair before size parsing and a body/trailing match for every CRLF pair; the falsifier is any accepted non-CRLF pair or changed valid pair. Cleanup: remove generated fixtures; limitation: no network timing."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the footer accumulation state survives arbitrary split delivery positions, including splits inside the footer and inside a following size line. Prerequisites: patched parser and one malformed plus one valid stream. Bounded test: split each stream at every byte boundary, feed two pieces and compare accept/reject, body and trailing data with whole-stream parsing; the falsifier is any split point with a different decision. Cleanup: discard temporary byte arrays; limitation: only two-piece splits are exercised."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the repair must also reject bare-LF footers on the zero-chunk and trailer paths, not only on non-terminal chunk data. Prerequisites: patched parser. Bounded test: feed streams ending with a bare LF before the zero-size line and trailer field lines ended by bare LF; expected is a protocol error at each site; the falsifier is EndOfMessage with a smuggled trailing request. Cleanup: remove temporary corpora; limitation: the later release oracle may retain this leniency."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the repair preserves every valid chunked corpus identically to the unpatched parser when footers are strict CRLF. Prerequisites: unpatched and patched local copies. Bounded test: run extensions, multiple trailers, uppercase hex, binary data, zero body, ten chunks, a 10 KB body and one/two-byte feeds through both parsers and compare bodies, events and trailing data byte-for-byte; the falsifier is any divergence on valid input. Cleanup: remove temporary copies; limitation: the corpus is curated, not exhaustive."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.93,
+      "rationale": "Selected. The 60-case required matrix had zero failures: every non-CRLF footer was rejected with a footer error before the next size line was interpreted, and every CRLF case preserved body and trailing boundaries. This directly closes the byte-class and shape uncertainty."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.82,
+      "rationale": "Deferred. All 462 two-piece split positions matched whole-stream decisions; supported but narrower than the selected matrix, and its checks are folded into the selected assessment."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.77,
+      "rationale": "Tested within the matrix and partially refuted for the current repair: zero-chunk and trailer bare-LF leniency remains (EndOfMessage plus trailing request), while the later fixed-release oracle also retains it. Kept as a documented residual, not a footer-patch failure."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.85,
+      "rationale": "Deferred. Thirteen valid request and response cases were byte-identical before and after the patch; strong regression evidence, but the matrix was the selected closure action."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.78,
+      "rationale": "Incumbent remains valid and its core repair is confirmed, but the generated matrix is the more specific next action for the recorded uncertainty. Retained as parent and broad description of the repair."
+    }
+  ],
+  "selected_id": "r3-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Executed the footer/shape matrix on the patched parser. Required set: 60 combinations of 12 footer pairs and 5 next-segment shapes (zero chunk, 1-byte chunk, 5-byte chunk, shifted `0x101` chunk, trailer). All 60 behaved as required: every non-CRLF footer raised a footer protocol error before size parsing, and every CRLF case preserved body and trailing boundaries. All 462 two-piece split positions for one malformed and one valid stream matched whole-stream decisions. Thirteen valid request/response cases, including extensions, trailers, uppercase hex, binary bytes, zero body, ten chunks, a 10 KB body and one/two-byte feeds, were byte-identical before and after the patch. Informational residual: zero-chunk and trailer bare-LF leniency remains; the later fixed-release oracle also retains it, so it is outside this footer repair. No official evaluator was available.",
+    "next_hint": "Verify that the exported one-file patch applies to a pristine copy, works from cold Python caches, and leaves the documented zero-chunk/trailer behavior unchanged."
+  },
+  "lineage": {
+    "case_id": "case-12b764f81331452fad88878ec0ab915b",
+    "iteration_id": "iteration-0003",
+    "previous_iteration_id": "iteration-0002",
+    "step_id": "iteration-0003",
+    "parent_step_id": "iteration-0002",
+    "branch_id": "main"
+  }
+}

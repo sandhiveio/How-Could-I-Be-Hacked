@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: comparing normalized tuples of scheme, hostname and effective port inside the redirect-auth rebuild step closes the leak. Prerequisites: the loopback fixture and the staged vulnerable copy with a self-signed certificate for one fixed hostname. Test: apply the tuple comparison patch to the redirect module, replacing the hostname-only check, and run the same secure-to-plaintext redirect. Expected: the Authorization header is absent on the plaintext target, while a scheme-change-only control still strips and same-origin controls still keep; cleanup stops servers and removes logs."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: normalizing ports to their scheme defaults prevents false-positive stripping for equivalent-origin redirects. Test: after the repair, redirect a plaintext origin to an explicit default-port form of itself and inspect the header log; a stripped header despite identical logical origins indicates overly aggressive normalization. Defense: substitute default ports in the comparison key only, leaving explicit ports untouched; cleanup kills both listeners."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: cross-host redirects must keep stripping credentials after the tuple repair, even when scheme and port also change. Test: a TLS origin redirecting to a different hostname on loopback (distinct hostname string resolving to the same machine) with a header log. Expected: Authorization stripped; if it persists, the repair broke the original hostname-uniqueness path. Cleanup stops both servers."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: 307 and 308 redirects keep method and body integrity while applying the new strip rule. Test: a POST with a non-empty body through a cross-scheme 307 and a same-origin 308; log method, body and headers at the target. Expected: method and body preserved exactly as before, credentials following the new predicate; body loss indicates a regression in request reconstruction after the auth strip. Cleanup deletes fixture servers and logs."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the repair applies cleanly as a unified diff to a pristine copy and preserves every matrix outcome. Test: export the diff, run git apply --check then apply on a fresh pristine tree extracted from the baseline, and replay the leak and matrix scripts against that tree. Expected: no hunk failures and all keep/strip outcomes match design; whitespace or line-ending mismatches serve as counterexamples. Cleanup removes the scratch trees."
+    }
+  ]
+}

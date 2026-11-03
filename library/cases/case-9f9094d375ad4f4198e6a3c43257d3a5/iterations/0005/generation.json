@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r5-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the exported bundle's diff string, once JSON-decoded, applies to a fresh pristine tree exactly as the standalone patch did. Test: load the bundle, write the embedded diff verbatim to a scratch file, run git apply --check then apply on a new tree extracted from the baseline, compare the modified file hash with the repaired copy, and replay the leak check. Falsifier: any hunk rejection or hash mismatch. Cleanup removes the scratch tree and file."
+    },
+    {
+      "id": "r5-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the patch survives CRLF and missing-trailing-newline variance because it targets one file with stable context. Test: convert a pristine copy of the source file to CRLF and separately strip its final newline, then attempt git apply and record accept or reject per variant. Falsifier: silent application with corrupted whitespace or a rejected hunk. Cleanup restores the pristine copies."
+    },
+    {
+      "id": "r5-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the repair adds only module-level helpers in the same file, so an evaluator that applies only that file cannot break imports. Test: parse the diff headers and assert exactly one source file appears, then replay on a tree where every other file matches the baseline hash. Falsifier: a second file in the diff, or an import-time error after application. Cleanup removes the replay tree."
+    },
+    {
+      "id": "r5-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: bracketed IPv6 hosts and uppercase schemes hit parser edge cases not exercised by the matrix. Test: same-origin keep versus scheme-change strip on both copies with bracketed host forms if the loopback range can bind the needed addresses, else direct predicate calls on parsed strings. Falsifier: kept credentials across a real origin change, or stripped credentials for an equivalent origin. Cleanup stops servers."
+    },
+    {
+      "id": "r5-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the tamper-evident manifest is closure evidence only if recomputable independently of the bundle. Test: recompute the baseline, repaired, replay and patch hashes fresh from disk and compare with the recorded values, plus a negative control that mutates one line in a copied source file and confirms detection. Falsifier: a recorded hash that does not match recomputation, or an undetected mutation. Cleanup removes the mutated copy."
+    }
+  ]
+}

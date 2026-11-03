@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "The target is a generic HTTP static-file handler that joins the configured content root with the request pathname, appends a default index filename when the joined target has no extension, and streams the target if it exists as a regular file. A pre-fix run on a disposable fixture confirmed five leaking shapes: single parent traversal to a sibling file, deep traversal, doubled-slash traversal, and two extensionless traversal targets served through a sibling directory's index file. Controls behaved normally: root index, ordinary file, and nested file returned 200; missing path and extensionless in-root directory without an index returned 404. Percent-encoded variants were inert because the URL parser did not decode the pathname. The patched and vulnerable trees are separate disposable copies. The observer may read and run both, write fixture trees, and use ephemeral loopback ports. The next action is to add a containment gate immediately after the join and before the index append: resolve the configured root and the joined target, accept only a target equal to the root or beginning with the root plus the path separator, and otherwise return the existing 404 page.",
+    "surface": "Generic Node-style HTTP static-file handler serving a configurable directory; disposable local fixtures and ephemeral loopback ports.",
+    "assumptions": [
+      "The observer can read the handler source, run it locally, create disposable fixture trees, and send raw HTTP requests; no write access to a deployed service is assumed.",
+      "Request pathnames are attacker-controlled and reach the handler without client-side normalization.",
+      "The configured content root is resolved to an absolute path before requests are served.",
+      "The handler ships without a test suite, so regression checks must be authored locally."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Reproduce-then-boundary-containment: first reproduce the flaw against a live local handler using a fixture root with a sibling marker file and raw requests carrying literal parent-directory segments, so no client-side normalization hides the behavior. Characterize which shapes leak, including the extensionless index-append branch and deep traversal. Then implement the minimal repair at the path-derivation boundary: after joining, resolve the configured root and the joined target and accept only when the target equals the root or begins with the root plus the path separator; otherwise return the existing 404 page. Close with a regression suite covering ordinary files, nested files, directory index, missing files, and traversal variants. Assumption: the join is the single trust boundary; falsifier: a leaking shape that a resolved-prefix check still admits."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a containment check fails if the configured root is not fully normalized, allowing a sibling path that shares the root name as a prefix. Prerequisite: configure the root with a trailing separator or relative component and place a sibling file whose name extends the root name. Action: request a traversal target aimed at that sibling and a near-miss sibling that should not exist, then repeat with a normalized root. Expected: both return 404 after repair. Falsifier: the name-extended sibling returns 200. Defense: resolve and normalize the root before comparing."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the containment check rejects valid nested files because it requires strictly more than the root prefix and does not admit boundary equality. Prerequisite: repaired handler, a root index, and a nested file with distinct contents. Action: request the root index and the nested file, then compare response-body hashes with the source files; also request an extensionless in-root directory without an index. Expected: both legal files return 200 with matching hashes and the indexless directory returns 404. Falsifier: a 404 or hash mismatch for a legal file. Defense: accept exact root equality in addition to the separator-strict prefix."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: placing the containment check after the extensionless index append allows an outside directory to be served through its index file. Prerequisite: repaired handler, a sibling directory outside the root containing an index with marker bytes, and a version of the gate placed after the append. Action: request an extensionless traversal target aimed at the sibling directory with and without a trailing separator. Expected: 404 with no marker bytes when the gate precedes the append. Falsifier: 200 returning sibling index content. Defense: perform containment before any conditional path mutation."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a repair that adds percent-decoding accidentally activates previously inert encoded traversal shapes. Prerequisite: vulnerable and repaired copies, an outside marker file, and separate ephemeral ports. Action: send percent-encoded dot segments and an encoded slash to both copies; also send an ordinary nested file with an encoded character as a control. Expected: encoded traversal stays 404 on the repaired copy, matching pre-fix behavior. Falsifier: a 200 leak appears only after repair. Defense: keep the repair limited to path containment and do not change URL parsing semantics."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a case-sensitivity or separator mismatch in the containment comparison could admit an outside target on another platform. Prerequisite: simulate a different platform by intercepting the join routine in the local runner. Action: dynamically replace the join behavior and inspect comparison outcomes. A falsifier would be an outside target accepted, but the generation names no request shape, fixture layout, or expected observation, so it is not executable as written."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.7583,
+      "rationale": "Reproduction is complete and saved; the containment gate is the discriminating action, and all new probes can run as its regression cases."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.7175,
+      "rationale": "Boundary equality plus body-hash equality is exactly the regression needed to prove the gate does not reject valid nested files."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.6833,
+      "rationale": "Sibling-suffix bypass is the classic failure of a prefix check without a separator; directly discriminable with the existing fixture."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.6775,
+      "rationale": "Placement before the append is the planned design; the extensionless sibling-directory probe is a cheap confirmation."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.6533,
+      "rationale": "Behavioral parity for encoded shapes is relevant because a decoding layer would broaden the patch; secondary to the gate itself."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": false,
+      "score": 0.05,
+      "rationale": "The generated text is incoherent and supplies no concrete fixture, request shape, expected result, or executable falsifier."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "The repair was applied only to the independent patched copy: resolve the configured root and joined target immediately after the join and before the extensionless append, reject unless the target equals the root or begins with the root plus the path separator, and reuse the existing 404 page. A 15-case suite on the patched copy passed all cases: three ordinary in-root requests returned 200 with bodies whose hashes matched the source files, seven traversal shapes returned 404 with no marker bytes, encoded shapes remained 404 for behavioral parity, and missing and extensionless-no-index cases stayed 404. The same suite against the vulnerable copy passed 8 of 15 and failed exactly the seven traversal cases with marker bytes present, so the suite discriminates. Sibling-suffix, boundary-equality, and placement-before-append probes were all confirmed; symlink containment remained untested.",
+    "next_hint": "The repaired handler passed a discriminating 15-case suite and the vulnerable copy failed exactly the traversal cases. Close the remaining questions: query strings, a relative root under a changed working directory, a sibling directory sharing a long name prefix, concurrent requests, and the measured behavior of a symlink inside the root; then package the repair as a unified diff and a machine-readable patch record."
+  },
+  "lineage": {
+    "case_id": "case-702a9739c1f34802a415de3b9fdc7a19",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

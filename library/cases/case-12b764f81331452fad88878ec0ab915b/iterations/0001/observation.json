@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Selected plan-1 and executed a local wire-level differential. A crafted request ended its first chunk data with a bare LF and then used a next size line of `101` hex. The staged parser emitted body `helloX` and EndOfMessage, leaving trailing bytes that began with a complete `GET /privileged HTTP/1.1` request; after a simulated response and cycle reset it accepted that request as the next one. A lenient front-end model that accepts the bare LF but reads the next size line from its true first byte saw a 257-byte second chunk and no trailing request. A strict CRLF reference rejected the same stream at footer `\\n1`. This supports the two-byte blind-discard mechanism. No official evaluator was available; only one footer/next-size pair was exercised in this step.",
+  "next_hint": "With the boundary divergence established, decide whether validating exactly the two footer bytes is sufficient and how to handle a footer split across receive calls."
+}

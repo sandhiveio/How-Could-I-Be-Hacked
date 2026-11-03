@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A repaired copy of a generic Python HTTP client passes the single-hop keep/strip matrix, the package's own redirect/auth subset is green on both copies, and a three-hop chain shows the strip is per-hop and persistent. The exported diff has not yet been tested against a pristine tree. Permissions: read the run artifacts, create fresh scratch trees under an approved temporary directory, run git apply, replay local scripts, and hash files. The official verdict will be produced externally from an exported patch bundle.",
+    "surface": "Generic Python HTTP client library with an automatic redirect policy layer; disposable loopback TLS and plaintext servers, one short-lived self-signed certificate for a fixed loopback hostname, and header/body-logging targets.",
+    "assumptions": [
+      "The observer can read the client source, run it locally, mint a short-lived self-signed certificate, bind disposable loopback servers on a reserved high-port range, and issue ordinary HTTP calls; no write access to a deployed service is assumed.",
+      "The attacker controls or can influence the redirect target returned by a server the client already talks to, and the redirect Location is followed automatically (library default).",
+      "The caller supplies HTTP Basic credentials per request or session; the client keeps them in an Authorization header across hops unless the redirect policy strips them.",
+      "The package ships a test suite, but its test dependencies are not installed in the local environment; the suite is era-appropriate and does not by itself cover same-host cross-scheme redirects.",
+      "Only loopback ports are used and no public target is contacted. The official verdict comes from an external harness on an exported patch, so all local checks are supporting evidence only."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first reproduction then origin-based repair: stand up a loopback TLS origin with a self-signed certificate for one fixed hostname plus a header-logging plaintext target; first prove the leak at wire level (a same-hostname secure-to-plaintext 302 forwards the Authorization header in the vulnerable copy), then apply the minimal repair in the redirect-auth rebuild step so credentials are kept only when scheme, hostname and effective port are identical, substituting the implicit default ports 80/443 when omitted and leaving the netrc re-lookup untouched. Finally run a keep/strip regression matrix on both copies: same-origin plaintext and secure keep, cross-host strip, same-host port change strip, explicit versus implicit default ports, 307/308 method and body integrity, and the netrc interaction."
+  },
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the repair ignores URL-embedded (userinfo) credentials, so a Location carrying user and password on a plaintext URL after a TLS hop may leak or double-attach. Test: a TLS origin redirecting to a userinfo-bearing plaintext URL, header log at the target, both copies. Falsifier: the target sees either a Basic header or userinfo-derived auth after the repair, proving a cross-scheme leak persists. Cleanup deletes fixture servers and logs."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: implicit versus explicit default ports differ only when a real default-port listener exists, so binding one proves normalization rather than string equality. Test: TLS origin on a high port redirecting to a plaintext URL at the default port (and explicit default forms), header logs per variant. Falsifier: kept credentials after an effective-port change, or stripped credentials when effective ports are equal. Cleanup unbinds listeners; privileged-port availability is a prerequisite."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a mixed simultaneous scheme-and-host change can re-attach credentials through the netrc lookup below the strip branch, so even a correct predicate leaks at that hop. Test: TLS origin redirecting to a plaintext target under a different hostname with a netrc entry for that host, comparing trust_env on and off on both copies. Falsifier: the repaired run sends netrc-derived Basic auth over plaintext when trust_env is on. Cleanup removes the temporary netrc file and stops servers."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: near closure the highest-value check is clean-apply replay rather than new leak probes. Test: extract a pristine tree from the baseline commit, git apply --check and apply the exported diff, replay the leak and matrix scripts with the replayed tree on the path, and compare the modified file hash with the working repaired copy. Falsifier: hunk rejection, hash mismatch or replay failure. Cleanup removes scratch trees; a checksum manifest records provenance."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: strict hostname equality without case folding could over-strip mixed-case host redirects; verify on the wire that a case-only variant of the same scheme and port keeps credentials while other variants strip. Test: construct host case variants on loopback, with a fallback to direct predicate calls if name resolution or certificate matching cannot support them. Falsifier: credentials stripped for a case-only same-origin variant, or kept across a real origin change. Cleanup stops servers."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.738,
+      "rationale": "The incumbent now has directly observed evidence across matrix, contract neutrality and multi-hop persistence; its remaining explicit step is the clean-apply replay, which one of the vectors instantiates, so continuing the plan does not pretend closure is done."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.5175,
+      "rationale": "Closure action exactly matching the incumbent's final step: pristine extraction, git apply check then apply, replay and a checksum manifest; high feasibility and it catches diff-context, mode and missing-file risks the working-tree copy cannot."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.5075,
+      "rationale": "Mixed scheme-and-host change with a target-host netrc entry probes whether the re-lookup below the patched branch can re-attach credentials over plaintext; genuinely distinct and cheap, though the expected netrc behavior is already strongly suggested by earlier observations."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.5,
+      "rationale": "Distinct userinfo surface, testable with the existing fixture, but narrower than closure and its expected result is partly confusable with the target-side userinfo question it leaves open."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.399,
+      "rationale": "Wire default-port equivalence needs an actual default-port listener (privileged availability unverified) while the predicate table already proves the normalization logic; real but lower marginal value."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.354,
+      "rationale": "Host case-fold counterexample is largely pre-established: URL parsing already lowercases the host, as the predicate table shows, so a wire variant adds little at closure time."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "A pristine tree was extracted from the baseline commit of the staged snapshot and the exported diff was checked with git apply --check and then applied; application succeeded with only a benign file-mode warning (executable bit versus regular), and the resulting source file hash matched the working repaired copy exactly. The full discriminator replay on the freshly patched tree produced no credential on the plaintext hop, a regression matrix with zero failing wire cases and zero failing predicate rows, and a multi-hop chain with credentials stripped at both hops. A manifest recorded four hashes: baseline file, repaired file, replay file and the patch itself.",
+    "next_hint": "The standalone diff applies and replays cleanly. The last risk is the exported evaluator payload: the bundle embeds the diff as a JSON string, so parse the bundle exactly as the external evaluator would, write the extracted diff verbatim, apply it to a fresh pristine tree with git apply --check and apply, compare the modified file hash with the repaired copy, assert the diff targets exactly one file, recompute every manifest hash independently from disk with a deliberate one-line mutation as a negative control, and replay the leak, matrix and multi-hop checks on the bundle-patched tree."
+  },
+  "lineage": {
+    "case_id": "case-9f9094d375ad4f4198e6a3c43257d3a5",
+    "iteration_id": "iteration-0004",
+    "previous_iteration_id": "iteration-0003",
+    "step_id": "iteration-0004",
+    "parent_step_id": "iteration-0003",
+    "branch_id": "main"
+  }
+}

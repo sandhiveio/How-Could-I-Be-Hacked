@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.88,
+      "rationale": "Not selected separately because it is narrower than the incumbent, but its mechanism is exactly what the selected plan executed: accumulate the two footer bytes and compare them with CRLF, including split feeds."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.64,
+      "rationale": "Deferred. The zero-size line is worth a regression assertion, but the staged parser already requires CRLF for every chunk-size line, so it likely needs no separate repair."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Deferred. Trailer leniency is real but distinct; the observed smuggling case did not use a trailer and the selected repair was intentionally footer-only."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.68,
+      "rationale": "Deferred. The false-positive concern is valid and becomes part of the valid-corpus regression, but it does not define the minimal code change."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.72,
+      "rationale": "Deferred. A multi-variant malformed-footer differential is a good post-patch oracle; it is incorporated into a dedicated post-patch matrix rather than selected first."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.9,
+      "rationale": "Selected incumbent. The plan's remaining action is the footer validation plus differential and full-suite rerun; keeping it avoids replacing a partially executed plan with a narrower restatement. Elements of r2-v1 and r2-v5 are incorporated."
+    }
+  ]
+}

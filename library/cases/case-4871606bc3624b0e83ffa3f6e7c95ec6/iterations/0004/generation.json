@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the exported diff applies cleanly to a freshly extracted pristine snapshot and reproduces byte-identical patched files. Prerequisites and permissions: the exported patch, a pristine copy, git apply, and hashing. Bounded test: run git apply check then apply in a scratch pristine copy and compare sha256 of each modified file with the working patched copy. Expected supporting result: no hunk rejection and exact hash equality. Falsifier: any rejection or hash mismatch. Cleanup: remove the extraction tree."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an external consumer parsing the JSON-lines bundle sees exactly one well-formed record with only the expected keys and no trailing garbage. Prerequisites and permissions: the bundle file and a JSON parser. Bounded test: stream-parse every line, assert record count, schema keys, identifier value and that the embedded diff names exactly the expected target files. Expected supporting result: one parseable record, exact key set, and the expected two target files. Falsifier: a parse exception, an unexpected field or an extra target file. Cleanup: delete parser scratch output."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: replaying the differential and edge-origin harnesses against the bundle-patched tree yields the same case-by-case outcomes as the working patched copy. Prerequisites and permissions: the bundle-patched tree, loopback servers, and permission to run both harnesses. Bounded test: point both harnesses at the bundle-patched tree and compare origin/target outcomes and Host values case by case with the earlier patched runs. Expected supporting result: no case flips server or Host. Falsifier: any flip between working-copy and bundle-patched runs. Cleanup: tear down servers and keep the logs."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a deliberate near-miss mutant that repairs only one resolution site fails the differential, proving the suite discriminates a real fix from a partial one. Prerequisites and permissions: pristine and patched copies, permission to build a scratch mutant and run the harness. Bounded test: create a tree with the internally resolved object form repaired but the public string-path branch left vulnerable, run the differential, and confirm foreign deliveries remain; then restore the full patch. Expected supporting result: the mutant produces at least one foreign delivery while the full patch produces none. Falsifier: the mutant passes all cases, meaning the suite is blind. Cleanup: discard the mutant tree."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: bracketed-IPv6 containment can be validated logically even when no IPv6 socket can bind, by feeding origin and path strings through the resolution helper and comparing parsed origins. Prerequisites and permissions: patched and vulnerable copies and permission to call the helper directly. Bounded test: use a bracketed base origin and protocol-relative, absolute, triple-slash, cross-scheme and default-port paths; assert the patched helper reports the base origin and the vulnerable parser reports foreign origins. Expected supporting result: all patched rows are contained and the vulnerable rows are not. Falsifier: a patched row changing origin or throwing on brackets. Cleanup: remove the scratch script."
+    }
+  ]
+}

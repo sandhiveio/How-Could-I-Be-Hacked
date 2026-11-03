@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "A pre-fix run on the disposable fixture confirmed five leaking request shapes with 200 responses and marker bytes: a single parent traversal to the sibling file, a deep traversal, a doubled-slash traversal, and two extensionless traversal targets served through the sibling directory's index file. The root index, ordinary file, and nested file returned 200; the missing path and the extensionless in-root directory without an index returned 404. Percent-encoded dot and slash variants were inert because URL parsing did not decode the pathname, and a bare parent-traversal path returned 404 because no root-level index existed at that location. All observed leaks passed through the same join, so the repair must gate resolved containment before the index-append branch.",
+  "next_hint": "The pre-fix run measured five leaking shapes and inert encoded variants. Apply a resolved-prefix containment gate immediately after the join and before the index append, then verify that every leaking shape returns the existing 404 page while ordinary in-root files still serve byte-identical content."
+}

@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.8138,
+      "rationale": "Selected. The differential matrix is a directly observed, discriminating result, and the incumbent's next step is exactly the remaining contract and unusual-origin verification. The generated vectors sharpen that step but none carried executed evidence at selection time."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.5606,
+      "rationale": "Deferred and folded into the executed verification block. The over-broad-repair counterexample is the best discriminator against a lazy reject-all fix, and its manual validation assertions were run on both copies."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.5381,
+      "rationale": "Deferred, partly executed. Uppercase and bare-scheme paths were measured and error parity was checked; the candidate is narrower than the combined verification action."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.535,
+      "rationale": "Deferred and executed. The hostname-versus-loopback spelling proved that a same-socket path can still change the parsed origin, which is a useful nuance; its later re-resolution concern did not materialize."
+    },
+    {
+      "id": "r3-v5",
+      "eligible": true,
+      "score": 0.5281,
+      "rationale": "Deferred to the packaging round. Cross-scheme containment was verified, but the clean-apply half belonged to the final closure action."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.5063,
+      "rationale": "Deferred and executed logically. Bracketed IPv6 sockets could not bind in the container, so the resolution-level table was used; it showed containment for all bracketed spellings on the patched copy and origin changes on the vulnerable parser."
+    }
+  ]
+}

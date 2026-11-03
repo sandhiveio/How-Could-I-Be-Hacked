@@ -1,0 +1,10 @@
+{
+  "case_id": "case-12b764f81331452fad88878ec0ab915b",
+  "iteration_id": "iteration-0004",
+  "previous_iteration_id": "iteration-0003",
+  "incumbent": {
+    "id": "r3-v1",
+    "text": "Hypothesis: an exhaustive footer-pair by next-shape matrix after the footer-only patch exposes any surviving accepted divergence or over-rejection. Prerequisites: patched local copy and strict reference dechunker. Bounded test: enumerate footer pairs (CRLF, LF plus hex/non-hex/space, CR plus digit, CR-CR, NUL-NUL, LF-LF, LF-CR) against next shapes (zero chunk, 1-byte, 5-byte, shifted `0x101` chunk, trailer); expected is a footer error for every non-CRLF pair before size parsing and a body/trailing match for every CRLF pair; the falsifier is any accepted non-CRLF pair or changed valid pair. Cleanup: remove generated fixtures; limitation: no network timing."
+  },
+  "hint": "A local Python HTTP/1.1 parser's chunked reader now accumulates the two bytes after each chunk-data block and rejects any footer other than CRLF. A 60-case footer/shape matrix and a 13-case valid corpus have passed locally. The remaining artifact question is whether the single-file patch applies cleanly to a pristine copy of the staged source, reproduces focused checks with no cached bytecode, passes the full suite, and leaves the documented zero-chunk/trailer bare-LF behavior unchanged for the host-side handoff."
+}

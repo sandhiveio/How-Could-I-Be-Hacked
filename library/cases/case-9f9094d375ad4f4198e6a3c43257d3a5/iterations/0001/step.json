@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A generic Python HTTP client library (staged vulnerable copy; dependencies installed locally) follows redirects automatically and carries a caller-supplied HTTP Basic credential. Its redirect-auth rebuild step compares only the hostname parsed from the redirected-from URL and the redirect target URL; scheme and port are not compared. Permissions: read source, run the library locally, mint a self-signed certificate for one fixed loopback hostname, bind disposable loopback servers on a reserved high-port range, issue ordinary calls. A TLS origin can answer with a 302 whose Location points at a plaintext target on the same hostname and log every received header.",
+    "surface": "Generic Python HTTP client library with an automatic redirect policy layer; disposable loopback TLS and plaintext servers, one short-lived self-signed certificate for a fixed loopback hostname, and header/body-logging targets.",
+    "assumptions": [
+      "The observer can read the client source, run it locally, mint a short-lived self-signed certificate, bind disposable loopback servers on a reserved high-port range, and issue ordinary HTTP calls; no write access to a deployed service is assumed.",
+      "The attacker controls or can influence the redirect target returned by a server the client already talks to, and the redirect Location is followed automatically (library default).",
+      "The caller supplies HTTP Basic credentials per request or session; the client keeps them in an Authorization header across hops unless the redirect policy strips them.",
+      "The package ships a test suite, but its test dependencies are not installed in the local environment; the suite is era-appropriate and does not by itself cover same-host cross-scheme redirects.",
+      "Only loopback ports are used and no public target is contacted. The official verdict comes from an external harness on an exported patch, so all local checks are supporting evidence only."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first reproduction then origin-based repair: stand up a loopback TLS origin with a self-signed certificate for one fixed hostname plus a header-logging plaintext target; first prove the leak at wire level (a same-hostname secure-to-plaintext 302 forwards the Authorization header in the vulnerable copy), then apply the minimal repair in the redirect-auth rebuild step so credentials are kept only when scheme, hostname and effective port are identical, substituting the implicit default ports 80/443 when omitted and leaving the netrc re-lookup untouched. Finally run a keep/strip regression matrix on both copies: same-origin plaintext and secure keep, cross-host strip, same-host port change strip, explicit versus implicit default ports, 307/308 method and body integrity, and the netrc interaction."
+  },
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: hostname comparison is string equality after parsing, so case-varied or trailing-dot host variants in the Location can pass as same-origin and keep the credential on a secure-to-plaintext hop. Fixture: a TLS origin that redirects to an uppercase-hostname or trailing-dot plaintext URL, plus a header log. Falsifier: header absent means normalization is not the leak mechanism. Defense: compare parsed, normalized hosts (lowercased, dot-stripped) plus scheme and port; cleanup deletes both servers and logs."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: explicit non-default ports on both sides make effective ports unequal yet the hostname-only rule keeps the credential across a genuine cross-port hop. Fixture: TLS origin on one high port redirecting to a plaintext target on another high port, header log on the target. Falsifier: header stripped implies the scheme alone drives the decision and port logic is dead code for this defect. Defense: substitute implicit default ports (80 for plaintext, 443 for TLS) into the comparison key so omitted and explicit default ports collapse; cleanup kills both listeners."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis (counterexample): a redirect that stays on TLS but changes only hostname case should keep credentials because certificate validation covers the same name, so a repair must lowercase rather than compare strictly. Fixture: TLS origin redirecting to a case-varied TLS target with a header log. Falsifier: a strict-equality repair over-strips the case-only variant. Defense: lowercase and strip trailing dots in one helper used by all redirect branches; cleanup removes temporary certificate material and stops servers."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the strip may be one-shot rather than persistent, and a later hop of a chain could re-attach credentials from environment or netrc state after an earlier strip; the delivered text was self-announced as unfinished and conflated multi-hop persistence with netrc re-attachment without naming a single falsifiable experiment."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: POST 307 semantics interact with the strip decision, so a completeness probe of the header set plus method and body preservation is needed. Fixture: a TLS origin answering a POST with 307 to a plaintext target that logs method, body and headers. Falsifier: body loss or a changed method after the hop indicates a regression in request reconstruction. Defense: verify method and body equality alongside the auth decision; cleanup deletes fixture servers and logs."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.676,
+      "rationale": "The incumbent's first step is exactly the prepared wire-level reproduction; no generated vector establishes the baseline leak itself, so every repair-oriented vector lacks its causal anchor until the plaintext target is observed receiving the header. Fixture pieces are all available locally."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.591,
+      "rationale": "Distinct normalization mechanism and feasible on loopback, but it refines the repair's comparison rather than proving the leak: under the hostname-only rule a case-varied host is already unequal, so this is a better later regression edge."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.5895,
+      "rationale": "Clear and cheap: shows the predicate ignores ports entirely and tests default-port normalization. Narrower than the baseline leak and it presupposes the scheme-change leak exists; strong second-round material."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.5335,
+      "rationale": "Counterexample angle on host-case normalization for the repair; feasible, but its pre-patch expectation is muddled because a case-only host difference is unequal under the current rule."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": false,
+      "score": 0.0,
+      "rationale": "Incoherent as delivered: self-announced unfinished text that conflates two hypotheses and names no single falsifiable experiment or expected result, so it is retained but ineligible this round."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.5035,
+      "rationale": "Interpretable core: 307 method and body preservation plus a header-set probe as a truth-table driver, but it is a repair-validation check, not a leak baseline, and the text shows mid-generation editing."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Two disposable loopback servers were started: a TLS origin holding a short-lived self-signed certificate for one fixed hostname, and a plaintext target that appends every received request (method, path, headers) to a JSON-lines log. One GET with a Basic credential pair followed a 302 from the TLS origin to the plaintext target on the same hostname. The target log contains the hop with 'Authorization: Basic <base64 of the pair>' and the session finished with status 200. The credential crossed the plaintext wire exactly as the hostname-only predicate predicts; the falsifier (header absent) did not occur.",
+    "next_hint": "The leak is confirmed at wire level on the vulnerable copy. The next step is to repair the redirect-auth rebuild step: keep the Authorization header only when the redirect target preserves scheme, hostname and effective port (substituting implicit default ports when omitted), replacing the hostname-only comparison while leaving the netrc re-lookup untouched; then prove the same fixture no longer forwards the header and that same-origin redirects still do. Fixture and certificate remain available; loopback ports only."
+  },
+  "lineage": {
+    "case_id": "case-9f9094d375ad4f4198e6a3c43257d3a5",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null,
+    "step_id": "iteration-0001",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: string containment is insufficient when the filesystem follows a symlink inside the root, because the resolved string stays under the root while the content comes from outside. Prerequisite: repaired and vulnerable copies plus fixture symlinks, one to an outside directory and one to an outside file. Action: request both links on both copies and record status, body hash, and marker presence. Expected: the measurement decides between documenting the limitation and realpath hardening. Falsifier: a realpath-based repair blocks the escape without changing in-root behavior."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: query-string handling or encoded input bypasses the containment gate because the gate sees a different value than the filesystem read. Prerequisite: repaired handler, an outside marker file, and an ordinary nested file. Action: send a traversal path with a query string, an ordinary nested file with a query string, and encoded traversal variants; hash the bodies. Expected: traversal returns 404 and the ordinary file returns 200 with the expected hash. Falsifier: an encoded or query-bearing input serves outside bytes. Defense: keep the gate on the parsed pathname and do not decode after validation."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a relative configured root under a changed working directory causes the per-request resolution to diverge and admits an outside target. Prerequisite: repaired handler, a relative root path, and a request-time working-directory change. Action: start the handler with the relative root, change the working directory, then send a traversal request and an ordinary in-root request. Expected: traversal returns 404 and the ordinary file returns 200. Falsifier: the traversal returns 200 or the control fails. Defense: resolve the root before comparison on every request."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a separator-strict comparison still fails for sibling directories that share a long name prefix with the root. Prerequisite: repaired handler, a sibling directory whose name extends the root name and contains an index with marker bytes, and an ordinary control file. Action: request the extensionless sibling directory and the control through traversal-shaped paths. Expected: sibling returns 404 with no marker bytes, control unchanged. Falsifier: loose prefix matching admits the sibling directory. Defense: compare the target against root plus the path separator, not a bare string prefix."
+    },
+    {
+      "id": "r3-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: concurrent requests expose shared mutable path state and allow one request to serve bytes resolved for another. Prerequisite: repaired handler and a fixture with both a leak target and a control file. Action: issue interleaved parallel requests, half traversal and half ordinary, and record status, body hash, and marker presence for every response. Expected: every traversal request is 404 and every control is 200 with a matching hash. Falsifier: any response mixes status or content across request classes. Defense: keep the gate a per-request synchronous computation with no shared mutable state."
+    }
+  ]
+}

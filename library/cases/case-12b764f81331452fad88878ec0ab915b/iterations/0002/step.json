@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A local Python HTTP/1.1 parser discards two bytes after every chunk-data block as a presumed chunk footer without checking that they are CRLF. A raw request can end its first chunk data with a bare LF and then supply a next chunk-size line whose leading hex digit is swallowed, shifting the body boundary and leaving a complete request as trailing data. The task is a minimal repair: accumulate the two footer bytes across receive calls, require CRLF, and verify valid CRLF bodies, fragmented feeds and the existing suite. A later fixed release is available only as a black-box behavior oracle.",
+    "surface": "Python HTTP/1.1 connection state machine with a receive buffer, a chunked-body reader, a public event iterator and writer, and raw-byte fixtures. The attacker and the lenient intermediary are simulated locally; no network peers or public targets are used.",
+    "assumptions": [
+      "The staged source is a local disposable copy; testing uses local Python, pytest and raw bytes only.",
+      "The attacker controls the complete raw HTTP/1.1 byte stream sent to the parser, including chunk footers, chunk-size lines and any pipelined request.",
+      "A front-end intermediary may accept a bare LF as a chunk-data terminator while the parser is the back end.",
+      "Permissions: create and delete temporary files under the run directory, import the local source, and run local tests; no Docker, host evaluator or external service.",
+      "Official patch-benchmark evaluation is separate and host-side; local checks are not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first differential reproduction then footer validation: construct a raw chunked request whose chunk-data footer is a bare line feed followed by a next-chunk size whose leading hex digit is swallowed by a two-byte discard; parse it with the staged parser and with a strict CRLF-requiring reference dechunker; compare body and trailing bytes; then add chunk-footer validation and rerun the differential and full suite."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: validating exactly the two footer bytes and accumulating them across split receive calls is sufficient to reject bare-LF footers without breaking fragmented valid input. Prerequisites: local source copy and raw streams. Bounded test: patch the chunked reader to compare the collected footer with CRLF; feed the malicious stream and a valid stream one byte at a time; expected is a footer error for LF and an identical valid parse; the falsifier is LF passing or fragmented CRLF failing. Cleanup: discard the patched copy; limitation: a single-file experiment."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the zero-size chunk line needs a separate strictness rule because it has no following size line; a bare-LF zero-size line may be accepted or left incomplete. Prerequisites: local parser and raw bytes. Bounded test: parse `0\\r\\n` and `0\\n` variants and inspect EndOfMessage and error state; expected is success for CRLF and an error or incomplete state for LF; the falsifier is silent acceptance of `0\\n` as EndOfMessage. Cleanup: reset the connection; limitation: only the zero-size line is varied."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: trailer headers after the zero chunk use the generic header-line reader and therefore inherit bare-LF leniency, which can reopen a trailer/body boundary divergence. Prerequisites: local parser and raw bytes. Bounded test: feed `0\\r\\nX-T: y\\n\\n` followed by a second request and compare trailers and trailing data with a strict reference; the falsifier is an identical boundary under strict and lenient handling. Cleanup: clear the fixture; limitation: trailer field values are simple."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an unconditional non-CRLF rejection introduces false positives for valid empty-chunk or abrupt-EOF streams. Prerequisites: local parser. Bounded test: parse `0\\r\\n\\r\\n`, `0\\n` and a chunked body ended by EOF, and check for success, error or incomplete state without crashes; the falsifier is a valid abrupt EOF being rejected. Cleanup: reset the parser; limitation: EOF behavior is implementation-specific."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: validating at consumption time yields the same rejection point for LF, CR-only and NUL footers as a strict reference. Prerequisites: patched local copy and strict reference. Bounded test: run a multi-variant differential over LF, CR-only and NUL footers and compare error type and consumed offset; expected is rejection at the footer for all variants and success for CRLF; the falsifier is any accepted variant or offset mismatch. Cleanup: remove temporary fixtures; limitation: no network timing."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.88,
+      "rationale": "Not selected separately because it is narrower than the incumbent, but its mechanism is exactly what the selected plan executed: accumulate the two footer bytes and compare them with CRLF, including split feeds."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.64,
+      "rationale": "Deferred. The zero-size line is worth a regression assertion, but the staged parser already requires CRLF for every chunk-size line, so it likely needs no separate repair."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Deferred. Trailer leniency is real but distinct; the observed smuggling case did not use a trailer and the selected repair was intentionally footer-only."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.68,
+      "rationale": "Deferred. The false-positive concern is valid and becomes part of the valid-corpus regression, but it does not define the minimal code change."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.72,
+      "rationale": "Deferred. A multi-variant malformed-footer differential is a good post-patch oracle; it is incorporated into a dedicated post-patch matrix rather than selected first."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.9,
+      "rationale": "Selected incumbent. The plan's remaining action is the footer validation plus differential and full-suite rerun; keeping it avoids replacing a partially executed plan with a narrower restatement. Elements of r2-v1 and r2-v5 are incorporated."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Applied a minimal repair in the working copy: the chunked reader now accumulates the two bytes after each chunk-data block and raises a protocol error unless they are exactly CRLF. Focused checks passed: valid CRLF bodies produced `hello world` and EndOfMessage with the pipelined request preserved as trailing data; one-byte and two-byte feeds matched whole-stream parsing; bare-LF, bare-CR and NUL footers were rejected; chunk extensions and CRLF trailers still parsed. The existing suite passed all 78 tests. The footer-only change leaves zero-chunk and trailer bare-LF leniency untouched. No official evaluator was available.",
+    "next_hint": "Test whether the footer-only rule survives every footer byte class and next-size shape, and whether it preserves a broad valid chunked corpus."
+  },
+  "lineage": {
+    "case_id": "case-12b764f81331452fad88878ec0ab915b",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001",
+    "step_id": "iteration-0002",
+    "parent_step_id": "iteration-0001",
+    "branch_id": "main"
+  }
+}

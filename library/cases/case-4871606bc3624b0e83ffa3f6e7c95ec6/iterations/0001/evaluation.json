@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.7669,
+      "rationale": "Selected. The wire-first route is the only candidate whose first step is already anchored in a real observation, and it directly produces the causal ground truth the repair needs. The saved reconnaissance showed the four named spellings reaching the target and the control staying on the origin."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.6756,
+      "rationale": "Deferred in favor of the incumbent and largely folded into its execution. Highest information gain because boundary spellings could share the same parser semantics; the dot-segment expectation was confirmed safe, which sharpened the control set."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.6625,
+      "rationale": "Deferred. The site-attribution idea is sound and was effectively executed as part of the incumbent's matrix, but alone it explains the route rather than proving the widened leak surface."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.6394,
+      "rationale": "Deferred. A correct design constraint rather than a first action: rejecting all double-slash paths would be over-broad. The same-origin double-slash control became a permanent regression case."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.5313,
+      "rationale": "Deferred. The literal-rebuild alternative is real and later informed the chosen implementation, but as delivered it was the least precise candidate and presupposed a repair phase that did not exist yet."
+    }
+  ]
+}

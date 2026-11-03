@@ -1,0 +1,13 @@
+{
+  "id": "case-9f9094d375ad4f4198e6a3c43257d3a5",
+  "kind": "curated_case",
+  "hint": "A generic Python HTTP client library follows redirects automatically and reuses the caller-supplied HTTP Basic credential across hops. Its redirect-auth rebuild step strips the Authorization header only when the hostname of the redirected-from request differs from the redirect target; scheme and port are never compared. A same-hostname redirect from a TLS endpoint to a plaintext endpoint therefore forwards the base64 Basic credential to the plaintext server, and the same predicate also keeps credentials across a same-host port change and across a full multi-hop chain.",
+  "surface": "Generic Python HTTP client library with an automatic redirect policy layer; disposable loopback TLS and plaintext servers, one short-lived self-signed certificate for a fixed loopback hostname, and header/body-logging targets.",
+  "assumptions": [
+    "The observer can read the client source, run it locally, mint a short-lived self-signed certificate, bind disposable loopback servers on a reserved high-port range, and issue ordinary HTTP calls; no write access to a deployed service is assumed.",
+    "The attacker controls or can influence the redirect target returned by a server the client already talks to, and the redirect Location is followed automatically (library default).",
+    "The caller supplies HTTP Basic credentials per request or session; the client keeps them in an Authorization header across hops unless the redirect policy strips them.",
+    "The package ships a test suite, but its test dependencies are not installed in the local environment; the suite is era-appropriate and does not by itself cover same-host cross-scheme redirects.",
+    "Only loopback ports are used and no public target is contacted. The official verdict comes from an external harness on an exported patch, so all local checks are supporting evidence only."
+  ]
+}

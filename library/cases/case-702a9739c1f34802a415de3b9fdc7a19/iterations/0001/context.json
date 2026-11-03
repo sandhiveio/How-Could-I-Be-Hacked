@@ -1,0 +1,10 @@
+{
+  "case_id": "case-702a9739c1f34802a415de3b9fdc7a19",
+  "iteration_id": "iteration-0001",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Reproduce-then-boundary-containment: first reproduce the flaw against a live local handler using a fixture root with a sibling marker file and raw requests carrying literal parent-directory segments, so no client-side normalization hides the behavior. Characterize which shapes leak, including the extensionless index-append branch and deep traversal. Then implement the minimal repair at the path-derivation boundary: after joining, resolve the configured root and the joined target and accept only when the target equals the root or begins with the root plus the path separator; otherwise return the existing 404 page. Close with a regression suite covering ordinary files, nested files, directory index, missing files, and traversal variants. Assumption: the join is the single trust boundary; falsifier: a leaking shape that a resolved-prefix check still admits."
+  },
+  "hint": "A generic HTTP static-file handler derives a target by joining the configured content root with the request pathname, appends a default index filename when the joined target has no extension, and streams the target if it exists as a regular file. No containment check follows the join. A disposable local fixture contains a content root with a root index file, an ordinary file, a nested file, a missing path, an extensionless directory without an index, a sibling file outside the root, and a sibling directory outside the root whose index file carries marker bytes. The handler runs on an ephemeral loopback port. The observer may read the handler source, create disposable fixture trees, and send raw HTTP requests, but may not modify any deployed service. Determine which literal request shapes disclose outside-root bytes and whether the extensionless append branch participates."
+}

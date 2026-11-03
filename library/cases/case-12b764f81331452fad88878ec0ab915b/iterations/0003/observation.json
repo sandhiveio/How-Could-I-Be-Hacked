@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Executed the footer/shape matrix on the patched parser. Required set: 60 combinations of 12 footer pairs and 5 next-segment shapes (zero chunk, 1-byte chunk, 5-byte chunk, shifted `0x101` chunk, trailer). All 60 behaved as required: every non-CRLF footer raised a footer protocol error before size parsing, and every CRLF case preserved body and trailing boundaries. All 462 two-piece split positions for one malformed and one valid stream matched whole-stream decisions. Thirteen valid request/response cases, including extensions, trailers, uppercase hex, binary bytes, zero body, ten chunks, a 10 KB body and one/two-byte feeds, were byte-identical before and after the patch. Informational residual: zero-chunk and trailer bare-LF leniency remains; the later fixed-release oracle also retains it, so it is outside this footer repair. No official evaluator was available.",
+  "next_hint": "Verify that the exported one-file patch applies to a pristine copy, works from cold Python caches, and leaves the documented zero-chunk/trailer behavior unchanged."
+}

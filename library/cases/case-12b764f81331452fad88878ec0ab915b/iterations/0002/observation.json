@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Applied a minimal repair in the working copy: the chunked reader now accumulates the two bytes after each chunk-data block and raises a protocol error unless they are exactly CRLF. Focused checks passed: valid CRLF bodies produced `hello world` and EndOfMessage with the pipelined request preserved as trailing data; one-byte and two-byte feeds matched whole-stream parsing; bare-LF, bare-CR and NUL footers were rejected; chunk extensions and CRLF trailers still parsed. The existing suite passed all 78 tests. The footer-only change leaves zero-chunk and trailer bare-LF leniency untouched. No official evaluator was available.",
+  "next_hint": "Test whether the footer-only rule survives every footer byte class and next-size shape, and whether it preserves a broad valid chunked corpus."
+}

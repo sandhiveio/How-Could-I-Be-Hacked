@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.718,
+      "rationale": "The matrix deliverable is executed and saved with before/after contrast and zero repaired-copy failures, which is direct local causal evidence; remaining explicit steps are exactly the contract check and the clean-apply closure, making the incumbent the correct continuation."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.578,
+      "rationale": "Directly closes the stated multi-hop uncertainty with a crisp falsifier and modest cost using the existing fixture; high information relative to setup."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.5175,
+      "rationale": "Strongest independent contract check available (the package's own redirect/auth subset); feasibility is the risk because era tests on a modern interpreter need pinned dependencies and failure triage."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.5145,
+      "rationale": "Genuinely distinct userinfo surface with a clean discriminating pair on a scheme-change hop; narrower than the incumbent's closure step and partly confusable with the target-side userinfo question it does not fully settle."
+    },
+    {
+      "id": "r3-v5",
+      "eligible": true,
+      "score": 0.4745,
+      "rationale": "Clean-apply and replay with a checksum manifest; very feasible and directly simulates external harness consumption, but it is terminal and should run after the contract check, not instead of it."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.42,
+      "rationale": "Extractable core around the default-port boundary and rewrite ordering, but the predicate table already covers the boundary logically and the wire variant needs an actual default-port listener plus a trace hook; lowest yield of the round."
+    }
+  ]
+}

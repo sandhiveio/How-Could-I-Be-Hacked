@@ -1,0 +1,4 @@
+{
+  "selected_id": "plan-1",
+  "selected_text": "Wire-first reproduction then origin-based repair: stand up a loopback TLS origin with a self-signed certificate for one fixed hostname plus a header-logging plaintext target; first prove the leak at wire level (a same-hostname secure-to-plaintext 302 forwards the Authorization header in the vulnerable copy), then apply the minimal repair in the redirect-auth rebuild step so credentials are kept only when scheme, hostname and effective port are identical, substituting the implicit default ports 80/443 when omitted and leaving the netrc re-lookup untouched. Finally run a keep/strip regression matrix on both copies: same-origin plaintext and secure keep, cross-host strip, same-host port change strip, explicit versus implicit default ports, 307/308 method and body integrity, and the netrc interaction."
+}

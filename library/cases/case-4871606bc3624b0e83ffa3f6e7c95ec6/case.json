@@ -1,0 +1,13 @@
+{
+  "id": "case-4871606bc3624b0e83ffa3f6e7c95ec6",
+  "kind": "curated_case",
+  "hint": "A generic Node.js HTTP/1.1 client library builds each outgoing request URL by resolving a caller-supplied path (or pathname) against a fixed origin URL. Both the public dispatcher and an internal plain-object URL parser use ordinary relative-URL resolution, which treats a path that begins with two slashes, a backslash-led authority form, a triple slash or an absolute http(s) URL as replacing the authority. An application that passes user input as the path therefore sends the request to a different host and port (SSRF), even though the API contract presents the path as a suffix of the fixed origin. A minimal repair must force the final origin to equal the supplied origin while keeping the supplied text usable as a literal path, and must not break ordinary paths, query-only paths, dot-segment normalization, encoded slashes or same-origin double-slash paths.",
+  "surface": "Dependency-free Node.js HTTP/1.1 client; public dispatcher accepting an origin plus a path or pathname option; internal URL parser with a plain-object branch and a separate string-path branch; disposable loopback origin and target servers that log request line, Host header and body; library diagnostics channel that exposes the resolved origin and path for each outgoing request.",
+  "assumptions": [
+    "A Node.js runtime is available and the library imports directly from an editable working copy with no installed runtime dependencies.",
+    "The observer may read the source, edit two resolution sites in a separate patched copy, and run ordinary HTTP calls.",
+    "The attacker controls only the path or pathname string; the application fixes the origin URL and method, and follows no attacker-controlled redirect logic in this scenario.",
+    "Disposable HTTP servers can bind ephemeral loopback ports on the loopback interface; one server acts as the fixed origin and a second as the foreign target, and both record every request.",
+    "No public target is contacted. The official benchmark verdict is produced externally from an exported patch, so local fixtures and matrices are supporting evidence only."
+  ]
+}

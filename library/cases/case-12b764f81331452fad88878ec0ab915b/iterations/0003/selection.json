@@ -1,0 +1,4 @@
+{
+  "selected_id": "r3-v1",
+  "selected_text": "Hypothesis: an exhaustive footer-pair by next-shape matrix after the footer-only patch exposes any surviving accepted divergence or over-rejection. Prerequisites: patched local copy and strict reference dechunker. Bounded test: enumerate footer pairs (CRLF, LF plus hex/non-hex/space, CR plus digit, CR-CR, NUL-NUL, LF-LF, LF-CR) against next shapes (zero chunk, 1-byte, 5-byte, shifted `0x101` chunk, trailer); expected is a footer error for every non-CRLF pair before size parsing and a body/trailing match for every CRLF pair; the falsifier is any accepted non-CRLF pair or changed valid pair. Cleanup: remove generated fixtures; limitation: no network timing."
+}

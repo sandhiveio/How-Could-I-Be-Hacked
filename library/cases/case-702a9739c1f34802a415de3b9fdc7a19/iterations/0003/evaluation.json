@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.8175,
+      "rationale": "Closure is the remaining core: package the repair and run the discriminating robustness suite that folds in every new probe; evidence is already at the regression level."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.705,
+      "rationale": "The open decision point: measure symlink behavior and decide between documenting the limitation and realpath hardening."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.6725,
+      "rationale": "Query-string separation is cheap and directly executable, confirming the gate sees only the pathname."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.6375,
+      "rationale": "Long-prefix sibling adjacency tests separator-strict comparison; already partially covered, so marginal gain."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.625,
+      "rationale": "Relative-root resolution under a changed working directory is a real configuration variant and cheap to test."
+    },
+    {
+      "id": "r3-v5",
+      "eligible": true,
+      "score": 0.605,
+      "rationale": "Concurrency is predicted safe because the gate is a per-request synchronous computation; cheap consistency check."
+    }
+  ]
+}

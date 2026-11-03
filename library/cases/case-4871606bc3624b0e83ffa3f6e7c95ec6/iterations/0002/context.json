@@ -1,0 +1,10 @@
+{
+  "case_id": "case-4871606bc3624b0e83ffa3f6e7c95ec6",
+  "iteration_id": "step-2",
+  "previous_iteration_id": "step-1",
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first reproduction then containment repair: stand up two disposable loopback servers (origin and target) that log method, request URL, Host and body; prove the foreign delivery end to end for both public input forms and a widened spelling set; add an origin-containment rule at both resolution sites so the supplied text is resolved literally under the supplied origin; then run a differential keep/reach matrix on vulnerable and patched copies plus a clean-apply check on a pristine tree."
+  },
+  "hint": "The vulnerable Node.js HTTP client was just observed delivering thirteen of twenty caller-controlled path spellings to a second loopback server, including protocol-relative, absolute, triple-slash, backslash, slash-backslash, userinfo, fragment and no-path forms, while ordinary, query, dot-segment, encoded and same-origin double-slash controls stayed on the origin. Both resolution sites are known to be involved: the public string-path branch and the plain-object parser branch. Permissions: edit a separate patched copy, run the library, bind the two loopback servers. The next question is the smallest implementation that forces the final origin to equal the supplied origin for every leaking spelling, keeps literal path text (so a same-origin double slash is not folded away), and leaves dot-segment normalization intact."
+}

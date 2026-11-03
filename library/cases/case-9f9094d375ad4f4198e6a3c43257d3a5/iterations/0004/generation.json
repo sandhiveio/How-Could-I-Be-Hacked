@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the repair ignores URL-embedded (userinfo) credentials, so a Location carrying user and password on a plaintext URL after a TLS hop may leak or double-attach. Test: a TLS origin redirecting to a userinfo-bearing plaintext URL, header log at the target, both copies. Falsifier: the target sees either a Basic header or userinfo-derived auth after the repair, proving a cross-scheme leak persists. Cleanup deletes fixture servers and logs."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: implicit versus explicit default ports differ only when a real default-port listener exists, so binding one proves normalization rather than string equality. Test: TLS origin on a high port redirecting to a plaintext URL at the default port (and explicit default forms), header logs per variant. Falsifier: kept credentials after an effective-port change, or stripped credentials when effective ports are equal. Cleanup unbinds listeners; privileged-port availability is a prerequisite."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a mixed simultaneous scheme-and-host change can re-attach credentials through the netrc lookup below the strip branch, so even a correct predicate leaks at that hop. Test: TLS origin redirecting to a plaintext target under a different hostname with a netrc entry for that host, comparing trust_env on and off on both copies. Falsifier: the repaired run sends netrc-derived Basic auth over plaintext when trust_env is on. Cleanup removes the temporary netrc file and stops servers."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: near closure the highest-value check is clean-apply replay rather than new leak probes. Test: extract a pristine tree from the baseline commit, git apply --check and apply the exported diff, replay the leak and matrix scripts with the replayed tree on the path, and compare the modified file hash with the working repaired copy. Falsifier: hunk rejection, hash mismatch or replay failure. Cleanup removes scratch trees; a checksum manifest records provenance."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: strict hostname equality without case folding could over-strip mixed-case host redirects; verify on the wire that a case-only variant of the same scheme and port keeps credentials while other variants strip. Test: construct host case variants on loopback, with a fallback to direct predicate calls if name resolution or certificate matching cannot support them. Falsifier: credentials stripped for a case-only same-origin variant, or kept across a real origin change. Cleanup stops servers."
+    }
+  ]
+}

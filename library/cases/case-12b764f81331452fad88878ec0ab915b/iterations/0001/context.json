@@ -1,0 +1,10 @@
+{
+  "case_id": "case-12b764f81331452fad88878ec0ab915b",
+  "iteration_id": "iteration-0001",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first differential reproduction then footer validation: construct a raw chunked request whose chunk-data footer is a bare line feed followed by a next-chunk size whose leading hex digit is swallowed by a two-byte discard; parse it with the staged parser and with a strict CRLF-requiring reference dechunker; compare body and trailing bytes; then add chunk-footer validation and rerun the differential and full suite."
+  },
+  "hint": "A local Python HTTP/1.1 parser discards two bytes after every chunk-data block as a presumed chunk footer, without validating that the bytes are CRLF. A raw request can end its first chunk data with a bare LF and then supply a next chunk-size line starting with a hex digit. The attacker controls all bytes and a lenient front-end proxy may accept the bare LF while forwarding a fixed body. Reproduce the boundary divergence, compare the parser with a strict CRLF reference and a lenient-proxy model, and identify the exact causal mechanism."
+}

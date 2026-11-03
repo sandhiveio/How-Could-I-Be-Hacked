@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.825,
+      "rationale": "Selected closure. The incumbent carries the only executed evidence chain (wire reproduction, repair differential, contract and edge checks), and its remaining step is packaging plus clean-apply replay; every generated candidate is folded into that final execution."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.5,
+      "rationale": "Deferred and executed under the incumbent. Clean apply with per-file hash comparison is the core packaging check; it succeeded on both a standalone-pristine and a bundle-pristine tree."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.5,
+      "rationale": "Deferred and executed under the incumbent. The one-site mutant produced five foreign deliveries, which is the strongest evidence that the suite is not blind to a partial repair."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.485,
+      "rationale": "Deferred and executed under the incumbent. Replaying both harnesses on the bundle-patched tree matched the working patched copy case by case."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.48,
+      "rationale": "Deferred and executed logically under the incumbent. The bracketed-IPv6 resolution table contained every patched spelling and showed foreign origins on the vulnerable parser."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.4775,
+      "rationale": "Deferred and executed under the incumbent. The bundle parsed as one record with the exact key set and exactly two target files, and its embedded diff matched the standalone patch hash."
+    }
+  ]
+}

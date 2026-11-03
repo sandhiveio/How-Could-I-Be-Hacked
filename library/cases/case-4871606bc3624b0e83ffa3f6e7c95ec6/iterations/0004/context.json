@@ -1,0 +1,10 @@
+{
+  "case_id": "case-4871606bc3624b0e83ffa3f6e7c95ec6",
+  "iteration_id": "step-4",
+  "previous_iteration_id": "step-3",
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first reproduction then containment repair: stand up two disposable loopback servers (origin and target) that log method, request URL, Host and body; prove the foreign delivery end to end for both public input forms and a widened spelling set; add an origin-containment rule at both resolution sites so the supplied text is resolved literally under the supplied origin; then run a differential keep/reach matrix on vulnerable and patched copies plus a clean-apply check on a pristine tree."
+  },
+  "hint": "The repaired Node.js HTTP client passed a 27-case wire differential, a public-contract parity block and a ten-case unusual-origin block; bracketed IPv6 wire delivery was unavailable in the container. A unified diff exists but has not been consumed as an evaluator payload. Permissions: read run artifacts, create fresh scratch trees under an approved temporary directory, run git apply, hash files, parse JSON lines, and run the local loopback harnesses. The next question is whether the exported payload reproduces the exact verified tree and behavior, including a fresh pristine application, hash equality, a one-site mutant negative control and a recomputable manifest."
+}

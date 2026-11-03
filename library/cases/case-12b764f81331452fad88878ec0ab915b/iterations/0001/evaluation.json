@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Not selected. Coherent and cheap, but the prediction that the terminating chunk is missed is weaker than the incumbent's already observed boundary shift; kept as an unexecuted alternative for a different chunk shape."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.74,
+      "rationale": "Deferred. A genuine mechanism refinement about hex versus non-hex swallowed bytes; the incumbent reproduction already established the causal path, so a dedicated byte-class matrix is the natural follow-up."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.61,
+      "rationale": "Deferred. Coherent counterexample using Content-Length/Transfer-Encoding precedence, but it is a separate boundary-selection mechanism rather than the chunk-footer leniency under repair."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.68,
+      "rationale": "Deferred. Round-trip idempotence is a compact consequence test, but the writer may normalize chunk boundaries, so it is less direct than the wire-level differential."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.63,
+      "rationale": "Deferred. Pre/post baseline and error assertions are appropriate closure but premature in the first round, before any patch exists."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.86,
+      "rationale": "Selected incumbent. It targets the exact two-byte discard mechanism and leads directly to a minimal footer validation plus full-suite regression."
+    }
+  ]
+}

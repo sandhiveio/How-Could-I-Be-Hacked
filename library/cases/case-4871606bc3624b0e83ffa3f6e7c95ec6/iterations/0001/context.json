@@ -1,0 +1,10 @@
+{
+  "case_id": "case-4871606bc3624b0e83ffa3f6e7c95ec6",
+  "iteration_id": "step-1",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first reproduction then containment repair: stand up two disposable loopback servers (origin and target) that log method, request URL, Host and body; prove the foreign delivery end to end for both public input forms and a widened spelling set; add an origin-containment rule at both resolution sites so the supplied text is resolved literally under the supplied origin; then run a differential keep/reach matrix on vulnerable and patched copies plus a clean-apply check on a pristine tree."
+  },
+  "hint": "A staged vulnerable copy of a dependency-free Node.js HTTP/1.1 client is available. Its public request entry point accepts a fixed origin plus a caller-supplied path or pathname, and it has a separate internal URL parser for the plain-object form. Two disposable loopback servers are bound: an origin that answers 'ORIGIN' and a target that answers 'TARGET', both logging method, request URL and Host. Permissions: read the source, run the library locally, bind ephemeral loopback ports, and subscribe to the library's diagnostics channel that reports the resolved origin and path of each outgoing request. Reconnaissance suggested that protocol-relative and absolute path spellings reach the target. The next question is which resolution site is responsible for each public form and which additional boundary spellings also change egress, so one minimal repair can cover every route."
+}

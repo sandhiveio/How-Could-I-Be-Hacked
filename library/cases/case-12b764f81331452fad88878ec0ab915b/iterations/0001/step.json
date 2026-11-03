@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A local Python HTTP/1.1 parser discards two bytes after every chunk-data block as a presumed chunk footer, without validating that the bytes are CRLF. A raw request can end its first chunk data with a bare LF and then supply a next chunk-size line starting with a hex digit. The attacker controls all bytes and a lenient front-end proxy may accept the bare LF while forwarding a fixed body. Reproduce the boundary divergence, compare the parser with a strict CRLF reference and a lenient-proxy model, and identify the exact causal mechanism.",
+    "surface": "Python HTTP/1.1 connection state machine with a receive buffer, a chunked-body reader, a public event iterator and writer, and raw-byte fixtures. The attacker and the lenient intermediary are simulated locally; no network peers or public targets are used.",
+    "assumptions": [
+      "The staged source is a local disposable copy; testing uses local Python, pytest and raw bytes only.",
+      "The attacker controls the complete raw HTTP/1.1 byte stream sent to the parser, including chunk footers, chunk-size lines and any pipelined request.",
+      "A front-end intermediary may accept a bare LF as a chunk-data terminator while the parser is the back end.",
+      "Permissions: create and delete temporary files under the run directory, import the local source, and run local tests; no Docker, host evaluator or external service.",
+      "Official patch-benchmark evaluation is separate and host-side; local checks are not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first differential reproduction then footer validation: construct a raw chunked request whose chunk-data footer is a bare line feed followed by a next-chunk size whose leading hex digit is swallowed by a two-byte discard; parse it with the staged parser and with a strict CRLF-requiring reference dechunker; compare body and trailing bytes; then add chunk-footer validation and rerun the differential and full suite."
+  },
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a bare-LF chunk-data footer followed immediately by a zero-chunk line makes the parser consume the zero digit as the second footer byte, so the terminating chunk is missed and the body ends elsewhere. Prerequisites: raw chunked bytes under attacker control and a local server connection. Bounded test: feed `5\\r\\nhello\\n0\\r\\n\\r\\n` and record the EndOfMessage offset against a strict CRLF reference; the falsifier is an EndOfMessage at the strict reference offset. Cleanup: discard the connection object; limitation: only a zero-size next line is tested."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the two-byte swallow causes a silent body-boundary shift only when the first byte of the next chunk-size line is a hex digit; a non-hex byte makes the next chunk header invalid and produces an error. Prerequisites: raw chunked bytes, local parser and strict reference. Bounded test: vary the first byte of the next size line over `1`, `A`, `f`, `g` and `z` and compare accept/reject plus trailing offsets; expected is shifted acceptance for hex and an error for non-hex, with identical class behavior as the falsifier. Cleanup: remove temporary byte fixtures; limitation: one chunk shape per class."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: Content-Length plus Transfer-Encoding precedence is an independent boundary-selection divergence: the parser prefers Transfer-Encoding while a proxy may prefer Content-Length, so a request with both headers hides a second request. Prerequisites: attacker-controlled headers and a local parser. Bounded test: send a chunked request with an additional Content-Length and a request suffix, compare the parser body with the Content-Length interpretation; the falsifier is identical body and trailing data. Cleanup: reset the fixture; limitation: this is a different mechanism from chunk-footer validation."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: parsing, re-serializing canonical chunked output and parsing again is non-idempotent whenever a bare-LF footer was accepted, providing a self-contained oracle without a reference dechunker. Prerequisites: local parser and its writer. Bounded test: parse a bare-LF stream, re-encode the Data events as canonical chunked bytes, reparse and compare body and event sequence; the falsifier is a stable round-trip for bare-LF input. Cleanup: discard temporary blobs; limitation: the writer may legitimately normalize chunk boundaries."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a saved pre-patch and post-patch baseline plus focused error assertions closes repair validation: every bare-LF input raises a footer error while every valid CRLF input keeps identical body and trailing data. Prerequisites: a patch candidate and a clean copy for each run. Bounded test: run the same input corpus on both copies and compare JSON results; the falsifier is any accepted bare-LF case or changed valid output. Cleanup: remove the temporary copy; limitation: premature before a patch exists."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Not selected. Coherent and cheap, but the prediction that the terminating chunk is missed is weaker than the incumbent's already observed boundary shift; kept as an unexecuted alternative for a different chunk shape."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.74,
+      "rationale": "Deferred. A genuine mechanism refinement about hex versus non-hex swallowed bytes; the incumbent reproduction already established the causal path, so a dedicated byte-class matrix is the natural follow-up."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.61,
+      "rationale": "Deferred. Coherent counterexample using Content-Length/Transfer-Encoding precedence, but it is a separate boundary-selection mechanism rather than the chunk-footer leniency under repair."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.68,
+      "rationale": "Deferred. Round-trip idempotence is a compact consequence test, but the writer may normalize chunk boundaries, so it is less direct than the wire-level differential."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.63,
+      "rationale": "Deferred. Pre/post baseline and error assertions are appropriate closure but premature in the first round, before any patch exists."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.86,
+      "rationale": "Selected incumbent. It targets the exact two-byte discard mechanism and leads directly to a minimal footer validation plus full-suite regression."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Selected plan-1 and executed a local wire-level differential. A crafted request ended its first chunk data with a bare LF and then used a next size line of `101` hex. The staged parser emitted body `helloX` and EndOfMessage, leaving trailing bytes that began with a complete `GET /privileged HTTP/1.1` request; after a simulated response and cycle reset it accepted that request as the next one. A lenient front-end model that accepts the bare LF but reads the next size line from its true first byte saw a 257-byte second chunk and no trailing request. A strict CRLF reference rejected the same stream at footer `\\n1`. This supports the two-byte blind-discard mechanism. No official evaluator was available; only one footer/next-size pair was exercised in this step.",
+    "next_hint": "With the boundary divergence established, decide whether validating exactly the two footer bytes is sufficient and how to handle a footer split across receive calls."
+  },
+  "lineage": {
+    "case_id": "case-12b764f81331452fad88878ec0ab915b",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null,
+    "step_id": "iteration-0001",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an exhaustive footer-pair by next-shape matrix after the footer-only patch exposes any surviving accepted divergence or over-rejection. Prerequisites: patched local copy and strict reference dechunker. Bounded test: enumerate footer pairs (CRLF, LF plus hex/non-hex/space, CR plus digit, CR-CR, NUL-NUL, LF-LF, LF-CR) against next shapes (zero chunk, 1-byte, 5-byte, shifted `0x101` chunk, trailer); expected is a footer error for every non-CRLF pair before size parsing and a body/trailing match for every CRLF pair; the falsifier is any accepted non-CRLF pair or changed valid pair. Cleanup: remove generated fixtures; limitation: no network timing."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the footer accumulation state survives arbitrary split delivery positions, including splits inside the footer and inside a following size line. Prerequisites: patched parser and one malformed plus one valid stream. Bounded test: split each stream at every byte boundary, feed two pieces and compare accept/reject, body and trailing data with whole-stream parsing; the falsifier is any split point with a different decision. Cleanup: discard temporary byte arrays; limitation: only two-piece splits are exercised."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the repair must also reject bare-LF footers on the zero-chunk and trailer paths, not only on non-terminal chunk data. Prerequisites: patched parser. Bounded test: feed streams ending with a bare LF before the zero-size line and trailer field lines ended by bare LF; expected is a protocol error at each site; the falsifier is EndOfMessage with a smuggled trailing request. Cleanup: remove temporary corpora; limitation: the later release oracle may retain this leniency."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the repair preserves every valid chunked corpus identically to the unpatched parser when footers are strict CRLF. Prerequisites: unpatched and patched local copies. Bounded test: run extensions, multiple trailers, uppercase hex, binary data, zero body, ten chunks, a 10 KB body and one/two-byte feeds through both parsers and compare bodies, events and trailing data byte-for-byte; the falsifier is any divergence on valid input. Cleanup: remove temporary copies; limitation: the corpus is curated, not exhaustive."
+    }
+  ]
+}

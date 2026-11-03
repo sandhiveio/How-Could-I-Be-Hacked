@@ -1,0 +1,10 @@
+{
+  "case_id": "case-4871606bc3624b0e83ffa3f6e7c95ec6",
+  "iteration_id": "step-3",
+  "previous_iteration_id": "step-2",
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first reproduction then containment repair: stand up two disposable loopback servers (origin and target) that log method, request URL, Host and body; prove the foreign delivery end to end for both public input forms and a widened spelling set; add an origin-containment rule at both resolution sites so the supplied text is resolved literally under the supplied origin; then run a differential keep/reach matrix on vulnerable and patched copies plus a clean-apply check on a pristine tree."
+  },
+  "hint": "A patched copy of the Node.js HTTP client now forces every tested caller-supplied path back onto the supplied origin while preserving literal path text; the vulnerable copy still delivered thirteen of twenty-seven cases to a second loopback server. Method, body, query, same-origin double-slash and dot-segment behavior matched between copies. Permissions: run both copies, bind loopback servers, call the public entry points, and inspect error types and messages. The next question is whether the repair is over-broad or fragile: do public validation expectations still hold, and do unusual origin forms (hostname versus loopback address spelling, uppercase or cross-scheme absolute paths, a bare scheme prefix, bracketed IPv6) stay contained without throwing?"
+}

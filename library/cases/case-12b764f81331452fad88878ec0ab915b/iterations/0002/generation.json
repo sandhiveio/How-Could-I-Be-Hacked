@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: validating exactly the two footer bytes and accumulating them across split receive calls is sufficient to reject bare-LF footers without breaking fragmented valid input. Prerequisites: local source copy and raw streams. Bounded test: patch the chunked reader to compare the collected footer with CRLF; feed the malicious stream and a valid stream one byte at a time; expected is a footer error for LF and an identical valid parse; the falsifier is LF passing or fragmented CRLF failing. Cleanup: discard the patched copy; limitation: a single-file experiment."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the zero-size chunk line needs a separate strictness rule because it has no following size line; a bare-LF zero-size line may be accepted or left incomplete. Prerequisites: local parser and raw bytes. Bounded test: parse `0\\r\\n` and `0\\n` variants and inspect EndOfMessage and error state; expected is success for CRLF and an error or incomplete state for LF; the falsifier is silent acceptance of `0\\n` as EndOfMessage. Cleanup: reset the connection; limitation: only the zero-size line is varied."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: trailer headers after the zero chunk use the generic header-line reader and therefore inherit bare-LF leniency, which can reopen a trailer/body boundary divergence. Prerequisites: local parser and raw bytes. Bounded test: feed `0\\r\\nX-T: y\\n\\n` followed by a second request and compare trailers and trailing data with a strict reference; the falsifier is an identical boundary under strict and lenient handling. Cleanup: clear the fixture; limitation: trailer field values are simple."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an unconditional non-CRLF rejection introduces false positives for valid empty-chunk or abrupt-EOF streams. Prerequisites: local parser. Bounded test: parse `0\\r\\n\\r\\n`, `0\\n` and a chunked body ended by EOF, and check for success, error or incomplete state without crashes; the falsifier is a valid abrupt EOF being rejected. Cleanup: reset the parser; limitation: EOF behavior is implementation-specific."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: validating at consumption time yields the same rejection point for LF, CR-only and NUL footers as a strict reference. Prerequisites: patched local copy and strict reference. Bounded test: run a multi-variant differential over LF, CR-only and NUL footers and compare error type and consumed offset; expected is rejection at the footer for all variants and success for CRLF; the falsifier is any accepted variant or offset mismatch. Cleanup: remove temporary fixtures; limitation: no network timing."
+    }
+  ]
+}

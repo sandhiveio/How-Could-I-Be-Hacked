@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: encoded separators or a trailing null byte survive URL parsing and reach the join, so decoding must be part of the boundary. Prerequisite: a disposable root with a sibling marker file and a handler on an ephemeral loopback port. Action: send percent-encoded dot segments, an encoded slash, a mixed encoded backslash, and a filename followed by an encoded null; compare each with literal traversal and ordinary-file controls. Falsifier: any encoded shape returns sibling marker bytes instead of the existing 404 page. Defense: normalize and reject decoded traversal and null bytes before joining."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an absolute-looking or doubled-slash pathname can override or absorb the configured root during path joining or resolution. Prerequisite: a known marker file outside the root and a disposable handler instance. Action: request doubled-slash and single-slash absolute-looking shapes before and after any repair, using the sibling marker file as the outside target and an ordinary in-root file as control. Falsifier: a response streams outside-root bytes with a plausible media type. Defense: strip leading separators and re-anchor the target to the resolved root."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a symlink inside the content root escapes containment even when the string-prefix check passes. Prerequisite: create a fixture whose root contains a symlink to an outside marker file and confirm the link target resolves outside. Action: request the symlink path after the repair and compare it with a real in-root file as control. Falsifier: the link serves outside content while string containment reports the path as inside. Defense: resolve both root and target with realpath before comparison, then delete the symlink fixture during cleanup."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the extensionless index-append branch can mask traversal checks or break normal directory serving after repair. Prerequisite: a disposable fixture with nested directories containing an index, an empty directory, and a sibling directory outside the root with its own index. Action: request nested directory forms, a root index, an empty directory, and extensionless traversal targets before and after repair, comparing with a plain exact-prefix baseline. Expected: legitimate indexes serve and escapes return 404. Falsifier: wrong content is served or a legitimate directory index breaks. Defense: validate containment before the index append, not after."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an over-strict repair blocks legitimate filenames containing literal dot-dot substrings, leading dots, or trailing-slash-like forms that are not traversal segments. Prerequisite: fixture files named with adjacent dots, a leading-dot path, and a deeper legitimate nested file as controls. Action: request every legal path from the repaired handler on an ephemeral port and compare response bodies byte-for-byte with the expected files rather than checking status codes alone. Falsifier: a legal file returns 404 even though its pre-fix body matched the expected bytes. Defense: compare resolved paths with a separator boundary rather than rejecting substrings."
+    }
+  ]
+}

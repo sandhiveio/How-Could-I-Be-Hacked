@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: comparing serialized origin strings can fire on a base origin spelled with a hostname while the absolute path names the loopback address on the same socket, and the literal rebuild could still land on the foreign spelling if any later step re-resolves absolutely. Prerequisites and permissions: both copies and two servers, one reachable as the hostname and as the loopback address. Bounded test: use a hostname base with a loopback-named path, and the reverse, logging Host and resolved origin at each server. Expected supporting result: the patched copy stays on the base origin string and the vulnerable copy changes origin in at least the hostname-base direction. Falsifier: any target delivery, throw, or later re-resolution to the foreign spelling on the patched copy. Cleanup: stop servers and diff the logs."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: bracketed IPv6 origins break a helper that manipulates host and port strings, causing a throw or a fall-through for protocol-relative and absolute IPv6 paths. Prerequisites and permissions: patched and vulnerable copies; if ::1 cannot bind, permission to call the resolution helper directly. Bounded test: bind fixture servers on ::1 when available; otherwise feed bracketed origins and paths through the helper and assert resolved-origin equality. Expected supporting result: every bracketed spelling stays on the base IPv6 origin with literal path text. Falsifier: a non-origin origin, an exception on brackets, or a crash. Cleanup: close sockets and keep the logical table."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis (over-breadth counterexample): rejecting every path that begins with two slashes is a simpler repair that would pass leak tests but break same-origin double-slash and same-origin absolute-URL controls, silently changing the accepted public contract. Prerequisites and permissions: both copies, loopback servers, and permission to run identical controls. Bounded test: run ordinary, query, dot-segment, encoded, same-origin double-slash and same-origin absolute controls through both copies and replicate the package's documented path-validation expectations manually. Expected supporting result: controls are unchanged by the containment repair and the documented error strings are identical. Falsifier: any control changed between copies or any validation string changed. Cleanup: reset scratch trees and keep the comparison report."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a case-varied absolute scheme and a bare scheme prefix exercise protocol normalization differently, so a string comparison could miss them even though ordinary resolution leaks the uppercase form. Prerequisites and permissions: both copies, loopback servers, and permission to call the public entry points. Bounded test: send an uppercase-scheme absolute URL and a bare scheme-prefixed path to both copies, recording resolved origin and status; also compare the no-leading-slash error contract. Expected supporting result: the vulnerable copy leaks the uppercase form, while the patched copy contains both and keeps error parity for the no-leading-slash case. Falsifier: a patched target delivery or a divergent error type or message. Cleanup: stop servers and release ports."
+    },
+    {
+      "id": "r3-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an https-scheme absolute path against an http base origin is a foreign origin even though the schemes differ, and must be literalized rather than merged into the http socket address space. Prerequisites and permissions: patched copy, loopback servers, and permission to export and apply a patch. Bounded test: send an absolute URL with the https scheme and a host:port as the path against an http base and record the destination and literal path; separately apply the exported diff to a pristine tree and replay the matrix there. Expected supporting result: the request reaches the http origin with a leading slash followed by that absolute URL as literal text, and the clean-apply replay matches the working patched copy. Falsifier: a foreign delivery or a replay mismatch. Cleanup: remove the scratch pristine tree."
+    }
+  ]
+}

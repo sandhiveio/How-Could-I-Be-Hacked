@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A repaired copy of the generic Python HTTP client strips HTTP Basic credentials on redirect unless scheme, hostname and effective port match; the single-hop wire matrix, including keep controls, POST 307/308 body integrity and the netrc interaction, passed on both the vulnerable and repaired copies. The package ships an era-appropriate test suite that is not installed locally. Permissions: install test-only dependencies in a disposable environment, read the suite, run selected tests against both copies, and drive multi-hop chains over loopback servers with header logging.",
+    "surface": "Generic Python HTTP client library with an automatic redirect policy layer; disposable loopback TLS and plaintext servers, one short-lived self-signed certificate for a fixed loopback hostname, and header/body-logging targets.",
+    "assumptions": [
+      "The observer can read the client source, run it locally, mint a short-lived self-signed certificate, bind disposable loopback servers on a reserved high-port range, and issue ordinary HTTP calls; no write access to a deployed service is assumed.",
+      "The attacker controls or can influence the redirect target returned by a server the client already talks to, and the redirect Location is followed automatically (library default).",
+      "The caller supplies HTTP Basic credentials per request or session; the client keeps them in an Authorization header across hops unless the redirect policy strips them.",
+      "The package ships a test suite, but its test dependencies are not installed in the local environment; the suite is era-appropriate and does not by itself cover same-host cross-scheme redirects.",
+      "Only loopback ports are used and no public target is contacted. The official verdict comes from an external harness on an exported patch, so all local checks are supporting evidence only."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first reproduction then origin-based repair: stand up a loopback TLS origin with a self-signed certificate for one fixed hostname plus a header-logging plaintext target; first prove the leak at wire level (a same-hostname secure-to-plaintext 302 forwards the Authorization header in the vulnerable copy), then apply the minimal repair in the redirect-auth rebuild step so credentials are kept only when scheme, hostname and effective port are identical, substituting the implicit default ports 80/443 when omitted and leaving the netrc re-lookup untouched. Finally run a keep/strip regression matrix on both copies: same-origin plaintext and secure keep, cross-host strip, same-host port change strip, explicit versus implicit default ports, 307/308 method and body integrity, and the netrc interaction."
+  },
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the strip predicate is re-evaluated per hop, so a three-hop chain (TLS origin to plaintext middle to TLS origin) should not carry the original credential at hops 2 or 3 after the repair, nor re-attach it without a netrc entry. Test: three loopback servers logging headers, one session through the whole chain, inspect hop-2 and hop-3 logs; run the same chain on the vulnerable copy for contrast. Falsifier: hop 3 receives the original tuple header, proving a one-shot rather than per-hop decision. Cleanup stops all three servers and deletes logs."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: URL-embedded (userinfo) credentials behave differently from tuple credentials across a scheme-change hop, because the rebuild step only touches the Authorization header. Test: a plaintext origin redirecting to a TLS target whose URL embeds a user and password, with a header log; compare both copies. Falsifier: the target sees an Authorization header after the repair, proving a cross-scheme leak through the userinfo path. Cleanup deletes fixture servers and logs."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: running the package's own redirect and auth test subset under an era-appropriate test harness exposes expectation mismatches that a hand-built matrix misses, revealing over-strict repair behavior. Test: install test dependencies in a disposable environment, run only redirect/auth/netrc selectors against the repaired and vulnerable copies, triage failures as fixture artifacts versus real regressions. Falsifier: a green subset means the predicate aligns with the package contract; a failing same-origin case flags over-stripping. Cleanup keeps the environment disposable."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a 307 across an explicit-versus-implicit default-port boundary may over-strip because URL rewrite order matters, and a trace hook around the rebuild routine can capture pre- and post-rewrite URLs directly. Test: four permutations (explicit and implicit default ports, same and changed scheme) with method, body and auth logged, plus a wrapper recording the rebuild arguments. Falsifier: a stripped header when effective ports are equal, or a kept header when they differ. Cleanup stops all listeners."
+    },
+    {
+      "id": "r3-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the exported diff applies cleanly to a fresh copy of the baseline and the full discriminator suite passes on the replayed tree, with a checksum manifest making the baseline tamper-evident. Test: extract a pristine tree from the baseline commit, git apply --check and apply the exported diff, replay the leak, matrix and multi-hop scripts with the replayed tree on the path, and hash every modified file. Falsifier: a hunk rejection, hash mismatch or replay failure. Cleanup removes scratch trees."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.718,
+      "rationale": "The matrix deliverable is executed and saved with before/after contrast and zero repaired-copy failures, which is direct local causal evidence; remaining explicit steps are exactly the contract check and the clean-apply closure, making the incumbent the correct continuation."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.578,
+      "rationale": "Directly closes the stated multi-hop uncertainty with a crisp falsifier and modest cost using the existing fixture; high information relative to setup."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.5175,
+      "rationale": "Strongest independent contract check available (the package's own redirect/auth subset); feasibility is the risk because era tests on a modern interpreter need pinned dependencies and failure triage."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.5145,
+      "rationale": "Genuinely distinct userinfo surface with a clean discriminating pair on a scheme-change hop; narrower than the incumbent's closure step and partly confusable with the target-side userinfo question it does not fully settle."
+    },
+    {
+      "id": "r3-v5",
+      "eligible": true,
+      "score": 0.4745,
+      "rationale": "Clean-apply and replay with a checksum manifest; very feasible and directly simulates external harness consumption, but it is terminal and should run after the contract check, not instead of it."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.42,
+      "rationale": "Extractable core around the default-port boundary and rewrite ordering, but the predicate table already covers the boundary logically and the wire variant needs an actual default-port listener plus a trace hook; lowest yield of the round."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Two checks were executed. First, the package's own redirect/auth/netrc test subset (35 tests covering redirect status codes, method and body removal, cookies, basic and digest auth, netrc, proxy auth, uppercase-scheme redirects and a custom redirect mixin) ran under an era-appropriate test harness: 34 passed and one expected-failure case passed unexpectedly because loopback networking was available, on the repaired copy, and identically on the vulnerable copy. The era suite never covered same-host cross-scheme redirects, and the repair is contract-neutral. Second, a three-hop chain (TLS origin to plaintext middle to TLS origin) driven by one session: the vulnerable copy delivered the original Basic credential at hop 2 over plaintext and again at hop 3; the repaired copy delivered it at neither, with no re-attachment when no netrc file existed. The per-hop strip is persistent.",
+    "next_hint": "Contract neutrality and multi-hop persistence are verified; the only remaining local uncertainty is packaging. Export the diff, extract a pristine tree from the baseline commit, apply the diff there with git apply --check and apply, replay the leak, matrix and multi-hop discriminators on the freshly patched tree, and record a tamper-evident checksum manifest for the modified file and the patch. Loopback fixture and certificate remain available."
+  },
+  "lineage": {
+    "case_id": "case-9f9094d375ad4f4198e6a3c43257d3a5",
+    "iteration_id": "iteration-0003",
+    "previous_iteration_id": "iteration-0002",
+    "step_id": "iteration-0003",
+    "parent_step_id": "iteration-0002",
+    "branch_id": "main"
+  }
+}

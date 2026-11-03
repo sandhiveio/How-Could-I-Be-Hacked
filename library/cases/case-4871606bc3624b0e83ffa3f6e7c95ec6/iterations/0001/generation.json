@@ -1,0 +1,24 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the two public input forms leak through different resolution sites, so a repair applied at only one site leaves the other route open. Prerequisites and permissions: a working copy with harmless marker logging available at both the public string-path branch and the internal plain-object branch; loopback servers; read and run permissions. Bounded test: instrument each site with a distinct marker, then send the absolute-URL spelling through the string-path form and through the pathname form and attribute each delivery to the site that produced it. Expected supporting result: each form maps to exactly one site and the markers explain both deliveries. Falsifier: a delivery with no marker (an uncovered resolution route) or one input leaking through both sites, which would demand a wider fix. Limitations: logging is temporary and must be removed before creating the patch; cleanup stops the servers."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: boundary spellings beyond the two named forms also escape because the URL parser treats backslash-led authority, triple slash and userinfo forms as network-path references. Prerequisites and permissions: the vulnerable copy, both loopback servers, and permission to send arbitrary harmless path strings. Bounded test: send backslash '\\\\\\\\host\\\\x', triple-slash '///host/x', userinfo '//user:pw@host/x' and a dot-segment prefix '/a/../../..//host' through the public forms and log which server receives each one. Expected supporting result: authority-bearing spellings reach the target, while the dot-segment and encoded forms stay on the origin after normalization. Falsifier: a same-origin spelling that changes meaning or an authority spelling that does not reach the target. Cleanup: delete temporary fixture logs and stop both servers."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis (design counterexample): a repair that simply rejects every path beginning with two slashes would close the leak but change the accepted contract for a same-origin echoed prefix such as '//origin-host:origin-port//keep', which currently resolves to the origin and keeps the double slash. Prerequisites and permissions: both copies, the two-server fixture and permission to run identical inputs. Bounded test: compare the same-origin double-slash path and a same-origin absolute URL on the vulnerable copy, recording received Host, path bytes and status. Expected supporting result: both reach the origin before the repair, so a rejecting repair is over-broad. Falsifier: either control already failing or changing destination on the vulnerable copy. Cleanup: stop the fixture servers; keep the comparison log as a regression target."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a simpler alternative repair that always rebuilds the request target from the origin plus the literal supplied text, never trusting the authority produced by URL resolution, closes all observed spellings without a separate containment predicate. Prerequisites and permissions: an editable working copy, the two-server fixture, and permission to run both candidate repairs under identical inputs. Bounded test: implement the literal rebuild in a scratch copy, run the full spelling matrix and the same-origin controls, then compare outcomes with the containment-predicate candidate. Expected supporting result: both candidates route leaking spellings to the origin and keep controls stable. Falsifier: any spelling still reaching the target, or a control path changing bytes or destination. Cleanup: discard the losing scratch copy and stop the servers."
+    }
+  ]
+}

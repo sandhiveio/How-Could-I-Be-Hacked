@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: hostname comparison is string equality after parsing, so case-varied or trailing-dot host variants in the Location can pass as same-origin and keep the credential on a secure-to-plaintext hop. Fixture: a TLS origin that redirects to an uppercase-hostname or trailing-dot plaintext URL, plus a header log. Falsifier: header absent means normalization is not the leak mechanism. Defense: compare parsed, normalized hosts (lowercased, dot-stripped) plus scheme and port; cleanup deletes both servers and logs."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: explicit non-default ports on both sides make effective ports unequal yet the hostname-only rule keeps the credential across a genuine cross-port hop. Fixture: TLS origin on one high port redirecting to a plaintext target on another high port, header log on the target. Falsifier: header stripped implies the scheme alone drives the decision and port logic is dead code for this defect. Defense: substitute implicit default ports (80 for plaintext, 443 for TLS) into the comparison key so omitted and explicit default ports collapse; cleanup kills both listeners."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis (counterexample): a redirect that stays on TLS but changes only hostname case should keep credentials because certificate validation covers the same name, so a repair must lowercase rather than compare strictly. Fixture: TLS origin redirecting to a case-varied TLS target with a header log. Falsifier: a strict-equality repair over-strips the case-only variant. Defense: lowercase and strip trailing dots in one helper used by all redirect branches; cleanup removes temporary certificate material and stops servers."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the strip may be one-shot rather than persistent, and a later hop of a chain could re-attach credentials from environment or netrc state after an earlier strip; the delivered text was self-announced as unfinished and conflated multi-hop persistence with netrc re-attachment without naming a single falsifiable experiment."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: POST 307 semantics interact with the strip decision, so a completeness probe of the header set plus method and body preservation is needed. Fixture: a TLS origin answering a POST with 307 to a plaintext target that logs method, body and headers. Falsifier: body loss or a changed method after the hop indicates a regression in request reconstruction. Defense: verify method and body equality alongside the auth decision; cleanup deletes fixture servers and logs."
+    }
+  ]
+}

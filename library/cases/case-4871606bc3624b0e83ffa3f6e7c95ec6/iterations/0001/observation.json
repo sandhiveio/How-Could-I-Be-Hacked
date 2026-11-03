@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "A 20-case matrix plus a direct helper table ran on the vulnerable copy with two loopback servers and the diagnostics channel as ground truth. Both public forms delivered protocol-relative and absolute spellings to the target server. The widened set also leaked triple-slash, backslash, slash-backslash, userinfo, fragment-suffixed and no-path spellings; ordinary path, query, dot-segment '/a/../b' (normalized to '/b'), encoded '%2f%2f...' and a same-origin double-slash control stayed on the origin. The helper table reproduced the mapping directly, showing that the plain-object parser resolves both protocol-relative and absolute inputs to the foreign origin. Thirteen of twenty cases reached the target.",
+  "next_hint": "The foreign delivery is confirmed on both public forms and a widened spelling set, and the same-origin double-slash control is known to work before the repair. The next step is to implement containment at both resolution sites so the final origin always equals the supplied origin while the supplied text stays literal, and to replay the identical matrix on the patched copy."
+}

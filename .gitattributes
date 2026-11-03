@@ -1,0 +1,3 @@
+* text=auto eol=lf
+library/cases/** -text
+library/index.sqlite -text

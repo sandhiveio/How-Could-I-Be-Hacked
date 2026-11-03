@@ -1,0 +1,10 @@
+{
+  "case_id": "case-9f9094d375ad4f4198e6a3c43257d3a5",
+  "iteration_id": "iteration-0002",
+  "previous_iteration_id": "iteration-0001",
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first reproduction then origin-based repair: stand up a loopback TLS origin with a self-signed certificate for one fixed hostname plus a header-logging plaintext target; first prove the leak at wire level (a same-hostname secure-to-plaintext 302 forwards the Authorization header in the vulnerable copy), then apply the minimal repair in the redirect-auth rebuild step so credentials are kept only when scheme, hostname and effective port are identical, substituting the implicit default ports 80/443 when omitted and leaving the netrc re-lookup untouched. Finally run a keep/strip regression matrix on both copies: same-origin plaintext and secure keep, cross-host strip, same-host port change strip, explicit versus implicit default ports, 307/308 method and body integrity, and the netrc interaction."
+  },
+  "hint": "A generic Python HTTP client library was just observed forwarding an HTTP Basic Authorization header from a TLS origin to a same-host plaintext target through a 302, because its redirect-auth rebuild step compares hostnames only. The fixture can start a TLS origin with a short-lived self-signed certificate plus plaintext or TLS logging targets on loopback. The planned repair keeps credentials only when scheme, case-folded hostname and effective port all match, and leaves the netrc re-lookup below the strip branch untouched. Permissions: edit a patched working copy of the library, run it locally, bind disposable loopback servers, issue calls."
+}

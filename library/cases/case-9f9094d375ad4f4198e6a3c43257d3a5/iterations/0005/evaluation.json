@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.7875,
+      "rationale": "Every phase except bundle round-trip is executed with saved evidence; the one remaining explicit step is verifying the exported payload itself, which the top vectors instantiate, so the incumbent is the correct final selection under heavy evidence weighting."
+    },
+    {
+      "id": "r5-v1",
+      "eligible": true,
+      "score": 0.515,
+      "rationale": "Exactly the remaining uncertainty: JSON-decode the bundle, apply the embedded diff to a fresh pristine tree, compare hashes and replay the leak check; concrete falsifier and high relevance to the external evaluator action."
+    },
+    {
+      "id": "r5-v5",
+      "eligible": true,
+      "score": 0.445,
+      "rationale": "Recompute the manifest hashes independently and add a mutation negative control; directly validates that provenance is recomputable rather than self-asserted, and is feasible in one command."
+    },
+    {
+      "id": "r5-v3",
+      "eligible": true,
+      "score": 0.43,
+      "rationale": "Assert a single-file diff and replay on an otherwise baseline-identical tree; cheap and precise, complementing the bundle round-trip."
+    },
+    {
+      "id": "r5-v2",
+      "eligible": true,
+      "score": 0.3825,
+      "rationale": "CRLF and trailing-newline transport variance is a real robustness question, but the external payload is built from the LF source tree and the bundle already applied once; moderate value."
+    },
+    {
+      "id": "r5-v4",
+      "eligible": true,
+      "score": 0.325,
+      "rationale": "IPv6 and uppercase-scheme edges are predictable from parsing behavior and the matrix table; low-yield at closure and the fixture feasibility is hedged."
+    }
+  ]
+}

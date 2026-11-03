@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "case_id": "case-9f9094d375ad4f4198e6a3c43257d3a5",
+  "iterations": 5,
+  "artifacts": [
+    {
+      "path": "case.json",
+      "sha256": "aa1a44f17b85b58f4fc6d06c6c3f9ca4d18871c3e3088f543bb014f3289fe4f7"
+    },
+    {
+      "path": "planning.json",
+      "sha256": "732580bc79b2319c7d6ef079952194f5945f76ce8f1553437a57e6733254511e"
+    },
+    {
+      "path": "iterations/0001/context.json",
+      "sha256": "e3aca6a7b392e3f97c08691d7c45caa42be468a6dae0f4466531b0013eb5c836"
+    },
+    {
+      "path": "iterations/0001/generation.json",
+      "sha256": "bd9a2dbd3cb8fc2ab9e3db8f67c769850c30c96098910e53de7a759d8bdde838"
+    },
+    {
+      "path": "iterations/0001/evaluation.json",
+      "sha256": "1739e4a9b5c8d44c3fd5d9f260c6356dbaa2553a5ed4fa6449c6809c14b79b75"
+    },
+    {
+      "path": "iterations/0001/selection.json",
+      "sha256": "9ee1e14c0a21118d34aaa121245db1446e593aaa22dcdc93e47359a8e3d47209"
+    },
+    {
+      "path": "iterations/0001/observation.json",
+      "sha256": "e395740c109f0201265a244409f3593aff88631e517616bf1701ec85ddb06992"
+    },
+    {
+      "path": "iterations/0001/step.json",
+      "sha256": "9dcc2a6715dd89c81a9d16b9cef1039c6cd772535d3f0b1ed1fb1b5d9c1e1f2a"
+    },
+    {
+      "path": "iterations/0002/context.json",
+      "sha256": "c8c603c628d731bf5bb4137e8d936878bf503d49dd0aeb53fa42fa339155a37a"
+    },
+    {
+      "path": "iterations/0002/generation.json",
+      "sha256": "c31c765b6335c4af5aa6556228f0831087228d95de79e4cbea3932b4446bf826"
+    },
+    {
+      "path": "iterations/0002/evaluation.json",
+      "sha256": "8bbd372f9d1de8d764834961596bd08347c16bb0cc4afef5feffb4cdb5e9347b"
+    },
+    {
+      "path": "iterations/0002/selection.json",
+      "sha256": "9ee1e14c0a21118d34aaa121245db1446e593aaa22dcdc93e47359a8e3d47209"
+    },
+    {
+      "path": "iterations/0002/observation.json",
+      "sha256": "b57c7e4d9180a63f8000fdbfd96fbe654e8ac209d9433b443f19be71d6420b35"
+    },
+    {
+      "path": "iterations/0002/step.json",
+      "sha256": "c10fe2bdf371cf8ba116bfb23a1cdc6d903e4444cdd2792f0811ca5aaa7d546c"
+    },
+    {
+      "path": "iterations/0003/context.json",
+      "sha256": "2865191a94ccd8231973571338fcde051e79e3b47718be8434a93cfb373c9b6d"
+    },
+    {
+      "path": "iterations/0003/generation.json",
+      "sha256": "cc068089689f649cc8f0f36877c42da447ca795f19f2b9baaca74bbe8837fc3f"
+    },
+    {
+      "path": "iterations/0003/evaluation.json",
+      "sha256": "6500544982c355552f667b4e7ecc0145dafbe3348dbc8faa1b56222bf1d9e4d1"
+    },
+    {
+      "path": "iterations/0003/selection.json",
+      "sha256": "9ee1e14c0a21118d34aaa121245db1446e593aaa22dcdc93e47359a8e3d47209"
+    },
+    {
+      "path": "iterations/0003/observation.json",
+      "sha256": "4095e38c4ac95a9bd4350c29305d9684b0381e44c9a3dcbed54e54d304e250f4"
+    },
+    {
+      "path": "iterations/0003/step.json",
+      "sha256": "651a2eb7b56db099f35967cf26cdecad2af045024aeb43e4b05e48344cf983e1"
+    },
+    {
+      "path": "iterations/0004/context.json",
+      "sha256": "d9956fa31428633a093cc60c222c00c5afffdf31adbdd0847aae74bbad840b05"
+    },
+    {
+      "path": "iterations/0004/generation.json",
+      "sha256": "7ef10d31d25a75f807ca12bb52fbd358f8dc03f7248584a0057d7688d127d04c"
+    },
+    {
+      "path": "iterations/0004/evaluation.json",
+      "sha256": "494ee96a3a428af38ec3da3c6e66a8175e6dc5636adc9990c74c835d02f5a407"
+    },
+    {
+      "path": "iterations/0004/selection.json",
+      "sha256": "9ee1e14c0a21118d34aaa121245db1446e593aaa22dcdc93e47359a8e3d47209"
+    },
+    {
+      "path": "iterations/0004/observation.json",
+      "sha256": "234e8b0f9b8e5b00e58c07557590db1cae981561aaa68345d4772b722ac93aed"
+    },
+    {
+      "path": "iterations/0004/step.json",
+      "sha256": "44d7f9bde51c42b7c3eecad0ce5e3629c431635f8544963885e11f8f03dc6897"
+    },
+    {
+      "path": "iterations/0005/context.json",
+      "sha256": "e2ddf0840d3121207bca1988ad52c6aa74d30281e8890ea71ca96ff968837a42"
+    },
+    {
+      "path": "iterations/0005/generation.json",
+      "sha256": "48bf092e439e4c9dc4d003f1305e93a02f431d38d6c97ce4a103c373dfe39308"
+    },
+    {
+      "path": "iterations/0005/evaluation.json",
+      "sha256": "949ff6a3a852df88852250493f8948a6f9ca397f0489d4998c6ac2d6ad00c9d4"
+    },
+    {
+      "path": "iterations/0005/selection.json",
+      "sha256": "9ee1e14c0a21118d34aaa121245db1446e593aaa22dcdc93e47359a8e3d47209"
+    },
+    {
+      "path": "iterations/0005/observation.json",
+      "sha256": "5ef4c72b1fae07cc657f95415a3b43c4ba21ae58c5a754e12d8405ad0f0ff1f6"
+    },
+    {
+      "path": "iterations/0005/step.json",
+      "sha256": "788504b85c924528775ea0184b968494acba38a9b352edf065dd261f00f7adee"
+    }
+  ]
+}

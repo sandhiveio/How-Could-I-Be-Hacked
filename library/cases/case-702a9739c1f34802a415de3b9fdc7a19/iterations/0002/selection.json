@@ -1,0 +1,4 @@
+{
+  "selected_id": "plan-1",
+  "selected_text": "Reproduce-then-boundary-containment: first reproduce the flaw against a live local handler using a fixture root with a sibling marker file and raw requests carrying literal parent-directory segments, so no client-side normalization hides the behavior. Characterize which shapes leak, including the extensionless index-append branch and deep traversal. Then implement the minimal repair at the path-derivation boundary: after joining, resolve the configured root and the joined target and accept only when the target equals the root or begins with the root plus the path separator; otherwise return the existing 404 page. Close with a regression suite covering ordinary files, nested files, directory index, missing files, and traversal variants. Assumption: the join is the single trust boundary; falsifier: a leaking shape that a resolved-prefix check still admits."
+}

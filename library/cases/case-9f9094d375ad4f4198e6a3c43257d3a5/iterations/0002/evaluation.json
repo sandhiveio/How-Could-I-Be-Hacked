@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.7285,
+      "rationale": "The incumbent's immediate next step is applying the minimal origin-based repair and confirming closure on the same fixture; the saved wire log is directly applicable evidence for the reproduction half, while the repair half is still unexecuted."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.6175,
+      "rationale": "Most concrete instantiation of the repair: tuple comparison replacing the hostname-only check with an over-strip control; directly falsifiable by the existing fixture. Evidence zero because the baseline leak does not prove that this comparison closes it."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.5255,
+      "rationale": "Default-port normalization check that discriminates over-stripping; needs an actual default-port listener or a predicate-table variant. Strong matrix element but presupposes the patch exists."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.519,
+      "rationale": "307/308 method and body integrity under the new strip rule; requires the fixture to log bodies (small extension) and matters only after the patch exists, so better as a matrix element next round."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.5155,
+      "rationale": "Cross-host strip regression control; passes under both the vulnerable and the repaired predicate, so its information is a guard against broken strip paths rather than a discriminator of the repair itself."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.4705,
+      "rationale": "Clean-apply check of the exported diff on a pristine tree; cheap and high feasibility, but a closure action with nothing to apply until a patch exists."
+    }
+  ]
+}

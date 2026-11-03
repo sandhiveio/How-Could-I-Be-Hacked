@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: the exported single-file patch applies to a pristine source snapshot without context drift. Prerequisites: pristine local copy and the patch file. Bounded test: run a patch dry-run and then apply it, recording exit codes and a recursive source diff; expected is exit 0 and only the reader file changed; the falsifier is a context conflict or any additional changed file. Cleanup: remove the clean copy; limitation: no host container is used."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: cold-start execution validates the repair without stale bytecode or import-path interference. Prerequisites: clean copy with all `__pycache__` and `.pyc` files removed. Bounded test: run the focused footer verification from a cold cache and compare outcomes with the warm run; the falsifier is a failure caused only by bytecode or import paths. Cleanup: delete generated caches; limitation: Python version is fixed locally."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: the full regression suite confirms no functional breakage from the stricter footer rule on a clean tree. Prerequisites: patched clean copy and local test dependency. Bounded test: run the entire parser test directory and record pass/fail counts; expected is all tests passing; the falsifier is an assertion failure in chunked parsing or protocol-error handling. Cleanup: remove the clean copy; limitation: the hidden benchmark tests are not available."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: zero-chunk and trailer bare-LF behavior stays byte-identical to the unpatched lenient baseline, so the footer repair does not silently expand its scope. Prerequisites: unpatched and clean patched copies plus three edge streams. Bounded test: parse a CRLF zero chunk, a bare-LF blank zero chunk and a bare-LF trailer on both copies and compare events, body and trailing data; the falsifier is any difference. Cleanup: remove temporary copies; limitation: only three edge streams."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: the patch artifact is self-contained and reproducible for host-side evaluation, with a diff limited to the chunked-reader implementation. Prerequisites: pristine and patched trees. Bounded test: generate the diff, list changed files and inspect for temporary metadata or unrelated whitespace; the proposal's expected `_events.py` filename is corrected to the reader module, and the falsifier is any unrelated file or hunk. Cleanup: delete generated diffs; limitation: artifact shape only, not behavior."
+    }
+  ]
+}

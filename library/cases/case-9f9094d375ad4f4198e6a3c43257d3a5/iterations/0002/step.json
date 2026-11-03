@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A generic Python HTTP client library was just observed forwarding an HTTP Basic Authorization header from a TLS origin to a same-host plaintext target through a 302, because its redirect-auth rebuild step compares hostnames only. The fixture can start a TLS origin with a short-lived self-signed certificate plus plaintext or TLS logging targets on loopback. The planned repair keeps credentials only when scheme, case-folded hostname and effective port all match, and leaves the netrc re-lookup below the strip branch untouched. Permissions: edit a patched working copy of the library, run it locally, bind disposable loopback servers, issue calls.",
+    "surface": "Generic Python HTTP client library with an automatic redirect policy layer; disposable loopback TLS and plaintext servers, one short-lived self-signed certificate for a fixed loopback hostname, and header/body-logging targets.",
+    "assumptions": [
+      "The observer can read the client source, run it locally, mint a short-lived self-signed certificate, bind disposable loopback servers on a reserved high-port range, and issue ordinary HTTP calls; no write access to a deployed service is assumed.",
+      "The attacker controls or can influence the redirect target returned by a server the client already talks to, and the redirect Location is followed automatically (library default).",
+      "The caller supplies HTTP Basic credentials per request or session; the client keeps them in an Authorization header across hops unless the redirect policy strips them.",
+      "The package ships a test suite, but its test dependencies are not installed in the local environment; the suite is era-appropriate and does not by itself cover same-host cross-scheme redirects.",
+      "Only loopback ports are used and no public target is contacted. The official verdict comes from an external harness on an exported patch, so all local checks are supporting evidence only."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first reproduction then origin-based repair: stand up a loopback TLS origin with a self-signed certificate for one fixed hostname plus a header-logging plaintext target; first prove the leak at wire level (a same-hostname secure-to-plaintext 302 forwards the Authorization header in the vulnerable copy), then apply the minimal repair in the redirect-auth rebuild step so credentials are kept only when scheme, hostname and effective port are identical, substituting the implicit default ports 80/443 when omitted and leaving the netrc re-lookup untouched. Finally run a keep/strip regression matrix on both copies: same-origin plaintext and secure keep, cross-host strip, same-host port change strip, explicit versus implicit default ports, 307/308 method and body integrity, and the netrc interaction."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: comparing normalized tuples of scheme, hostname and effective port inside the redirect-auth rebuild step closes the leak. Prerequisites: the loopback fixture and the staged vulnerable copy with a self-signed certificate for one fixed hostname. Test: apply the tuple comparison patch to the redirect module, replacing the hostname-only check, and run the same secure-to-plaintext redirect. Expected: the Authorization header is absent on the plaintext target, while a scheme-change-only control still strips and same-origin controls still keep; cleanup stops servers and removes logs."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: normalizing ports to their scheme defaults prevents false-positive stripping for equivalent-origin redirects. Test: after the repair, redirect a plaintext origin to an explicit default-port form of itself and inspect the header log; a stripped header despite identical logical origins indicates overly aggressive normalization. Defense: substitute default ports in the comparison key only, leaving explicit ports untouched; cleanup kills both listeners."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: cross-host redirects must keep stripping credentials after the tuple repair, even when scheme and port also change. Test: a TLS origin redirecting to a different hostname on loopback (distinct hostname string resolving to the same machine) with a header log. Expected: Authorization stripped; if it persists, the repair broke the original hostname-uniqueness path. Cleanup stops both servers."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: 307 and 308 redirects keep method and body integrity while applying the new strip rule. Test: a POST with a non-empty body through a cross-scheme 307 and a same-origin 308; log method, body and headers at the target. Expected: method and body preserved exactly as before, credentials following the new predicate; body loss indicates a regression in request reconstruction after the auth strip. Cleanup deletes fixture servers and logs."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the repair applies cleanly as a unified diff to a pristine copy and preserves every matrix outcome. Test: export the diff, run git apply --check then apply on a fresh pristine tree extracted from the baseline, and replay the leak and matrix scripts against that tree. Expected: no hunk failures and all keep/strip outcomes match design; whitespace or line-ending mismatches serve as counterexamples. Cleanup removes the scratch trees."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.7285,
+      "rationale": "The incumbent's immediate next step is applying the minimal origin-based repair and confirming closure on the same fixture; the saved wire log is directly applicable evidence for the reproduction half, while the repair half is still unexecuted."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.6175,
+      "rationale": "Most concrete instantiation of the repair: tuple comparison replacing the hostname-only check with an over-strip control; directly falsifiable by the existing fixture. Evidence zero because the baseline leak does not prove that this comparison closes it."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.5255,
+      "rationale": "Default-port normalization check that discriminates over-stripping; needs an actual default-port listener or a predicate-table variant. Strong matrix element but presupposes the patch exists."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.519,
+      "rationale": "307/308 method and body integrity under the new strip rule; requires the fixture to log bodies (small extension) and matters only after the patch exists, so better as a matrix element next round."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.5155,
+      "rationale": "Cross-host strip regression control; passes under both the vulnerable and the repaired predicate, so its information is a guard against broken strip paths rather than a discriminator of the repair itself."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.4705,
+      "rationale": "Clean-apply check of the exported diff on a pristine tree; cheap and high feasibility, but a closure action with nothing to apply until a patch exists."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "The repair was applied in a separate patched working copy: the redirect-auth rebuild step now strips the Authorization header unless scheme, case-folded hostname and effective port all match, with implicit default ports substituted when omitted; the netrc re-lookup below the branch is unchanged. Re-running the identical secure-to-plaintext redirect against the patched copy delivered the hop to the plaintext target with no Authorization header (final status 200), while the keep direction held: same-origin plaintext-to-plaintext and TLS-to-TLS redirects still carried the header, cross-host still stripped, a POST through a cross-scheme 307 preserved method and body while stripping credentials, a same-origin 308 kept both credential and body, and the netrc credential was re-attached for a cross-host hop exactly as before the repair. A 14-row predicate table matched the intended keep/strip table on every row after the repair, versus four hostname-only deviations before it (scheme-change and same-host port-change pairs).",
+    "next_hint": "The repair closes the single-hop leak with positive and negative wire controls, and the predicate table matches design including explicit versus implicit default ports and case-folded hostnames. Two independent checks remain before export: the package's own redirect/auth test subset must stay green on the repaired copy (contract neutrality, compared against the vulnerable copy), and a three-hop chain driven by one session must not carry or re-attach the original credential at later hops. Both run on loopback with the existing fixture; no new permissions are needed."
+  },
+  "lineage": {
+    "case_id": "case-9f9094d375ad4f4198e6a3c43257d3a5",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001",
+    "step_id": "iteration-0002",
+    "parent_step_id": "iteration-0001",
+    "branch_id": "main"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the strip predicate is re-evaluated per hop, so a three-hop chain (TLS origin to plaintext middle to TLS origin) should not carry the original credential at hops 2 or 3 after the repair, nor re-attach it without a netrc entry. Test: three loopback servers logging headers, one session through the whole chain, inspect hop-2 and hop-3 logs; run the same chain on the vulnerable copy for contrast. Falsifier: hop 3 receives the original tuple header, proving a one-shot rather than per-hop decision. Cleanup stops all three servers and deletes logs."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: URL-embedded (userinfo) credentials behave differently from tuple credentials across a scheme-change hop, because the rebuild step only touches the Authorization header. Test: a plaintext origin redirecting to a TLS target whose URL embeds a user and password, with a header log; compare both copies. Falsifier: the target sees an Authorization header after the repair, proving a cross-scheme leak through the userinfo path. Cleanup deletes fixture servers and logs."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: running the package's own redirect and auth test subset under an era-appropriate test harness exposes expectation mismatches that a hand-built matrix misses, revealing over-strict repair behavior. Test: install test dependencies in a disposable environment, run only redirect/auth/netrc selectors against the repaired and vulnerable copies, triage failures as fixture artifacts versus real regressions. Falsifier: a green subset means the predicate aligns with the package contract; a failing same-origin case flags over-stripping. Cleanup keeps the environment disposable."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a 307 across an explicit-versus-implicit default-port boundary may over-strip because URL rewrite order matters, and a trace hook around the rebuild routine can capture pre- and post-rewrite URLs directly. Test: four permutations (explicit and implicit default ports, same and changed scheme) with method, body and auth logged, plus a wrapper recording the rebuild arguments. Falsifier: a stripped header when effective ports are equal, or a kept header when they differ. Cleanup stops all listeners."
+    },
+    {
+      "id": "r3-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the exported diff applies cleanly to a fresh copy of the baseline and the full discriminator suite passes on the replayed tree, with a checksum manifest making the baseline tamper-evident. Test: extract a pristine tree from the baseline commit, git apply --check and apply the exported diff, replay the leak, matrix and multi-hop scripts with the replayed tree on the path, and hash every modified file. Falsifier: a hunk rejection, hash mismatch or replay failure. Cleanup removes scratch trees."
+    }
+  ]
+}

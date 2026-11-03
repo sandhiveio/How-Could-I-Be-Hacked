@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "The vulnerable Node.js HTTP client was just observed delivering thirteen of twenty caller-controlled path spellings to a second loopback server, including protocol-relative, absolute, triple-slash, backslash, slash-backslash, userinfo, fragment and no-path forms, while ordinary, query, dot-segment, encoded and same-origin double-slash controls stayed on the origin. Both resolution sites are known to be involved: the public string-path branch and the plain-object parser branch. Permissions: edit a separate patched copy, run the library, bind the two loopback servers. The next question is the smallest implementation that forces the final origin to equal the supplied origin for every leaking spelling, keeps literal path text (so a same-origin double slash is not folded away), and leaves dot-segment normalization intact.",
+    "surface": "Dependency-free Node.js HTTP/1.1 client; public dispatcher accepting an origin plus a path or pathname option; internal URL parser with a plain-object branch and a separate string-path branch; disposable loopback origin and target servers that log request line, Host header and body; library diagnostics channel that exposes the resolved origin and path for each outgoing request.",
+    "assumptions": [
+      "A Node.js runtime is available and the library imports directly from an editable working copy with no installed runtime dependencies.",
+      "The observer may read the source, edit two resolution sites in a separate patched copy, and run ordinary HTTP calls.",
+      "The attacker controls only the path or pathname string; the application fixes the origin URL and method, and follows no attacker-controlled redirect logic in this scenario.",
+      "Disposable HTTP servers can bind ephemeral loopback ports on the loopback interface; one server acts as the fixed origin and a second as the foreign target, and both record every request.",
+      "No public target is contacted. The official benchmark verdict is produced externally from an exported patch, so local fixtures and matrices are supporting evidence only."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Wire-first reproduction then containment repair: stand up two disposable loopback servers (origin and target) that log method, request URL, Host and body; prove the foreign delivery end to end for both public input forms and a widened spelling set; add an origin-containment rule at both resolution sites so the supplied text is resolved literally under the supplied origin; then run a differential keep/reach matrix on vulnerable and patched copies plus a clean-apply check on a pristine tree."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: post-resolution origin comparison with a literal-path rebuild is sufficient and minimal when applied to both resolution sites. Prerequisites and permissions: patched copy, loopback servers, permission to run the differential matrix. Bounded test: replace ordinary resolution with a helper that compares resolved origin to base origin; if different, rebuild as base origin plus the supplied text (prefixing one slash when absent); replay the 20-case matrix and the same-origin double-slash control. Expected supporting result: all leaking spellings reach the origin with literal text and the control still preserves its double slash. Falsifier: a leaking spelling still reaching the target or the control collapsing. Cleanup: remove scratch logs and close listeners."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: re-resolving the extracted pathname and search against a dot-anchored base gives literal leading-slash semantics without origin drift, avoiding an explicit origin comparison. Prerequisites and permissions: patched copy, loopback servers and the diagnostics channel. Bounded test: after the ordinary resolution, extract only pathname, search and hash and re-resolve with a base of the form base-origin plus a dot segment; compare resolved origin and path for protocol-relative, triple-slash, backslash and fragment inputs. Expected supporting result: no case routes to the target and dot-segment '/a/../b' still yields '/b'. Falsifier: any target delivery, or a fragment-only input mapping to the wrong path. Cleanup: stop servers and discard scratch trees."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an allowlist guard in the request constructor that rejects authority-bearing path prefixes is a sufficient single choke point and avoids touching both resolution sites. Prerequisites and permissions: instrumented request constructor, both loopback servers, and permission to run the public forms. Bounded test: reject paths whose prefix denotes an authority and run protocol-relative, absolute, triple-slash, backslash and userinfo inputs plus ordinary controls through the public forms. Expected supporting result: authority forms are rejected and ordinary paths still succeed. Falsifier: an authority form bypassing the guard and reaching the target, or an ordinary control becoming an error. Cleanup: revert instrumentation and stop servers."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the repaired copy preserves method, body and query normalization for benign inputs and differs from the vulnerable copy only on leaking spellings. Prerequisites and permissions: both copies, the two-server fixture, permission to capture full request lines. Bounded test: send GET with query, POST with a small marker body, HEAD, and a leaking POST through both copies and compare method, request target, Host and body hash at the origin. Expected supporting result: benign cases are byte-equal and leaking cases now land on the origin. Falsifier: any benign case differing beyond ephemeral port digits, or a leaking case still on the target. Cleanup: remove scratch copies and stop servers."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.7538,
+      "rationale": "Selected. Round 1 supplied directly observed wire evidence and the incumbent's next step is the minimal containment repair at the two known resolution sites with a full replay. No generated candidate had executed evidence, so the incumbent remained strongest under the evidence-weighted rubric."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.6275,
+      "rationale": "Deferred, but it is the selected implementation shape: post-resolution origin comparison plus literal rebuild, applied at both sites, with the same-origin double slash and dot-segment behavior as explicit falsifiers."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.5888,
+      "rationale": "Deferred. The dot-anchored re-resolution is a distinct alternative, but its literal behavior for a same-origin double slash is less clear and it adds a second parsing step; kept as a comparison idea."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.56,
+      "rationale": "Deferred. Constructor rejection is defense in depth but changes the public contract for same-origin double-slash paths and treats the symptom after resolution; not the minimal repair."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.525,
+      "rationale": "Deferred to the later regression round. The byte-level benign differential is the right instrument once a patched copy exists, but at selection time there was nothing patched to compare."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "The containment helper was added to a separate patched copy and called from both resolution sites. It compares the origin produced by ordinary resolution with the supplied base origin and, when they differ, rebuilds the URL as base origin plus the supplied text, prefixing one slash when the text does not begin with one. A 27-case differential ran the same inputs against vulnerable and patched copies with two loopback servers. The vulnerable copy delivered thirteen cases to the target server; the patched copy delivered none, and every case reached the origin with literal text such as '//host:port/evil' or a leading slash followed by the absolute URL text. Controls were identical on both copies: ordinary, query, '/a/../b' to '/b', same-origin double slash preserved, same-origin absolute URL and encoded slashes. POST method and a marker body were preserved on the origin, and HEAD stayed HEAD.",
+    "next_hint": "The containment repair routes every known leaking spelling back to the origin with literal text and leaves the controls, method and body intact. The next step is contract and unusual-origin verification: public validation expectations, a base origin spelled with a hostname while the path names the loopback address on the same socket, uppercase and cross-scheme absolute paths, a bare scheme prefix, and bracketed IPv6 where available."
+  },
+  "lineage": {
+    "case_id": "case-4871606bc3624b0e83ffa3f6e7c95ec6",
+    "iteration_id": "step-2",
+    "previous_iteration_id": "step-1",
+    "step_id": "step-2",
+    "parent_step_id": "step-1",
+    "branch_id": "main"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "case-702a9739c1f34802a415de3b9fdc7a19",
+  "kind": "curated_case",
+  "hint": "A generic HTTP static-file handler derives a filesystem target by joining a configured content root with the request pathname, appends a default index filename when the joined target has no extension, and streams the target if it exists as a regular file. No containment check follows the join.",
+  "surface": "Generic Node-style HTTP static-file handler serving a configurable directory; disposable local fixtures and ephemeral loopback ports.",
+  "assumptions": [
+    "The observer can read the handler source, run it locally, create disposable fixture trees, and send raw HTTP requests; no write access to a deployed service is assumed.",
+    "Request pathnames are attacker-controlled and reach the handler without client-side normalization.",
+    "The configured content root is resolved to an absolute path before requests are served.",
+    "The handler ships without a test suite, so regression checks must be authored locally."
+  ]
+}
