@@ -1,10 +1,10 @@
 # How Could I Be Hacked
 
-![Investigation paths branch from source code; one path leads to verified evidence and a regression check.](assets/illustrations/investigation-cover.png)
-
 Explore how your code could be attacked using real security investigation trajectories.
 Find applicable hypotheses, run targeted checks, and turn verified findings into regression
 tests — all locally, without API access.
+
+![Investigation paths branch from source code; one path leads to verified evidence and a regression check.](assets/illustrations/investigation-cover.webp)
 
 **As of November 3, 2026 · 6 cases · 20 investigation steps · 115 searchable hypotheses · Offline use · No API keys · Daily updates planned**
 

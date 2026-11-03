@@ -1,7 +1,7 @@
 # README illustrations
 
-- `investigation-cover.png`: generated with the built-in ImageGen tool, then visually reviewed. The illustration is conceptual, not evidence of an executed investigation.
-- `workflow.svg`: editable workflow diagram with explicit colors for light and dark GitHub themes, accessible title and description, and no external dependencies.
+- `investigation-cover.webp`: generated with the built-in ImageGen tool, then visually reviewed and exported as a 1600px WebP for faster loading. The illustration is conceptual, not evidence of an executed investigation.
+- `workflow.svg`: editable vertical workflow diagram with readable labels on narrow screens with explicit colors for light and dark GitHub themes, accessible title and description, and no external dependencies.
 
 ## Cover generation prompt
 
