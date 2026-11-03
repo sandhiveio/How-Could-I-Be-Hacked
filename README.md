@@ -1,5 +1,7 @@
 # How Could I Be Hacked
 
+![Investigation paths branch from source code; one path leads to verified evidence and a regression check.](assets/illustrations/investigation-cover.png)
+
 Explore how your code could be attacked using real security investigation trajectories.
 Find applicable hypotheses, run targeted checks, and turn verified findings into regression
 tests — all locally, without API access.
@@ -25,6 +27,8 @@ starting point for investigation, not a guarantee of completeness. Token savings
 and detection improvements have not yet been benchmarked.
 
 ## Use with an agent
+
+![Local investigation workflow: your code → retrieve hypotheses → check applicability → run local tests → add regression checks for verified findings. Observations guide the next round.](assets/illustrations/workflow.svg)
 
 Copy or clone this repository into a folder named `how-could-i-be-hacked` inside your agent's
 skills directory, or give your agent the absolute path to [SKILL.md](SKILL.md).
