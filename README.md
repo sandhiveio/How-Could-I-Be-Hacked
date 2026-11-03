@@ -12,6 +12,18 @@ with daily updates to the skill and its hypothesis library.
 This is the project's operating commitment. The continuous producer and daily delivery
 pipeline are not yet configured in this initial release; the bundled library is a snapshot.
 
+## Spend fewer tokens. Reuse investigation paths.
+
+Start from reusable investigation trajectories instead of rebuilding every hypothesis and test
+plan from scratch. Retrieve a relevant mechanism, check its prerequisites against your code,
+and adapt the existing test approach. This can save agent tokens and investigation time.
+
+Use the library as a security review checklist: compare applicable attack paths, revisit
+rejected alternatives, and add checks for overlooked trust boundaries and edge cases.
+Systematic coverage helps reduce the risk of missing vulnerabilities; the library is a
+starting point for investigation, not a guarantee of completeness. Token savings, time savings
+and detection improvements have not yet been benchmarked.
+
 ## Use with an agent
 
 Copy or clone this repository into a folder named `how-could-i-be-hacked` inside your agent's
