@@ -1,22 +1,14 @@
-<p align="center">
-  <img src="assets/illustrations/sandhive-emblem.jpg" width="140" height="140" alt="SandHive emblem" />
-</p>
-
-# How Could I Be Hacked
+<h1><img src="assets/illustrations/sandhive-emblem.jpg" width="40" height="40" alt="SandHive" /> How Could I Be Hacked</h1>
 
 Explore how your code could be attacked using real security investigation trajectories.
 Find applicable hypotheses, run targeted checks, and turn verified findings into regression
 tests — all locally, without API access.
 
-## 115 searchable hypotheses
-
-| Cases | Investigation steps | Searchable hypotheses |
-| --- | --- | --- |
-| **6** | **20** | **115** |
+**6 cases · 20 steps · 115 hypotheses**
 
 **Works offline. No API keys required.**
 
-Snapshot: November 3, 2026. Daily library updates are planned; the update pipeline is not yet configured.
+[Use with an agent](#use-with-an-agent) · [Run locally](#run-locally) · [Workflow](references/workflow.md)
 
 ![Branching investigation: competing hypotheses, discarded paths, a local experiment, evidence, and a regression test. Conceptual illustration.](assets/illustrations/investigation-cover.svg)
 
@@ -76,6 +68,8 @@ Search is lexical, not semantic, and cannot establish the absence of vulnerabili
 The toolkit assists an agent; it does not autonomously scan code or execute retrieved text.
 
 ## Data and evidence
+
+Snapshot: November 3, 2026. Daily library updates are planned; the update pipeline is not yet configured.
 
 The library is a snapshot of the project's curated local library. Raw producer runs, private
 identity mappings and credentials are excluded. Do not commit assessments or target logs here.
