@@ -1,5 +1,6 @@
-# Investigation diagram
+# Investigation illustrations
 
-`investigation-map.svg` is an editable, self-contained file-containment example. It illustrates why rejecting one input does not settle a different mechanism. The example is conceptual; it does not report an executed test or a vulnerability in a target.
+- `investigation-cover.svg`: conceptual branching trajectory, including discarded and unresolved paths.
+- `investigation-workflow.svg`: general offline consumer workflow, with observation-driven iteration and regression checks for verified findings.
 
-The graphic uses explicit background and foreground colors, a single red investigation branch, and descriptive SVG and Markdown alternatives. No external fonts or generated raster assets are required.
+Both diagrams are editable, self-contained SVGs with descriptive titles, descriptions, and Markdown alt text. They illustrate the method rather than an executed case.
