@@ -59,3 +59,8 @@ using offline-only JSON helpers instead of importing the producer module.
 
 Hash checks detect corruption; they do not establish authenticity or validate security claims.
 Use only within the target's actual authorized scope and permissions.
+
+## Contact
+
+- GitHub: [sandhiveio](https://github.com/sandhiveio)
+- Website: [SandHive](https://sandhive.io)

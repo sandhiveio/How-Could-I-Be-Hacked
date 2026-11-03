@@ -80,3 +80,8 @@ execute/observe cycle, evidence rubric, changing weights, incumbent comparison, 
 minimum two actual steps for a trajectory, and preservation of abandoned branches. Validate
 completed step arrays with `scripts/validate_steps.py --file <private-steps.json>`. An incomplete
 or interrupted review must remain labeled partial; a schema check is not security verification.
+
+## Contact
+
+- GitHub: [sandhiveio](https://github.com/sandhiveio)
+- Website: [SandHive](https://sandhive.io)
