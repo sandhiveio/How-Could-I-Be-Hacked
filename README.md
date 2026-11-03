@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/illustrations/sandhive-emblem.jpg" width="140" height="140" alt="SandHive emblem" />
+</p>
+
 # How Could I Be Hacked
 
 Explore how your code could be attacked using real security investigation trajectories.
@@ -16,6 +20,8 @@ Snapshot: November 3, 2026. Daily library updates are planned; the update pipeli
 
 ![Branching investigation: competing hypotheses, discarded paths, a local experiment, evidence, and a regression test. Conceptual illustration.](assets/illustrations/investigation-cover.svg)
 
+[View investigation map at full size](assets/illustrations/investigation-cover.svg)
+
 ## Spend fewer tokens. Reuse investigation paths.
 
 Start from reusable investigation trajectories instead of rebuilding every hypothesis and test
@@ -31,6 +37,8 @@ and detection improvements have not yet been benchmarked.
 ## Use with an agent
 
 ![General investigation workflow: retrieve trajectories, check applicability, run a bounded experiment, record evidence, and iterate. Verified findings receive regression checks.](assets/illustrations/investigation-workflow.svg)
+
+[View workflow at full size](assets/illustrations/investigation-workflow.svg)
 
 Copy or clone this repository into a folder named `how-could-i-be-hacked` inside your agent's
 skills directory, or give your agent the absolute path to [SKILL.md](SKILL.md).

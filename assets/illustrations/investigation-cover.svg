@@ -1,11 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="680" height="420" viewBox="0 0 680 420" role="img" aria-labelledby="title desc"><title id="title">An investigation follows more than one path</title><desc id="desc">Conceptual branching investigation. Start from code and a trust boundary, explore alternative hypotheses, retain discarded paths, and follow local evidence toward a regression test.</desc><rect width="680" height="420" fill="#f5f5f0"/><g font-family="Arial, Helvetica, sans-serif" fill="#202821">
-<text x="32" y="49" font-size="29" font-weight="700">One codebase. More than one way in.</text>
-<path d="M32 72H648" stroke="#202821"/>
-<text x="32" y="117" font-size="21">Code + trust boundaries</text>
-<g fill="none" stroke="#899285" stroke-width="2"><path d="M54 137V181H308"/><path d="M54 181V263H269V224H411"/><path d="M54 263V345H216"/><path d="M269 263H370V305H469"/></g>
-<g font-size="20" fill="#505b51"><text x="83" y="169">Hypothesis</text><text x="330" y="188">Prerequisite absent</text><text x="431" y="231">Ruled out by test</text><text x="236" y="352">Unresolved</text></g>
-<g stroke="#899285" stroke-width="2"><path d="M308 175v12M405 218l12 12m0-12-12 12"/></g>
-<path d="M54 137V263H370V305H478V353H625" fill="none" stroke="#bf3d24" stroke-width="3"/>
-<g fill="#bf3d24"><circle cx="54" cy="137" r="5"/><circle cx="370" cy="263" r="5"/><circle cx="478" cy="305" r="5"/><circle cx="625" cy="353" r="5"/></g>
-<text x="83" y="250" font-size="21" fill="#a3321e">Local experiment</text><text x="393" y="287" font-size="20" fill="#a3321e">Evidence</text><text x="497" y="381" font-size="20">Regression test</text>
-<text x="32" y="404" font-size="17" fill="#505b51">Conceptual trajectory · preserve the paths you discard</text></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="360" viewBox="0 0 1120 360" role="img" aria-labelledby="title desc"><title id="title">An investigation follows more than one path</title><desc id="desc">Conceptual branching investigation. Start from code and trust boundaries, explore competing hypotheses, preserve discarded and unresolved paths, and follow local evidence toward a regression test.</desc><rect width="1120" height="360" fill="#fff9ed"/><g font-family="Arial, Helvetica, sans-serif" fill="#242424">
+<text x="32" y="49" font-size="32" font-weight="700">One codebase. More than one way in.</text><path d="M32 72H1088" stroke="#242424"/>
+<text x="32" y="132" font-size="25">Code +</text><text x="32" y="163" font-size="25">trust boundaries</text>
+<g fill="none" stroke="#96918a" stroke-width="2"><path d="M238 187H290V114H470"/><path d="M290 187V275H470"/><path d="M815 187V94H855"/></g>
+<g font-size="24" fill="#61574d"><text x="490" y="122">Prerequisite absent</text><text x="490" y="283">Unresolved</text><text x="875" y="102">Ruled out by test</text></g>
+<path d="M470 107v14M849 88l12 12m0-12-12 12" stroke="#96918a" stroke-width="2"/>
+<path d="M238 187H572V235H815V187H1060" fill="none" stroke="#e86d00" stroke-width="3"/>
+<g fill="#e86d00"><circle cx="238" cy="187" r="5"/><circle cx="572" cy="235" r="5"/><circle cx="815" cy="235" r="5"/><circle cx="1060" cy="187" r="5"/></g>
+<text x="320" y="174" font-size="25" fill="#9b4300">Local experiment</text><text x="634" y="220" font-size="25" fill="#9b4300">Evidence</text><text x="868" y="220" font-size="25">Regression test</text>
+<text x="32" y="335" font-size="22" fill="#61574d">Conceptual trajectory · preserve the paths you discard</text></g></svg>
