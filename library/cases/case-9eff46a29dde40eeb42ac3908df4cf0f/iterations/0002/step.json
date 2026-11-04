@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "The fixture established that dot, constructor-chain, bracket-quoted and star paths reach Object.prototype, an array path reaches Array.prototype, and a bracket-unquoted path only writes a local key. A repair must block shared-prototype writes while preserving deep, shallow, array-index, bracket-read, terminal-constructor and star-selector behavior. The observer may patch the local helper, run the full payload matrix, run a repository test suite, and replay the saved patch on a fresh copy.",
+    "surface": "Single-file CommonJS property-path helper with a splitter for dots and brackets, a getter/setter API, array-index traversal, and star-selector expansion. The repair is a minimal assignment guard in the setter; no server, network peer or deployed target is involved.",
+    "assumptions": [
+      "The observer may read and edit the local library, create disposable objects and run Node.js assertions.",
+      "Caller-controlled path strings are the trust boundary; values may be any JavaScript value.",
+      "The repair must preserve the library's existing public behavior for primitive, null, empty, deep, shallow, array, bracket-key and star-selector cases.",
+      "Only local fixtures are used; the official benchmark verifier is host-side and unavailable in the working container.",
+      "Local test-suite results and self-authored regression assertions are evidence, not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "r1-v2",
+    "text": "Bracket-alias bypass hypothesis. Mechanism: a guard that checks only dot-separated names may miss a quoted bracket segment such as a[\"__proto__\"].x, while the splitter normalizes it into a path that still traverses the shared prototype. Prerequisites: the local splitter, one quoted bracket payload, one unquoted bracket payload and a plain-dot control. Bounded test: run all three and inspect Object.prototype plus the fixture. Expected: removal or blocking of the quoted and dot shared writes. Falsifier: Object.prototype gains the marker from any alias while the dot form is blocked. Cleanup: delete the marker; limitation: a single splitter implementation."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v2",
+      "text": "Parent-identity hypothesis. Mechanism: reject the final assignment when the resolved parent is Object.prototype, Array.prototype, Function.prototype or any constructor's prototype object; this is splitter-agnostic and covers every observed shared-parent case. Prerequisites: the resolved parent before assignment and a clean prototype matrix. Bounded test: run dot, constructor-chain, bracket-quoted, array, function, date and regexp payloads plus benign deep and array sets. Expected: no shared marker and benign sets unchanged. Falsifier: a shared prototype gains a marker or a benign set fails. Cleanup: delete markers from every built-in prototype."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v2",
+      "text": "Normalized-segment hypothesis. Mechanism: strip quotes and brackets from each split segment, then reject segments named __proto__, constructor or prototype before assignment. Prerequisites: knowledge of what the splitter returns for quoted and unquoted brackets. Bounded test: compare quoted bracket, unquoted bracket and plain dot payloads on a patched copy. Expected: no shared marker from any alias. Falsifier: a normalized alias still pollutes, or a legitimate terminal constructor/prototype write is rejected. Cleanup: delete markers; limitation: lexical over-blocking risk."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v2",
+      "text": "Combined-guard hypothesis. Mechanism: use both a parent-identity check and a normalized dangerous-segment check, because each covers the other's blind spot. Prerequisites: the full round-1 payload matrix plus constructor, date and regexp prototypes and benign terminal writes. Bounded test: run all payloads and benign cases against the combined patch. Expected: zero shared-prototype markers and zero benign regressions. Falsifier: any marker or any benign delta. Cleanup: clear marker keys from all built-in prototypes."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v2",
+      "text": "Behavioral-diff regression hypothesis. Mechanism: repair risk concentrates in terminal constructor/prototype writes and the existing bracket-key splitter quirk, so a vulnerable-versus-patched diff of benign cases should be empty except for pollution suppression. Prerequisites: a saved vulnerable copy and a patched copy. Bounded test: compare shallow set, deep set, array-index set, bracket-key read and terminal constructor writes. Expected: identical benign behavior. Falsifier: any benign behavioral delta. Cleanup: discard fixture objects; limitation: a sample, not every API consumer."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "r1-v2",
+      "text": "Every-traversed-segment hypothesis. Mechanism: checking only the final key misses a multi-level path that crosses into a shared prototype mid-walk and then assigns a benign final name. Prerequisites: a guard hook on each traversal step and multi-level payloads. Bounded test: run __proto__.a.b.c and constructor.prototype.a.b payloads and inspect the shared prototype. Expected: no marker. Falsifier: a mid-path traversal still lands a benign final key on a shared prototype. Cleanup: remove markers; limitation: more loop logic than the minimal fix."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.6725,
+      "rationale": "Selected incumbent: the bracket-bypass payload is already reproduced, and the repaired assignment guard was implemented as the next action from this hypothesis."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.548,
+      "rationale": "Deferred narrowly: the combined guard is the most complete, but the incumbent action already covered its observed cases."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.524,
+      "rationale": "Deferred: parent identity is the core guard and was used in the repair; the selected incumbent action included it."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.5115,
+      "rationale": "Deferred: normalized segments catch bracket aliases but risk over-blocking terminal constructor/prototype writes."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.502,
+      "rationale": "Deferred: per-segment checking is stronger but more invasive than the observed need."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.489,
+      "rationale": "Deferred: behavioral diff is a validation layer and was executed as part of the incumbent regression."
+    }
+  ],
+  "selected_id": "r1-v2",
+  "observation": {
+    "outcome": "supported",
+    "summary": "The minimal assignment guard was applied to the local helper. The original payload matrix then showed zero Object/Array/Function prototype markers for dot, nested dot, constructor.prototype, bracket-quoted, array-parent, star, function, date and regexp paths, while benign deep, shallow, array-index, bracket-read, terminal constructor/prototype and star cases still worked. A 19-check Node regression passed, the repository test suite passed 33 tests, and a fresh copy of the vulnerable source accepted the saved patch and passed the same probe and regression. The official benchmark evaluator remains host-side and unverified.",
+    "next_hint": "The local repair is complete. Remaining uncertainty is the host-side official evaluator and whether its hidden regression uses a different runtime or an independent exploit script; a future run should test that only if an official failure identifies a gap."
+  },
+  "lineage": {
+    "case_id": "case-9eff46a29dde40eeb42ac3908df4cf0f",
+    "iteration_id": "step-2",
+    "previous_iteration_id": "step-1",
+    "step_id": "step-2",
+    "parent_step_id": "step-1",
+    "branch_id": "main"
+  }
+}

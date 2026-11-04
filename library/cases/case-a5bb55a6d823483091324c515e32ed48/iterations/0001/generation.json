@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a public key serialized as SubjectPublicKeyInfo DER is not recognized by the HMAC key helper, so those bytes can serve as an HMAC secret. Applicability: the verifier holds the public key as DER bytes and permits HMAC among its allowed algorithms; the attacker knows the public key. Bounded test: generate a 2048-bit RSA key, serialize the public key as SPKI DER, forge an HS256 token over a chosen payload with those exact bytes as the HMAC key, then decode with the same bytes and the full default algorithm collection. Expected supporting result: the payload is returned before repair; falsifier: InvalidKeyError before repair. Cleanup and limits: generated keys and tokens are ephemeral, and this row alone does not prove PEM or OpenSSH behavior."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a cryptography asymmetric public-key object passed directly as the verification key is coerced or serialized into a usable HMAC secret, so an HS256 token verifies under the full default collection. Applicability: the caller stores the verify key as a library object rather than a string. Bounded test: forge an HS256 token with the object's DER bytes and pass the raw object as the decode key; compare with string and byte forms. Expected supporting result: acceptance; falsifier: a TypeError or InvalidKeyError from key preparation. Cleanup: discard fixture objects. Limit: this tests object handling, not encoded-key handling."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: OpenSSH public strings that do not start with ssh-rsa, such as ec- or ed25519-tagged strings, bypass the literal HMAC blocklist and verify as shared secrets. Applicability: the verifier holds an EC or Ed25519 public key in OpenSSH text and allows the full default collection. Bounded test: generate EC and Ed25519 keys, take the OpenSSH public string, forge an HS256 token with that string as the secret, and decode with the same string. Expected supporting result: acceptance before repair; falsifier: InvalidKeyError. Cleanup: remove generated key files. Limit: depends on how the caller's asymmetric verifier accepts OpenSSH input."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a repair that adds more literal substrings can over-reject legitimate shared secrets that merely contain words like BEGIN or PUBLIC. Applicability: ordinary HMAC callers with arbitrary byte or text secrets. Bounded test: after a repair, sign and verify HS256, HS384 and HS512 tokens with a table of legitimate secrets including near-miss words, random bytes and long base64 text. Expected supporting result: every legitimate secret verifies; falsifier: any InvalidKeyError for a non-key secret. Cleanup: secrets are ephemeral. Limit: a control for repair precision, not an attack by itself."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a structural detector using key-object type checks plus a parse-as-public-key fallback is more robust than extending the literal blocklist. Applicability: the repair may import optional crypto classes and must work when the optional dependency is absent. Bounded test: reject PEM, DER and OpenSSH public forms on the HMAC path while confirming ordinary HMAC and asymmetric tokens still verify. Expected supporting result: all asymmetric forms rejected with no HMAC regression; falsifier: an escaping form or a rejected legitimate secret. Cleanup: revert the experimental branch after comparison. Limit: a design alternative, not yet executed."
+    }
+  ]
+}

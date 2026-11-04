@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Implemented an HMAC-path guard that raises a key error for cryptography asymmetric key objects and for bytes that parse as public or private keys through PEM, OpenSSH or DER loaders, while retaining the original literal blocklist. The rerun showed DER SPKI, PKCS#1 DER, PEM, RSA OpenSSH, EC OpenSSH, Ed25519 OpenSSH and RSA/EC/Ed25519 key objects all rejected, with legitimate shared-secret, RS256 and wrong-secret controls unchanged. Added 22 regression checks covering every HMAC variant and near-miss secrets; all passed, and the upstream suite stayed at its passing baseline. The normalized patch applied to a fresh copy. Local evidence only.",
+  "next_hint": "Probe less common encodings — bare base64 key bodies, DER certificates, JWK text and encrypted private keys — to see whether the first structural guard is complete."
+}

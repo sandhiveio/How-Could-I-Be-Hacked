@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "The helper splits a caller-controlled path on dots and brackets, walks the object graph, and assigns the final key on the resolved parent. The splitter has special handling for bracket notation, periods inside keys and star selectors. No visible code rejects prototype-related names. A small Node fixture can compare dangerous paths with benign deep, shallow, array-index and bracket-read cases and record whether a shared built-in prototype was changed. The observer may run local Node scripts against a disposable source copy.",
+    "surface": "Single-file CommonJS property-path helper with a splitter for dots and brackets, a getter/setter API, array-index traversal, and star-selector expansion. The repair is a minimal assignment guard in the setter; no server, network peer or deployed target is involved.",
+    "assumptions": [
+      "The observer may read and edit the local library, create disposable objects and run Node.js assertions.",
+      "Caller-controlled path strings are the trust boundary; values may be any JavaScript value.",
+      "The repair must preserve the library's existing public behavior for primitive, null, empty, deep, shallow, array, bracket-key and star-selector cases.",
+      "Only local fixtures are used; the official benchmark verifier is host-side and unavailable in the working container.",
+      "Local test-suite results and self-authored regression assertions are evidence, not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Reproduce the shared-prototype write with a Node fixture covering plain dot, nested dot, constructor-chain, bracket-quoted, array-parent and star-expanded payloads. Then add a minimal setter guard that refuses an assignment when the resolved parent is a shared prototype object and when the final key is __proto__. Re-run benign deep, shallow, array, bracket and star behavior plus the repository test suite. Falsifier: any shared prototype gains a marker or a benign set stops working."
+  },
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Benign terminal-name hypothesis. Mechanism: a blanket ban on segments named constructor or prototype would reject legitimate terminal writes such as obj.constructor = value or obj.prototype = value even though they do not mutate a shared prototype. Prerequisites: a normal object fixture and a clean built-in prototype. Bounded test: perform both terminal writes and inspect the fixture plus Object.prototype. Expected: both writes stay on the fixture and no shared property appears. Falsifier: either write is rejected or pollution appears. Cleanup: delete injected keys; limitation: does not cover inherited traversal."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Bracket-alias bypass hypothesis. Mechanism: a guard that checks only dot-separated names may miss a quoted bracket segment such as a[\"__proto__\"].x, while the splitter normalizes it into a path that still traverses the shared prototype. Prerequisites: the local splitter, one quoted bracket payload, one unquoted bracket payload and a plain-dot control. Bounded test: run all three and inspect Object.prototype plus the fixture. Expected: removal or blocking of the quoted and dot shared writes. Falsifier: Object.prototype gains the marker from any alias while the dot form is blocked. Cleanup: delete the marker; limitation: a single splitter implementation."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Short-path or null-parent hypothesis. Mechanism: a guard placed only in the main traversal branch may be skipped when the path has one segment, the root is null, or an intermediate value is null/undefined. Prerequisites: null, empty-object, one-segment and two-segment fixtures. Bounded test: run __proto__ and __proto__.z payloads against each shape and inspect the shared prototype. Expected: no shared property on any shape. Falsifier: a one-segment or null-parent call still pollutes. Cleanup: delete markers and restore fixtures; limitation: covers only early-exit shapes."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Array and star-parent hypothesis. Mechanism: array values and star expansion can resolve multiple parents, including Array.prototype or Object.prototype, so a guard that checks only a literal object root misses them. Prerequisites: an array fixture, a star-selector fixture and marker cleanup on Array/Object prototypes. Bounded test: run arr.__proto__.polluted and a star-expanded __proto__ payload, then compare with a benign array-index set. Expected: no Array or Object prototype marker and the benign index still changes. Falsifier: a shared prototype changes or the benign array set breaks. Cleanup: delete markers from both prototypes; limitation: only one selector shape."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Return-contract and own-key regression hypothesis. Mechanism: a guard that silently suppresses writes can accidentally throw or change the return value, and marker cleanup can hide residual keys. Prerequisites: the full benign matrix plus own-key snapshots before and after each guarded call. Bounded test: compare return values and own enumerable keys on fixtures before and after dangerous and benign calls. Expected: no exception, no unexpected key, and unchanged benign return contracts. Falsifier: a throw, a changed return value, or an extra key after cleanup. Cleanup: reset fixtures per assertion; limitation: a validation layer rather than a repair mechanism."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.64,
+      "rationale": "Selected: the bracket-quoted spelling is a concrete discriminator and a small fixture can show whether a dot-only guard is insufficient."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.608,
+      "rationale": "Incumbent guard plan; deferred until the payload spellings were characterized."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.5805,
+      "rationale": "Deferred: array and star traversal are plausible, but the simpler literal payloads had to be reproduced first."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.576,
+      "rationale": "Deferred: the benign terminal-name case matters for a blanket guard, but it was a secondary fixture."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.5695,
+      "rationale": "Deferred: short and null paths may skip a guard, but the bracket alias was the more direct bypass hypothesis."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.5515,
+      "rationale": "Deferred: return-contract snapshots are valuable validation, but they do not identify which payload reaches the vulnerable assignment."
+    }
+  ],
+  "selected_id": "r1-v2",
+  "observation": {
+    "outcome": "supported",
+    "summary": "A Node fixture showed that plain dot, nested dot, constructor.prototype, bracket-quoted and star-expanded paths all added a marker to Object.prototype; an array path added it to Array.prototype. A bracket-unquoted path wrote only a local fixture key, and benign deep, shallow and array-index sets still worked. The result supports the bracket-alias hypothesis and shows that a dot-only name check is insufficient: either the resolved parent identity or a normalized segment check is needed.",
+    "next_hint": "The next step is a minimal setter guard. The key question is whether parent-identity checking, normalized-segment checking, or both is needed to cover dot, constructor-chain, bracket-quoted, array and star parents without breaking benign terminal constructor/prototype writes."
+  },
+  "lineage": {
+    "case_id": "case-9eff46a29dde40eeb42ac3908df4cf0f",
+    "iteration_id": "step-1",
+    "previous_iteration_id": null,
+    "step_id": "step-1",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}

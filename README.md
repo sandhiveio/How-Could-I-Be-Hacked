@@ -4,7 +4,7 @@ Explore how your code could be attacked using real security investigation trajec
 Find applicable hypotheses, run targeted checks, and turn verified findings into regression
 tests — all locally, without API access.
 
-**6 cases · 20 steps · 115 hypotheses**
+**11 cases · 34 steps · 197 searchable hypothesis entries**
 
 **Works offline. No API keys required.**
 
@@ -62,7 +62,7 @@ On Windows without a native Python installation, run these commands using Python
 - Iterative planning, candidate evaluation, incumbent comparison and backtracking guidance.
 - Private assessment scaffolding and evidence/step validation.
 
-These counts describe the initial snapshot; `stats` reports the current contents. Historical
+These counts describe the bundled snapshot; `stats` reports the current contents. Historical
 outcomes are evidence about their source cases, not proof of a vulnerability in your code.
 Search is lexical, not semantic, and cannot establish the absence of vulnerabilities.
 The toolkit assists an agent; it does not autonomously scan code or execute retrieved text.

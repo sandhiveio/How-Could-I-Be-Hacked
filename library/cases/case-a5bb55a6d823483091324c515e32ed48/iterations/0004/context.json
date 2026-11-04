@@ -1,0 +1,10 @@
+{
+  "case_id": "case-a5bb55a6d823483091324c515e32ed48",
+  "iteration_id": "step-4",
+  "previous_iteration_id": "step-3",
+  "incumbent": {
+    "id": "r3-v1",
+    "text": "Hypothesis: the base64 body of a PEM or OpenSSH public key, with headers and tag removed, has no recognizable text prefix and still verifies as an HMAC secret. Applicability: the verifier stores or passes the bare base64 body; the full default collection is allowed. Bounded test: strip the header/footer or OpenSSH tag from generated RSA, EC and Ed25519 keys, forge HS256 tokens with the body as the secret, and decode with the same body before and after the guard. Expected supporting result: acceptance before repair and rejection after a base64-aware guard; falsifier: early InvalidKeyError. Cleanup: discard generated keys. Limit: a valid shared secret that happens to decode to a key would be indistinguishable."
+  },
+  "hint": "The crypto-present guard now rejects 11 asymmetric encodings, including base64 bodies, certificates and JWK text, while legitimate HMAC, RS256, ES256 and EdDSA paths pass. The library also supports a build without the optional cryptography package, where the guard falls back to textual markers. The next question is whether raw DER and bare base64 key material still verify in that fallback build and whether one marker set can close it without false positives."
+}

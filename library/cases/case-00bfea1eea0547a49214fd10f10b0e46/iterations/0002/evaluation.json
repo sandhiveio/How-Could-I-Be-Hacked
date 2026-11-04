@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r2-a",
+      "eligible": true,
+      "score": 0.666,
+      "rationale": "A useful scope argument, but the saved direct-sink result already shows a reachable bypass unless a complete call-site inventory proves otherwise. Deferred behind a defense-in-depth repair that costs only a few lines."
+    },
+    {
+      "id": "r2-b",
+      "eligible": false,
+      "score": 0.5,
+      "rationale": "The stated prerequisite is false for the confirmed bypass: the backend prefix builder receives raw keyword options and does not construct the internal explain-options record. The shared-validator idea remains coherent for callers that do construct that record."
+    },
+    {
+      "id": "r2-c",
+      "eligible": true,
+      "score": 0.706,
+      "rationale": "Selected. Directly targets the confirmed residual sink, has a bounded legal-and-malicious matrix and a clear falsifier, and preserves the public guard. It is the strongest next action."
+    },
+    {
+      "id": "r2-d",
+      "eligible": true,
+      "score": 0.553,
+      "rationale": "Coherent future-backend concern, but the current sink renders every option value as literal true/false, so it is outside the observed mechanism. Retained as a limitation, not selected."
+    },
+    {
+      "id": "r2-e",
+      "eligible": true,
+      "score": 0.636,
+      "rationale": "Good regression closure but explicitly leaves the direct-backend bypass open. Deferred until after the defense-in-depth repair."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.695,
+      "rationale": "The incumbent remains a valid public-only fallback with strong evidence, but its scope is contradicted by the saved direct-sink result. Deferred in favor of r2-c."
+    }
+  ]
+}

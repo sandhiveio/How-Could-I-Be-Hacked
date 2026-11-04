@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.64,
+      "rationale": "Selected: the bracket-quoted spelling is a concrete discriminator and a small fixture can show whether a dot-only guard is insufficient."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.608,
+      "rationale": "Incumbent guard plan; deferred until the payload spellings were characterized."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.5805,
+      "rationale": "Deferred: array and star traversal are plausible, but the simpler literal payloads had to be reproduced first."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.576,
+      "rationale": "Deferred: the benign terminal-name case matters for a blanket guard, but it was a secondary fixture."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.5695,
+      "rationale": "Deferred: short and null paths may skip a guard, but the bracket alias was the more direct bypass hypothesis."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.5515,
+      "rationale": "Deferred: return-contract snapshots are valuable validation, but they do not identify which payload reaches the vulnerable assignment."
+    }
+  ]
+}

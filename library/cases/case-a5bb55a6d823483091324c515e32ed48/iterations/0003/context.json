@@ -1,0 +1,10 @@
+{
+  "case_id": "case-a5bb55a6d823483091324c515e32ed48",
+  "iteration_id": "step-3",
+  "previous_iteration_id": "step-2",
+  "incumbent": {
+    "id": "r1-v1",
+    "text": "Hypothesis: a public key serialized as SubjectPublicKeyInfo DER is not recognized by the HMAC key helper, so those bytes can serve as an HMAC secret. Applicability: the verifier holds the public key as DER bytes and permits HMAC among its allowed algorithms; the attacker knows the public key. Bounded test: generate a 2048-bit RSA key, serialize the public key as SPKI DER, forge an HS256 token over a chosen payload with those exact bytes as the HMAC key, then decode with the same bytes and the full default algorithm collection. Expected supporting result: the payload is returned before repair; falsifier: InvalidKeyError before repair. Cleanup and limits: generated keys and tokens are ephemeral, and this row alone does not prove PEM or OpenSSH behavior."
+  },
+  "hint": "After an HMAC-path guard was added, it rejects object keys and PEM/OpenSSH/DER key material that parses through the crypto loaders, and the main suite plus 22 authored checks pass. The guard only sees complete text or DER forms. The next question is whether bare base64 bodies, DER certificates, JWK JSON text or encrypted private keys still verify as HMAC secrets, and which of them a single structural extension can close without over-rejection."
+}

@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Benign terminal-name hypothesis. Mechanism: a blanket ban on segments named constructor or prototype would reject legitimate terminal writes such as obj.constructor = value or obj.prototype = value even though they do not mutate a shared prototype. Prerequisites: a normal object fixture and a clean built-in prototype. Bounded test: perform both terminal writes and inspect the fixture plus Object.prototype. Expected: both writes stay on the fixture and no shared property appears. Falsifier: either write is rejected or pollution appears. Cleanup: delete injected keys; limitation: does not cover inherited traversal."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Bracket-alias bypass hypothesis. Mechanism: a guard that checks only dot-separated names may miss a quoted bracket segment such as a[\"__proto__\"].x, while the splitter normalizes it into a path that still traverses the shared prototype. Prerequisites: the local splitter, one quoted bracket payload, one unquoted bracket payload and a plain-dot control. Bounded test: run all three and inspect Object.prototype plus the fixture. Expected: removal or blocking of the quoted and dot shared writes. Falsifier: Object.prototype gains the marker from any alias while the dot form is blocked. Cleanup: delete the marker; limitation: a single splitter implementation."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Short-path or null-parent hypothesis. Mechanism: a guard placed only in the main traversal branch may be skipped when the path has one segment, the root is null, or an intermediate value is null/undefined. Prerequisites: null, empty-object, one-segment and two-segment fixtures. Bounded test: run __proto__ and __proto__.z payloads against each shape and inspect the shared prototype. Expected: no shared property on any shape. Falsifier: a one-segment or null-parent call still pollutes. Cleanup: delete markers and restore fixtures; limitation: covers only early-exit shapes."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Array and star-parent hypothesis. Mechanism: array values and star expansion can resolve multiple parents, including Array.prototype or Object.prototype, so a guard that checks only a literal object root misses them. Prerequisites: an array fixture, a star-selector fixture and marker cleanup on Array/Object prototypes. Bounded test: run arr.__proto__.polluted and a star-expanded __proto__ payload, then compare with a benign array-index set. Expected: no Array or Object prototype marker and the benign index still changes. Falsifier: a shared prototype changes or the benign array set breaks. Cleanup: delete markers from both prototypes; limitation: only one selector shape."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Return-contract and own-key regression hypothesis. Mechanism: a guard that silently suppresses writes can accidentally throw or change the return value, and marker cleanup can hide residual keys. Prerequisites: the full benign matrix plus own-key snapshots before and after each guarded call. Bounded test: compare return values and own enumerable keys on fixtures before and after dangerous and benign calls. Expected: no exception, no unexpected key, and unchanged benign return contracts. Falsifier: a throw, a changed return value, or an extra key after cleanup. Cleanup: reset fixtures per assertion; limitation: a validation layer rather than a repair mechanism."
+    }
+  ]
+}

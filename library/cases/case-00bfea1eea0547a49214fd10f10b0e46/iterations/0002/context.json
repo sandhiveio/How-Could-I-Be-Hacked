@@ -1,0 +1,10 @@
+{
+  "case_id": "case-00bfea1eea0547a49214fd10f10b0e46",
+  "iteration_id": "step-2",
+  "previous_iteration_id": "step-1",
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Sink-first differential: instantiate the backend operations object with a disposable fake connection, compare EXPLAIN prefixes for legal and crafted option names, repair option-name validation at the public explain boundary, then rerun the matrix plus legal-option regression."
+  },
+  "hint": "The public query-level explain method now rejects option names that are not ASCII identifiers. A focused harness still shows the backend explain-prefix builder interpolating a malicious name into EXPLAIN (...) when called directly, while the same harness accepts legal names. The next question is whether duplicating the identifier check inside the backend builder closes the direct sink without over-restricting documented options, and whether the existing explain test module still passes."
+}

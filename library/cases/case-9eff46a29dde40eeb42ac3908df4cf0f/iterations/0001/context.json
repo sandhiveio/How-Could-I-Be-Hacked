@@ -1,0 +1,10 @@
+{
+  "case_id": "case-9eff46a29dde40eeb42ac3908df4cf0f",
+  "iteration_id": "step-1",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Reproduce the shared-prototype write with a Node fixture covering plain dot, nested dot, constructor-chain, bracket-quoted, array-parent and star-expanded payloads. Then add a minimal setter guard that refuses an assignment when the resolved parent is a shared prototype object and when the final key is __proto__. Re-run benign deep, shallow, array, bracket and star behavior plus the repository test suite. Falsifier: any shared prototype gains a marker or a benign set stops working."
+  },
+  "hint": "The helper splits a caller-controlled path on dots and brackets, walks the object graph, and assigns the final key on the resolved parent. The splitter has special handling for bracket notation, periods inside keys and star selectors. No visible code rejects prototype-related names. A small Node fixture can compare dangerous paths with benign deep, shallow, array-index and bracket-read cases and record whether a shared built-in prototype was changed. The observer may run local Node scripts against a disposable source copy."
+}

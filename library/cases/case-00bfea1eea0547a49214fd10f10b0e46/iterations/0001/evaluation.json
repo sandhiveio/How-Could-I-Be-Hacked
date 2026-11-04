@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-a",
+      "eligible": true,
+      "score": 0.606,
+      "rationale": "Coherent public-boundary repair, but the lowercase-only character class would reject legal uppercase option names that the backend currently accepts. Deferred as a variant to refine with a case-insensitive ASCII identifier check; not selected as written."
+    },
+    {
+      "id": "r1-b",
+      "eligible": true,
+      "score": 0.651,
+      "rationale": "Directly protects the observed sink and is easy to test, but leaves the public contract and other backends dependent on one builder. Deferred as defense-in-depth behind the public-boundary plan."
+    },
+    {
+      "id": "r1-c",
+      "eligible": true,
+      "score": 0.616,
+      "rationale": "Simple and consistent, but isidentifier() is broader than the SQL option vocabulary because it accepts Unicode identifiers. Deferred behind a stricter ASCII check."
+    },
+    {
+      "id": "r1-d",
+      "eligible": true,
+      "score": 0.617,
+      "rationale": "Correctly identifies the direct-call bypass and motivates a later defense-in-depth check, but its first action is a diagnostic rather than the repair. Deferred until the public guard was observed."
+    },
+    {
+      "id": "r1-e",
+      "eligible": true,
+      "score": 0.645,
+      "rationale": "Essential regression coverage that was absorbed into the selected plan rather than chosen as the next action. It does not by itself decide the validation point."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.728,
+      "rationale": "Selected. The incumbent had the best combination of known sink, executable fixture and bounded repair test, and could absorb the legal-option regression from r1-e and the direct-call check from r1-d."
+    }
+  ]
+}

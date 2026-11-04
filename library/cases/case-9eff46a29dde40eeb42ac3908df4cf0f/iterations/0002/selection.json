@@ -1,0 +1,4 @@
+{
+  "selected_id": "r1-v2",
+  "selected_text": "Bracket-alias bypass hypothesis. Mechanism: a guard that checks only dot-separated names may miss a quoted bracket segment such as a[\"__proto__\"].x, while the splitter normalizes it into a path that still traverses the shared prototype. Prerequisites: the local splitter, one quoted bracket payload, one unquoted bracket payload and a plain-dot control. Bounded test: run all three and inspect Object.prototype plus the fixture. Expected: removal or blocking of the quoted and dot shared writes. Falsifier: Object.prototype gains the marker from any alias while the dot form is blocked. Cleanup: delete the marker; limitation: a single splitter implementation."
+}

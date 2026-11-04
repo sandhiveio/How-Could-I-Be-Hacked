@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A full local run and a seed/determinism suite have passed. Cross-file equality could still be an artifact of exact-string normalization rather than the union edges. The fixture contains a three-hop cross-tenant link chain, an alias actor that also appears in a composing merge row, one account, and four households. The agent may edit a disposable copy, delete one edge row at a time, rerun the CLI, and compare token classes; unrelated account and household components are available as controls. The official verifier is unavailable. The next question is which smallest edge-ablation experiment distinguishes genuine union-caused equality from coincidence and over-merging.",
+    "surface": "Single-file Python CLI over ten related CSV tables with a YAML policy, deterministic seed, standard-library SQLite and compact integer arrays, and a 64 MB peak-RSS cap; all work is local and disposable.",
+    "assumptions": [
+      "The agent has read access to a disposable copy of the linked CSV tables and the YAML policy, and write access to a fresh output directory and temporary work files.",
+      "Python 3 and PyYAML are available; no third-party library beyond PyYAML is needed or permitted.",
+      "Peak resident memory must stay below 64 MB while processing about two million data rows.",
+      "Only local fixtures are used; the official benchmark verifier is host-side and is not available in the working container.",
+      "The policy transform names and source classifications are fixed; the agent may not change them to obtain a pass."
+    ]
+  },
+  "incumbent": {
+    "id": "r2-v2",
+    "text": "Hypothesis: a two-pass design is necessary and sufficient: finish the complete union before emission, and normalize tenant-local IDs and plural/singular scope prefixes to one canonical key before hashing. Prerequisites: read access to all tables, a disposable output directory, and Python 3 with a standard-library on-disk index. Bounded test: run the full corpus, then independently re-read every policy reference column, normalize each value to its canonical key, and assert that all occurrences of one key share one token while file structure is unchanged. Expected support: zero component splits, zero local-versus-scoped mismatches, and peak RSS below 64 MB. Falsifier: any component split, any mismatch between a local row and its scope-qualified handle, or memory above the cap. Cleanup: remove the temporary index and keep the audit report."
+  },
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: removing one composing merge row splits the alias actor from the chain subject, while unrelated classes stay identical. Prerequisites: a disposable linked fixture and permission to delete one merge row. Bounded test: run the baseline, delete that merge row, rerun with the same seed, and compare token partitions. Expected support: exactly the merged subject splits into its own class. Falsifier: the alias and chain subject remain equal, meaning the edge is ignored or another path over-merges. Cleanup: restore the row and rerun to confirm the baseline partition returns."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: an alias row linking an external account handle to an account reference is non-redundant; blanking it splits those tokens into an extra account class. Prerequisites: a fixture with one alias row and a preserved copy. Bounded test: blank only that alias row, rerun, and compare class counts and account tokens. Expected support: one extra account class with no unrelated changes. Falsifier: unchanged class count, or a broader split touching unrelated accounts, which would indicate another over-merging path. Cleanup: restore the row and verify the baseline."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: plural/singular order-scope normalization creates a real edge that raw string matching misses; disabling it raises the class count by splitting order handles from their local rows. Prerequisites: a fixture containing both forms and a way to disable only that normalization. Bounded test: run with and without normalization and diff the order-related classes. Expected support: the normalized run unifies the forms and the disabled run splits them. Falsifier: identical class counts, meaning normalization is decorative. Cleanup: restore the default and confirm byte-identical baseline output."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: removing the middle link of a three-hop chain splits it into two person components, with each side still internally unified. Prerequisites: a disposable chain fixture and a preserved link table. Bounded test: delete the middle link, rerun, and compare the token partition of the three subjects plus the alias actor. Expected support: two person classes, one containing the first two subjects and the actor, the other containing the third subject. Falsifier: the chain remains fully unified, which would indicate the component is not path-derived. Cleanup: restore the link and confirm the baseline partition."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: replacing one handle with a fresh unused string yields a new token and changes no other column. Prerequisites: a disposable fixture and a known unused handle value. Bounded test: substitute the handle, rerun, and compare every token column with the baseline. Expected support: exactly one new class and no collateral changes. Falsifier: another column changes in tandem, which would indicate hidden substring or masking logic. Cleanup: delete the mutated copy and confirm untouched outputs remain byte-identical."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.8225,
+      "rationale": "Incumbent has full-corpus execution, a 43M-check audit, and determinism/seed evidence; selected to carry the final causal ablation."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.5275,
+      "rationale": "Best new candidate: direct single-edge merge ablation with a precise split and over-merge falsifier."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.4525,
+      "rationale": "Deferred: useful alias ablation, but blanking a whole alias row removes two edge families and its predicted class count is not exact."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.47,
+      "rationale": "Deferred: valid normalization ablation, but needs a code branch or mutation and is less direct than deleting one edge."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.42,
+      "rationale": "Deferred: good middle-link test, but its stated expectation of three classes is wrong for the described chain; two person classes are expected."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.45,
+      "rationale": "Deferred: useful fresh-handle control against exact-string coalescence, but it does not test a specific union family."
+    }
+  ],
+  "selected_id": "r2-v2",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Executed the edge-ablation control on the 11-entity linked fixture. In the baseline, four subject IDs, the alias actor, and the composing merge subject shared one token, while the account and four households had distinct tokens. Removing the second cross-tenant link split only the third subject; the other three subject IDs, alias actor, and merge subject stayed together. Removing the composing merge row split only the merged subject; the other subject IDs, alias actor, and linked third subject stayed together. Account and household tokens were identical across all three runs, and the person class never collapsed into the account class. All seven expected checks passed. This shows that the link and merge edges are load-bearing and that unrelated components are not over-merged, but it is a small fixture-level control, not a full-corpus ablation. Evidence strength is causal at fixture scale; the official verifier was not run.",
+    "next_hint": "The union edges are causally load-bearing at fixture scale. The remaining uncertainty is host-side official verification and the hidden interpretation of effective-dated merges, noise scaling, and token length."
+  },
+  "lineage": {
+    "case_id": "case-21af815d7a4e4c8991c6286eb15deff9",
+    "iteration_id": "iteration-0004",
+    "previous_iteration_id": "iteration-0003",
+    "step_id": "iteration-0004",
+    "parent_step_id": "iteration-0003",
+    "branch_id": "main"
+  }
+}

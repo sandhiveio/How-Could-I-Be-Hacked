@@ -1,0 +1,4 @@
+{
+  "selected_id": "plan-1",
+  "selected_text": "Sink-first differential: instantiate the backend operations object with a disposable fake connection, compare EXPLAIN prefixes for legal and crafted option names, repair option-name validation at the public explain boundary, then rerun the matrix plus legal-option regression."
+}

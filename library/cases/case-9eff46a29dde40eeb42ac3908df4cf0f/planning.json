@@ -1,0 +1,8 @@
+{
+  "plans": [
+    "Reproduce the shared-prototype write with a Node fixture covering plain dot, nested dot, constructor-chain, bracket-quoted, array-parent and star-expanded payloads. Then add a minimal setter guard that refuses an assignment when the resolved parent is a shared prototype object and when the final key is __proto__. Re-run benign deep, shallow, array, bracket and star behavior plus the repository test suite. Falsifier: any shared prototype gains a marker or a benign set stops working.",
+    "Normalize every split path segment by stripping quotes and brackets, then reject segments named __proto__, constructor or prototype before assignment. Test bracket-quoted and unquoted aliases against plain dot paths. Falsifier: a normalized alias still reaches a shared prototype, or a legitimate terminal constructor/prototype write is rejected.",
+    "Walk the path with own-property or descriptor checks so inherited prototype objects are never traversed, then assign only to an own-property parent. Test pollution payloads and inherited reads. Falsifier: a benign inherited read stops working, or a dangerous path still reaches a shared prototype."
+  ],
+  "selected_id": "plan-1"
+}

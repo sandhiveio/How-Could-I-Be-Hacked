@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "case_id": "case-fce6af02155649cfb97771c91053dd0b",
+  "iterations": 2,
+  "artifacts": [
+    {
+      "path": "case.json",
+      "sha256": "3d774aa3eb110a84c8d95460fa922a3a0c0fcbb26eff6da1df1afbb8c8661ebd"
+    },
+    {
+      "path": "planning.json",
+      "sha256": "db6b540e0cb2af1c50ab624461135366408bd4fa40b75a0342652a2ec3125b7a"
+    },
+    {
+      "path": "iterations/0001/context.json",
+      "sha256": "76c98f86320311c7b195571908bc07948adb68076b4ffeb8041274b443118e3d"
+    },
+    {
+      "path": "iterations/0001/generation.json",
+      "sha256": "2eca98c606855d6bdbcea2f83f1015946faf92d4583f34ea88ab78d10056ecf9"
+    },
+    {
+      "path": "iterations/0001/evaluation.json",
+      "sha256": "408f558e83975137650c432438fb8a51115bd60aa715ec1a16e8602ab39b0095"
+    },
+    {
+      "path": "iterations/0001/selection.json",
+      "sha256": "649af5362d0eb4d5b44c93212a4378fba9263cc9fb9a4aad35e6f9f5e00f110d"
+    },
+    {
+      "path": "iterations/0001/observation.json",
+      "sha256": "b1f66463ca5b2b7ab55e38c0d248edcd326177c4e0d94d179135f4b18763197e"
+    },
+    {
+      "path": "iterations/0001/step.json",
+      "sha256": "64e83631eec20d86cf23b2142453a152c3e6dafef5494cfbff185e681a92dbd0"
+    },
+    {
+      "path": "iterations/0002/context.json",
+      "sha256": "e07d5bbfd189d06c73cca3b6d4fee6e19dddf579d5902b9d8e85d790c33e6d5d"
+    },
+    {
+      "path": "iterations/0002/generation.json",
+      "sha256": "5beefc7dd46e5a1f8bc810437f7ef53e2f4e352689a94e5eba91339f38cb5a16"
+    },
+    {
+      "path": "iterations/0002/evaluation.json",
+      "sha256": "cd82a8245795d1319b36f4665c828c6025953d2cdb029a90f0e503a18d870865"
+    },
+    {
+      "path": "iterations/0002/selection.json",
+      "sha256": "3a71c6884555ccd7820a658c33a952c8fab7ee172a62bdae619247130995b247"
+    },
+    {
+      "path": "iterations/0002/observation.json",
+      "sha256": "bc600d0a15204e6600f0b21af26c198a885fd769519b0f48678a9d0011d79ecd"
+    },
+    {
+      "path": "iterations/0002/step.json",
+      "sha256": "205ee0bec8a5a535ddbc38ad6da943686cb7e9e74be66c0155e29357a81f5d5b"
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "The crypto-present guard now rejects 11 asymmetric encodings, including base64 bodies, certificates and JWK text, while legitimate HMAC, RS256, ES256 and EdDSA paths pass. The library also supports a build without the optional cryptography package, where the guard falls back to textual markers. The next question is whether raw DER and bare base64 key material still verify in that fallback build and whether one marker set can close it without false positives.",
+    "surface": "Python JWT encode/decode library with pluggable signing algorithms; HMAC verification path shared with asymmetric key material",
+    "assumptions": [
+      "Only the local source snapshot, its test suite and disposable fixture keys are used; no public target or network dependency.",
+      "The attacker can submit tokens and knows the service's asymmetric public key, but cannot change the allowed-algorithm collection.",
+      "The verifier holds the public key in a configuration form (PEM, DER, OpenSSH, JWK text or a key object) and may allow every default algorithm.",
+      "Local execution uses a Python virtual environment with the optional cryptography package and a writable temporary test directory.",
+      "Official benchmark evaluation is host-side and is not claimed by any local result."
+    ]
+  },
+  "incumbent": {
+    "id": "r3-v1",
+    "text": "Hypothesis: the base64 body of a PEM or OpenSSH public key, with headers and tag removed, has no recognizable text prefix and still verifies as an HMAC secret. Applicability: the verifier stores or passes the bare base64 body; the full default collection is allowed. Bounded test: strip the header/footer or OpenSSH tag from generated RSA, EC and Ed25519 keys, forge HS256 tokens with the body as the secret, and decode with the same body before and after the guard. Expected supporting result: acceptance before repair and rejection after a base64-aware guard; falsifier: early InvalidKeyError. Cleanup: discard generated keys. Limit: a valid shared secret that happens to decode to a key would be indistinguishable."
+  },
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: with the optional crypto package unavailable, the fallback guard still accepts raw DER public-key bytes because only textual checks run. Applicability: a minimal installation without the optional dependency. Bounded test: import the library with cryptography blocked, confirm the no-crypto flag, and replay the DER rows from the encoding matrix with forged HS256 tokens. Expected supporting result: acceptance in the fallback; falsifier: InvalidKeyError for every asymmetric form. Cleanup: restore the import environment. Limit: an import hook is not identical to a real missing installation."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: bare base64 bodies of EC and Ed25519 keys escape a fallback that checks only tags and headers. Applicability: a no-crypto build with precomputed key material. Bounded test: precompute the bodies with crypto present, then feed each as an HMAC secret in a fresh process where cryptography is blocked; keep random-base64 controls. Expected supporting result: asymmetric bodies accepted; falsifier: rejection with controls still accepted. Cleanup: delete fixtures. Limit: requires precomputation because the test process cannot import the optional package."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: a fallback that treats decoded bytes beginning with an ASN.1 sequence tag as a key will falsely reject legitimate random secrets. Applicability: normal HMAC callers in a no-crypto build. Bounded test: construct random secrets whose base64 decode begins with 0x30 or 0x31 and verify HS256 tokens with them. Expected supporting result: all verify; falsifier: any key error. Cleanup: secrets are ephemeral. Limit: favors full structure markers over magic-byte matching."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: a centralized decode-time gate that refuses HMAC whenever the key was prepared by an asymmetric family closes all encodings without per-format heuristics. Applicability: both crypto-present and absent builds; strings pass through a loader shim. Bounded test: run the encoding matrix plus over-rejection controls with the gate, then confirm asymmetric tokens still decode. Expected supporting result: no escaping form and no false rejection; falsifier: any escape, false rejection or asymmetric regression. Cleanup: revert the experimental branch and confirm the exported patch still applies. Limit: extra indirection on a hot path and an unproven caching design."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: an import hook hides lazy-import differences that a real dependency-free installation would expose. Applicability: final patch-integrity verification. Bounded test: apply the exported patch to a pristine copy in a throwaway environment with cryptography genuinely absent, run the suite and the authored checks, and compare results with the hook-based matrix. Expected supporting result: the same rejection matrix and no import errors; falsifier: a passing asymmetric form or a suite regression. Cleanup: discard the throwaway environment. Limit: slower than the hook and may need dependency installation."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.77,
+      "rationale": "Selected incumbent. The crypto-present matrix is closed and regression-tested, but the fallback branch remains untested; the next bounded action is to reproduce and harden it."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.636,
+      "rationale": "Deferred, closest alternative. Its prediction about textual-only fallback checks is executable, but it lacks the repair and over-rejection controls that the final action needs."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.613,
+      "rationale": "Deferred. A real fallback row, but a subset of the same hardening action and dependent on a precomputation step."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.597,
+      "rationale": "Deferred but important as an over-rejection counterexample; it argues for key-structure markers rather than a bare sequence-tag test."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.579,
+      "rationale": "Deferred. Architecturally attractive but heavier, and replacing the passing guard on the last round adds risk without a decisive check."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.598,
+      "rationale": "Deferred. The strongest environment check, but slower than an import-hook subprocess; retained as a documented limitation."
+    }
+  ],
+  "selected_id": "r3-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Replayed the encoding matrix in a fresh process that imported the patched library with cryptography blocked; the module reported its no-crypto branch. The first fallback run found one residual escape: a SEC1 EC private-key DER blob was accepted because it carries a curve object identifier rather than the public-key identifier already in the marker set. Added the common curve identifiers and a PKCS#1 modulus marker, then repeated both environments. The no-crypto matrix rejected all 9 asymmetric forms while four controls still verified; the crypto-present matrix rejected all 11 asymmetric forms with three controls verifying. The upstream suite stayed at its passing baseline, 30 authored checks passed, and the regenerated patch applied to a fresh copy and closed the matrix there. Local evidence only; the official verdict remains host-side.",
+    "next_hint": "Export the minimal patch for the host-side official evaluation, and separately note that a real dependency-free installation was approximated with an import hook."
+  },
+  "lineage": {
+    "case_id": "case-a5bb55a6d823483091324c515e32ed48",
+    "iteration_id": "step-4",
+    "previous_iteration_id": "step-3",
+    "step_id": "step-4",
+    "parent_step_id": "step-3",
+    "branch_id": "main"
+  }
+}

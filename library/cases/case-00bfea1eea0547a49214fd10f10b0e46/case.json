@@ -1,0 +1,12 @@
+{
+  "id": "case-00bfea1eea0547a49214fd10f10b0e46",
+  "kind": "curated_case",
+  "hint": "A Python ORM's public queryset explain entry point accepts arbitrary keyword options and forwards them to a database backend. On one SQL backend, the explain-prefix builder uppercases every option name and interpolates it directly into an EXPLAIN (...) string, while options values are rendered only as literal true/false. A caller can expand an attacker-controlled dictionary into those keyword arguments, so an option name containing a closing parenthesis, semicolon and SQL comment can terminate the option list and append another statement. Determine the smallest option-name validation that removes the injection at both the public and direct-backend entry points while preserving documented explain options and normal output.",
+  "surface": "Python ORM query compiler plus a SQL backend operations layer; disposable local Python fixture with a fake connection and feature object, and a file-backed local test database for the existing explain test module.",
+  "assumptions": [
+    "The observer can read and modify a disposable local source tree and run Python locally; no live network service, production database, or public target is used.",
+    "The attacker controls only the option names supplied through dictionary expansion to the public explain API; option values are simple truthy/falsy scalars.",
+    "The public entry point and the backend prefix builder are both reachable within the local source; direct backend calls are allowed by the test fixture but may not be part of the public contract.",
+    "Official benchmark verification is performed outside this container; a saved patch and local regressions are not an official pass."
+  ]
+}

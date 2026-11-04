@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r1-a",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a strict lowercase-only regex (^[a-z_]+$) applied to option names in the public query-level explain method rejects SQL punctuation before the backend sees it. Prerequisites: the public method is the reachable entry point and all legitimate names can be lowercased by the caller. Bounded test: call the public explain method with a fake compiler using ANALYZE and a key like 'bad); SELECT 1; --', inspect the generated prefix, and expect ValueError for the malformed key. Expected supporting result: the malformed key never reaches the compiler; falsifier: the prefix contains the payload or an uppercase legal name is rejected. Cleanup: delete the fake compiler and any disposable records."
+    },
+    {
+      "id": "r1-b",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: validating option names inside the backend explain-prefix builder immediately before interpolation protects the exact string-assembly sink. Prerequisites: direct backend callers are in scope and a fake feature object can drive the builder without a live database. Bounded test: construct the backend operations object with the fake features, call its prefix builder with a key like 'analyze); SELECT 1; --' and with legal keys, and inspect the returned SQL. Expected supporting result: ValueError for the malformed key and a normal prefix for legal keys; falsifier: the payload appears in the SQL or a documented option is rejected. Limitation: other backends and public callers remain dependent on this one builder."
+    },
+    {
+      "id": "r1-c",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: Python's standard str.isidentifier() check on option names at both the public method and the backend sink is sufficient and simpler than a custom regex. Prerequisites: option names are always strings and the local interpreter supports isidentifier(). Bounded test: apply the check to keys such as 'analyze', 'ANALYZE', '_x', 'a1', 'bad-name', '1abc', a Unicode identifier and an empty string; expect acceptance only for identifiers. Expected supporting result: dangerous punctuation and empty strings are rejected consistently; falsifier: a SQL metacharacter passes or a documented option such as '_x' is rejected. Limitation: isidentifier() accepts Unicode identifiers and is broader than the backend option vocabulary."
+    },
+    {
+      "id": "r1-d",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: validating only at the public explain method leaves a bypass because internal code can construct the explain-options record directly or call the backend prefix builder with raw options. Prerequisites: an internal caller or test can construct the explain-options record without the public method. Bounded test: build the internal explain-options record with a malicious key, pass it to the backend explain path, and inspect the SQL; then repeat with a legal key. Expected supporting result: the malicious direct call still injects while the public call is blocked; falsifier: an internal guard already validates the key. Cleanup: remove the direct-call fixture after the check."
+    },
+    {
+      "id": "r1-e",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: after adding any option-name validation, a regression matrix over every documented backend explain option is needed to prove the repair did not over-restrict legal callers. Prerequisites: a disposable fake feature object and a list of legal option names such as analyze, verbose, costs, buffers, timing, summary, settings and wal. Bounded test: generate one prefix per legal option and compare it with the unpatched baseline; expect the same option name and true/false value in each prefix. Expected supporting result: all legal options still produce prefixes; falsifier: any legal option raises or changes rendering. Limitation: the matrix proves option acceptance, not that a live database accepts the resulting SQL."
+    }
+  ]
+}

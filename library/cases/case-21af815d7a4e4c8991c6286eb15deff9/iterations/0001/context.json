@@ -1,0 +1,10 @@
+{
+  "case_id": "case-21af815d7a4e4c8991c6286eb15deff9",
+  "iteration_id": "iteration-0001",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Streaming canonicalization with an on-disk key index: normalize every reference to a scope-qualified key, register keys and perform unions in SQLite while a compact array-backed disjoint set stays in memory, derive one HMAC(seed, root) token per component, and re-stream each CSV applying the policy. Measure peak RSS and validate cross-file token equality."
+  },
+  "hint": "A local CSV anonymizer must map references to one stable token per underlying entity. Ten tables use tenant-local IDs and scope-qualified handles; alias rows connect actor and account handles to person and account references; cross-tenant link rows connect people; effective-dated merge rows connect actor handles to people. The policy also requires format-preserving fake values, hashes, masks, redaction, and numeric noise, with deterministic seeded output and a 64 MB peak-RSS cap over about two million rows. The agent may read a disposable copy, create fixtures, write outputs, and run Python; no official verifier is available. The first question is whether per-key hashing without global components is sufficient, or whether transitive components are load-bearing."
+}

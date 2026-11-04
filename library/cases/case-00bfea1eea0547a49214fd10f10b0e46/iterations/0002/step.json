@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "The public query-level explain method now rejects option names that are not ASCII identifiers. A focused harness still shows the backend explain-prefix builder interpolating a malicious name into EXPLAIN (...) when called directly, while the same harness accepts legal names. The next question is whether duplicating the identifier check inside the backend builder closes the direct sink without over-restricting documented options, and whether the existing explain test module still passes.",
+    "surface": "Python ORM query compiler plus a SQL backend operations layer; disposable local Python fixture with a fake connection and feature object, and a file-backed local test database for the existing explain test module.",
+    "assumptions": [
+      "The observer can read and modify a disposable local source tree and run Python locally; no live network service, production database, or public target is used.",
+      "The attacker controls only the option names supplied through dictionary expansion to the public explain API; option values are simple truthy/falsy scalars.",
+      "The public entry point and the backend prefix builder are both reachable within the local source; direct backend calls are allowed by the test fixture but may not be part of the public contract.",
+      "Official benchmark verification is performed outside this container; a saved patch and local regressions are not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Sink-first differential: instantiate the backend operations object with a disposable fake connection, compare EXPLAIN prefixes for legal and crafted option names, repair option-name validation at the public explain boundary, then rerun the matrix plus legal-option regression."
+  },
+  "candidates": [
+    {
+      "id": "r2-a",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the public-only guard is sufficient because no shipped code path calls the backend prefix builder with caller-controlled options. Prerequisites: a complete call-site inventory of the backend prefix builder in the staged source. Bounded test: grep the source for direct builder calls, then run one public explain call and one direct builder call with the same malicious key and record which rejects. Expected supporting result: only the public call is reachable from user input and rejects; falsifier: any shipped or subclass path sends raw options to the builder. Limitation: a clean inventory does not protect future internal callers."
+    },
+    {
+      "id": "r2-b",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a shared validator in the internal explain-options record covers both public and direct-backend paths without duplicating logic. Prerequisites: every prefix construction flows through that record. Bounded test: add validation to the record constructor, then run legal and malicious keys through the public method and through the backend prefix builder with fake features. Expected supporting result: both entries reject the malicious key and accept legal keys; falsifier: the backend builder constructs a prefix directly from raw options without the record. Cleanup: revert the shared-record patch if the prerequisite is false."
+    },
+    {
+      "id": "r2-c",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: repeating the ASCII-identifier check inside the backend explain-prefix builder immediately before interpolation closes the confirmed direct sink while preserving every documented option. Prerequisites: the builder receives only keyword options, the public guard remains in place, and fake features can drive the builder without a live database. Bounded test: for each documented option (analyze, verbose, costs, buffers, timing, summary, settings, wal) call both the direct builder and the public method and expect the option in the prefix; then repeat with malformed keys and expect ValueError from both paths. Expected supporting result: legal prefixes match baseline and all malformed keys are rejected; falsifier: payload remains in SQL or a documented option is rejected. Cleanup: remove the disposable feature object and harness logs."
+    },
+    {
+      "id": "r2-d",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the option-value channel may become injectable in a future backend if values are rendered as strings rather than literal true/false, so validation must eventually cover both names and values. Prerequisites: a backend or future change that interpolates option values as text. Bounded test: pass boolean, integer and string values through the current fake backend sink and inspect rendering; then simulate a string-interpolating variant. Expected supporting result: the current backend renders every value as true/false, while the simulated variant exposes value injection; falsifier: the current backend already renders a raw string. Limitation: outside the observed vulnerability mechanism and requires a future-code assumption."
+    },
+    {
+      "id": "r2-e",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: keeping the minimal public-only guard and adding a regression assertion from the existing explain test module is enough to close the task without widening the patch. Prerequisites: the existing test module can run locally without a live external database. Bounded test: run the explain tests and a focused public-path assertion, then save the patch diff for export. Expected supporting result: existing tests pass and malformed public keys raise ValueError; falsifier: a normal option is rejected or the test module fails. Limitation: documents the direct-backend bypass as residual risk rather than closing it."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r2-a",
+      "eligible": true,
+      "score": 0.666,
+      "rationale": "A useful scope argument, but the saved direct-sink result already shows a reachable bypass unless a complete call-site inventory proves otherwise. Deferred behind a defense-in-depth repair that costs only a few lines."
+    },
+    {
+      "id": "r2-b",
+      "eligible": false,
+      "score": 0.5,
+      "rationale": "The stated prerequisite is false for the confirmed bypass: the backend prefix builder receives raw keyword options and does not construct the internal explain-options record. The shared-validator idea remains coherent for callers that do construct that record."
+    },
+    {
+      "id": "r2-c",
+      "eligible": true,
+      "score": 0.706,
+      "rationale": "Selected. Directly targets the confirmed residual sink, has a bounded legal-and-malicious matrix and a clear falsifier, and preserves the public guard. It is the strongest next action."
+    },
+    {
+      "id": "r2-d",
+      "eligible": true,
+      "score": 0.553,
+      "rationale": "Coherent future-backend concern, but the current sink renders every option value as literal true/false, so it is outside the observed mechanism. Retained as a limitation, not selected."
+    },
+    {
+      "id": "r2-e",
+      "eligible": true,
+      "score": 0.636,
+      "rationale": "Good regression closure but explicitly leaves the direct-backend bypass open. Deferred until after the defense-in-depth repair."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.695,
+      "rationale": "The incumbent remains a valid public-only fallback with strong evidence, but its scope is contradicted by the saved direct-sink result. Deferred in favor of r2-c."
+    }
+  ],
+  "selected_id": "r2-c",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Executed the defense-in-depth candidate: added the same ASCII-identifier option-name check inside the backend explain-prefix builder while retaining the public guard. A combined harness accepted all 12 legal names through both the direct builder and the public method, rejected all 17 malformed names through both paths, and confirmed option values still render only as true/false. The existing explain test module ran against a disposable local file-backed database: 7 tests found, 3 passed, 4 backend-specific tests skipped, overall OK. The two-file patch applied cleanly to the pristine baseline tree and reversed cleanly from the applied tree. Official benchmark evaluation was not available.",
+    "next_hint": "Submit the saved two-file patch to the official host-side patch evaluator. If its hidden test expects a different exception message or only one validation location, adjust from the actual failure; otherwise the remaining work is host verification, not another local mechanism search."
+  },
+  "lineage": {
+    "case_id": "case-00bfea1eea0547a49214fd10f10b0e46",
+    "iteration_id": "step-2",
+    "previous_iteration_id": "step-1",
+    "step_id": "step-2",
+    "parent_step_id": "step-1",
+    "branch_id": "main"
+  }
+}

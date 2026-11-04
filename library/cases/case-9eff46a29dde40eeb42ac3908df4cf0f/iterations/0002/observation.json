@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "The minimal assignment guard was applied to the local helper. The original payload matrix then showed zero Object/Array/Function prototype markers for dot, nested dot, constructor.prototype, bracket-quoted, array-parent, star, function, date and regexp paths, while benign deep, shallow, array-index, bracket-read, terminal constructor/prototype and star cases still worked. A 19-check Node regression passed, the repository test suite passed 33 tests, and a fresh copy of the vulnerable source accepted the saved patch and passed the same probe and regression. The official benchmark evaluator remains host-side and unverified.",
+  "next_hint": "The local repair is complete. Remaining uncertainty is the host-side official evaluator and whether its hidden regression uses a different runtime or an independent exploit script; a future run should test that only if an official failure identifies a gap."
+}

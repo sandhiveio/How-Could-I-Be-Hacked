@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "A Node fixture showed that plain dot, nested dot, constructor.prototype, bracket-quoted and star-expanded paths all added a marker to Object.prototype; an array path added it to Array.prototype. A bracket-unquoted path wrote only a local fixture key, and benign deep, shallow and array-index sets still worked. The result supports the bracket-alias hypothesis and shows that a dot-only name check is insufficient: either the resolved parent identity or a normalized segment check is needed.",
+  "next_hint": "The next step is a minimal setter guard. The key question is whether parent-identity checking, normalized-segment checking, or both is needed to cover dot, constructor-chain, bracket-quoted, array and star parents without breaking benign terminal constructor/prototype writes."
+}

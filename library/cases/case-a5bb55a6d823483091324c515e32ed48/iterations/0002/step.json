@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A local measurement showed that an HS256 token forged with RSA SPKI DER bytes verifies when the verifier uses the same DER bytes and allows the full default algorithm collection; an EC OpenSSH string also passed, while PEM, RSA OpenSSH and object inputs were rejected. The library is otherwise healthy and its suite passes. The next question is the smallest repair that rejects asymmetric material structurally and what regression would show an over-broad patch.",
+    "surface": "Python JWT encode/decode library with pluggable signing algorithms; HMAC verification path shared with asymmetric key material",
+    "assumptions": [
+      "Only the local source snapshot, its test suite and disposable fixture keys are used; no public target or network dependency.",
+      "The attacker can submit tokens and knows the service's asymmetric public key, but cannot change the allowed-algorithm collection.",
+      "The verifier holds the public key in a configuration form (PEM, DER, OpenSSH, JWK text or a key object) and may allow every default algorithm.",
+      "Local execution uses a Python virtual environment with the optional cryptography package and a writable temporary test directory.",
+      "Official benchmark evaluation is host-side and is not claimed by any local result."
+    ]
+  },
+  "incumbent": {
+    "id": "r1-v1",
+    "text": "Hypothesis: a public key serialized as SubjectPublicKeyInfo DER is not recognized by the HMAC key helper, so those bytes can serve as an HMAC secret. Applicability: the verifier holds the public key as DER bytes and permits HMAC among its allowed algorithms; the attacker knows the public key. Bounded test: generate a 2048-bit RSA key, serialize the public key as SPKI DER, forge an HS256 token over a chosen payload with those exact bytes as the HMAC key, then decode with the same bytes and the full default algorithm collection. Expected supporting result: the payload is returned before repair; falsifier: InvalidKeyError before repair. Cleanup and limits: generated keys and tokens are ephemeral, and this row alone does not prove PEM or OpenSSH behavior."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: recognizing DER SubjectPublicKeyInfo structure inside the HMAC key helper closes the observed DER row. Applicability: verification keys arrive as bytes and the optional crypto loaders are available. Bounded test: after the patch, forge an HS256 token with a DER public key and decode with the same bytes; also verify a legitimate shared secret. Expected supporting result: InvalidKeyError for the DER form and continued acceptance of the shared secret; falsifier: successful decoding or a false rejection. Cleanup: delete temporary keys. Limit: covers only DER and not OpenSSH or object inputs."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: extending the literal blocklist with EC PEM and ecdsa- prefixes closes EC OpenSSH confusion. Applicability: keys arrive as text with recognizable prefixes. Bounded test: forge HS256 with an EC OpenSSH public string and decode with that string; confirm a secret containing the letters ecdsa but not the prefix still verifies. Expected supporting result: InvalidKeyError for the key string and acceptance for the control; falsifier: an escaping key or a false rejection. Cleanup: remove generated keys. Limit: another blocklist extension and still blind to DER."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a type guard that rejects asymmetric key objects in HMAC preparation converts the current TypeError into a clear key error and closes object-based confusion. Applicability: the optional crypto package is installed and callers pass key objects. Bounded test: forge an HS256 token with DER bytes, pass a cryptography public-key object as the decode key, and assert InvalidKeyError; confirm plain objects still raise TypeError. Expected supporting result: key error for asymmetric objects and unchanged TypeError for unrelated objects; falsifier: successful verification or a changed plain-object contract. Cleanup: discard objects. Limit: does not close encoded byte attacks."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a structural repair can accidentally reject high-entropy shared secrets, so a random-secret regression is required. Applicability: ordinary HMAC callers. Bounded test: after the patch, generate a random 32-byte secret and a long random base64 string, sign HS256 tokens with each and verify with the same value. Expected supporting result: both verify; falsifier: InvalidKeyError for non-key material. Cleanup: secrets are ephemeral. Limit: a precision control selected only after a repair exists."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.681,
+      "rationale": "Selected incumbent. It owns the only executed causal evidence and its defense clause is exactly the repair to implement; the new candidates are more specific but unexecuted."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.642,
+      "rationale": "Deferred, strong runner-up. Directly targets the accepted DER row but is narrower than a full repair and lacks the OpenSSH/object coverage."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.575,
+      "rationale": "Deferred. Would close the observed EC OpenSSH row by repeating the fragile literal-blocklist approach and leaves DER untouched."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.605,
+      "rationale": "Deferred. A real object-input gap, but it cannot stand alone because byte encodings still escape."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.596,
+      "rationale": "Deferred as a required over-rejection control; its generated cleanup sentence was truncated but the test and falsifier are complete."
+    }
+  ],
+  "selected_id": "r1-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Implemented an HMAC-path guard that raises a key error for cryptography asymmetric key objects and for bytes that parse as public or private keys through PEM, OpenSSH or DER loaders, while retaining the original literal blocklist. The rerun showed DER SPKI, PKCS#1 DER, PEM, RSA OpenSSH, EC OpenSSH, Ed25519 OpenSSH and RSA/EC/Ed25519 key objects all rejected, with legitimate shared-secret, RS256 and wrong-secret controls unchanged. Added 22 regression checks covering every HMAC variant and near-miss secrets; all passed, and the upstream suite stayed at its passing baseline. The normalized patch applied to a fresh copy. Local evidence only.",
+    "next_hint": "Probe less common encodings — bare base64 key bodies, DER certificates, JWK text and encrypted private keys — to see whether the first structural guard is complete."
+  },
+  "lineage": {
+    "case_id": "case-a5bb55a6d823483091324c515e32ed48",
+    "iteration_id": "step-2",
+    "previous_iteration_id": "step-1",
+    "step_id": "step-2",
+    "parent_step_id": "step-1",
+    "branch_id": "main"
+  }
+}

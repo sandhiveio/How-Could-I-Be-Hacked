@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.8225,
+      "rationale": "Incumbent has full-corpus execution, a 43M-check audit, and determinism/seed evidence; selected to carry the final causal ablation."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.5275,
+      "rationale": "Best new candidate: direct single-edge merge ablation with a precise split and over-merge falsifier."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.4525,
+      "rationale": "Deferred: useful alias ablation, but blanking a whole alias row removes two edge families and its predicted class count is not exact."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.47,
+      "rationale": "Deferred: valid normalization ablation, but needs a code branch or mutation and is less direct than deleting one edge."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.42,
+      "rationale": "Deferred: good middle-link test, but its stated expectation of three classes is wrong for the described chain; two person classes are expected."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.45,
+      "rationale": "Deferred: useful fresh-handle control against exact-string coalescence, but it does not test a specific union family."
+    }
+  ]
+}

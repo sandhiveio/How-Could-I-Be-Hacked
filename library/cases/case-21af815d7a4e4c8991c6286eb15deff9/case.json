@@ -1,0 +1,13 @@
+{
+  "id": "case-21af815d7a4e4c8991c6286eb15deff9",
+  "kind": "curated_case",
+  "hint": "A local single-file CLI must anonymize ten related CSV tables according to a YAML policy. The tables describe people, type-2 history rows, households, accounts, memberships, alias handles, devices, orders, events, and merge/link assertions. The same underlying entity must receive one stable token across every file, including tenant-local IDs, plural/singular scope-qualified handles, alias actor and account handles, cross-tenant link chains, and effective-dated merges. Outputs must preserve filenames, headers, column order, row order, and row counts; seeded transforms must be deterministic per seed and change when the seed changes; peak resident memory must stay below a small fixed cap while processing about two million rows.",
+  "surface": "Single-file Python CLI over ten related CSV tables with a YAML policy, deterministic seed, standard-library SQLite and compact integer arrays, and a 64 MB peak-RSS cap; all work is local and disposable.",
+  "assumptions": [
+    "The agent has read access to a disposable copy of the linked CSV tables and the YAML policy, and write access to a fresh output directory and temporary work files.",
+    "Python 3 and PyYAML are available; no third-party library beyond PyYAML is needed or permitted.",
+    "Peak resident memory must stay below 64 MB while processing about two million data rows.",
+    "Only local fixtures are used; the official benchmark verifier is host-side and is not available in the working container.",
+    "The policy transform names and source classifications are fixed; the agent may not change them to obtain a pass."
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "selected_id": "r2-c",
+  "selected_text": "Hypothesis: repeating the ASCII-identifier check inside the backend explain-prefix builder immediately before interpolation closes the confirmed direct sink while preserving every documented option. Prerequisites: the builder receives only keyword options, the public guard remains in place, and fake features can drive the builder without a live database. Bounded test: for each documented option (analyze, verbose, costs, buffers, timing, summary, settings, wal) call both the direct builder and the public method and expect the option in the prefix; then repeat with malformed keys and expect ValueError from both paths. Expected supporting result: legal prefixes match baseline and all malformed keys are rejected; falsifier: payload remains in SQL or a documented option is rejected. Cleanup: remove the disposable feature object and harness logs."
+}

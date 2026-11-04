@@ -1,0 +1,24 @@
+{
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: recognizing DER SubjectPublicKeyInfo structure inside the HMAC key helper closes the observed DER row. Applicability: verification keys arrive as bytes and the optional crypto loaders are available. Bounded test: after the patch, forge an HS256 token with a DER public key and decode with the same bytes; also verify a legitimate shared secret. Expected supporting result: InvalidKeyError for the DER form and continued acceptance of the shared secret; falsifier: successful decoding or a false rejection. Cleanup: delete temporary keys. Limit: covers only DER and not OpenSSH or object inputs."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: extending the literal blocklist with EC PEM and ecdsa- prefixes closes EC OpenSSH confusion. Applicability: keys arrive as text with recognizable prefixes. Bounded test: forge HS256 with an EC OpenSSH public string and decode with that string; confirm a secret containing the letters ecdsa but not the prefix still verifies. Expected supporting result: InvalidKeyError for the key string and acceptance for the control; falsifier: an escaping key or a false rejection. Cleanup: remove generated keys. Limit: another blocklist extension and still blind to DER."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a type guard that rejects asymmetric key objects in HMAC preparation converts the current TypeError into a clear key error and closes object-based confusion. Applicability: the optional crypto package is installed and callers pass key objects. Bounded test: forge an HS256 token with DER bytes, pass a cryptography public-key object as the decode key, and assert InvalidKeyError; confirm plain objects still raise TypeError. Expected supporting result: key error for asymmetric objects and unchanged TypeError for unrelated objects; falsifier: successful verification or a changed plain-object contract. Cleanup: discard objects. Limit: does not close encoded byte attacks."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a structural repair can accidentally reject high-entropy shared secrets, so a random-secret regression is required. Applicability: ordinary HMAC callers. Bounded test: after the patch, generate a random 32-byte secret and a long random base64 string, sign HS256 tokens with each and verify with the same value. Expected supporting result: both verify; falsifier: InvalidKeyError for non-key material. Cleanup: secrets are ephemeral. Limit: a precision control selected only after a repair exists."
+    }
+  ]
+}

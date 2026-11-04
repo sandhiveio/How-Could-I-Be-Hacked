@@ -1,0 +1,4 @@
+{
+  "selected_id": "r1-v1",
+  "selected_text": "Hypothesis: a public key serialized as SubjectPublicKeyInfo DER is not recognized by the HMAC key helper, so those bytes can serve as an HMAC secret. Applicability: the verifier holds the public key as DER bytes and permits HMAC among its allowed algorithms; the attacker knows the public key. Bounded test: generate a 2048-bit RSA key, serialize the public key as SPKI DER, forge an HS256 token over a chosen payload with those exact bytes as the HMAC key, then decode with the same bytes and the full default algorithm collection. Expected supporting result: the payload is returned before repair; falsifier: InvalidKeyError before repair. Cleanup and limits: generated keys and tokens are ephemeral, and this row alone does not prove PEM or OpenSSH behavior."
+}

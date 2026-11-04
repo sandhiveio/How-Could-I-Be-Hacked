@@ -1,0 +1,10 @@
+{
+  "case_id": "case-21af815d7a4e4c8991c6286eb15deff9",
+  "iteration_id": "iteration-0002",
+  "previous_iteration_id": "iteration-0001",
+  "incumbent": {
+    "id": "r1-v5",
+    "text": "Hypothesis: tokenizing each exact reference string without global components is sufficient only when no transitive links exist; on a chain it will split the component. Prerequisites: a disposable fixture with a three-hop cross-tenant link chain, one alias actor, and one composing merge row. Bounded test: emit exact-key tokens and brute-force union-closure tokens for the same keys, then compare the partitions pairwise. Expected support: exact-key hashing produces more classes and breaks the chain, while closure produces one class. Falsifier: exact-key hashing unifies the chain, which would remove the need for global state. Cleanup: delete the fixture and both output copies after recording the diff."
+  },
+  "hint": "A fixture-level control showed that exact-key hashing splits a three-hop cross-tenant chain and leaves alias handles ununified, while brute-force closure unifies them. The task still requires a full streaming implementation over about two million rows under a 64 MB peak-RSS cap. References appear as tenant-local IDs, plural/singular scope-qualified handles, external actor and account handles, cross-tenant links, and effective-dated merges. The agent may edit a disposable working copy, run Python and SQLite, write outputs, and measure memory; the official verifier remains unavailable. The next question is which minimal normalized edge set and on-disk layout makes every business-reference column resolve consistently before emission."
+}

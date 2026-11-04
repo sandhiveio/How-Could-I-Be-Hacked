@@ -1,0 +1,10 @@
+{
+  "case_id": "case-a5bb55a6d823483091324c515e32ed48",
+  "iteration_id": "step-1",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Plan A: reproduce key confusion through an asymmetric key encoding the HMAC helper does not parse, then reject asymmetric material on the HMAC path and verify legitimate HMAC and asymmetric decoding."
+  },
+  "hint": "A Python JWT decoder accepts an algorithms collection from the caller. When the caller passes the library's full default collection while holding an asymmetric public key, an attacker who controls the token header can select an HMAC algorithm. Before hashing, the HMAC key helper checks only a few literal strings such as PEM public-key headers and the ssh-rsa prefix. The source, its tests and RSA/EC/Ed25519 fixture keys are available locally; cryptography is installed. The next question is which concrete public-key encoding actually reaches HMAC verification."
+}

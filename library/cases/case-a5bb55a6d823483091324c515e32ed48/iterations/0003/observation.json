@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "A 14-case encoding matrix against the pristine source accepted 10 of 11 asymmetric forms as HS256 secrets, including PEM and OpenSSH base64 bodies, DER certificate, asymmetric JWK text, private-key DER and encrypted private-key PEM. After the first guard, base64 bodies, certificate DER, JWK text and encrypted PEM still escaped. Extended the guard to strip whitespace, decode bare base64 text, inspect DER and SSH wire format, load DER certificates, parse asymmetric JWK text and reject any PEM BEGIN prefix. The repeated matrix then rejected all 11 asymmetric forms while three controls (2048 random bytes, random base64, a secret containing BEGIN/PUBLIC words) still verified. The full suite and 30 authored checks passed, and the regenerated patch applied to a fresh copy. Local evidence only.",
+  "next_hint": "Exercise the fallback branch in a build where the optional cryptography dependency is unavailable, since its textual checks may still accept raw DER."
+}

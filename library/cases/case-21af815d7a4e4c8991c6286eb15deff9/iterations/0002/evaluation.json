@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.5075,
+      "rationale": "Incumbent control is now known insufficient as the final mechanism; retained for comparison."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.5,
+      "rationale": "Deferred: sound persistent-index mechanism but omits the prefix-normalization and pre-emission union details."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.53,
+      "rationale": "Selected: names both missing correctness pieces, has an executable full-corpus test, and a clear component-split falsifier."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.4275,
+      "rationale": "Deferred: allocation tracing is weaker than a measured peak-RSS run of a correct implementation."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.4625,
+      "rationale": "Deferred: confirms an edge family already implicated by the first control, rather than resolving the next implementation gap."
+    }
+  ]
+}

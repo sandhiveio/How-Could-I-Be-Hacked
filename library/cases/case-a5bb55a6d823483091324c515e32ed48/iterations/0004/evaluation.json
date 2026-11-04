@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.77,
+      "rationale": "Selected incumbent. The crypto-present matrix is closed and regression-tested, but the fallback branch remains untested; the next bounded action is to reproduce and harden it."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.636,
+      "rationale": "Deferred, closest alternative. Its prediction about textual-only fallback checks is executable, but it lacks the repair and over-rejection controls that the final action needs."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.613,
+      "rationale": "Deferred. A real fallback row, but a subset of the same hardening action and dependent on a precomputation step."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.597,
+      "rationale": "Deferred but important as an over-rejection counterexample; it argues for key-structure markers rather than a bare sequence-tag test."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.579,
+      "rationale": "Deferred. Architecturally attractive but heavier, and replacing the passing guard on the last round adds risk without a decisive check."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.598,
+      "rationale": "Deferred. The strongest environment check, but slower than an import-hook subprocess; retained as a documented limitation."
+    }
+  ]
+}

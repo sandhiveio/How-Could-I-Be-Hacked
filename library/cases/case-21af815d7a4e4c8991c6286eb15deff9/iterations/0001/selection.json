@@ -1,0 +1,4 @@
+{
+  "selected_id": "r1-v5",
+  "selected_text": "Hypothesis: tokenizing each exact reference string without global components is sufficient only when no transitive links exist; on a chain it will split the component. Prerequisites: a disposable fixture with a three-hop cross-tenant link chain, one alias actor, and one composing merge row. Bounded test: emit exact-key tokens and brute-force union-closure tokens for the same keys, then compare the partitions pairwise. Expected support: exact-key hashing produces more classes and breaks the chain, while closure produces one class. Falsifier: exact-key hashing unifies the chain, which would remove the need for global state. Cleanup: delete the fixture and both output copies after recording the diff."
+}

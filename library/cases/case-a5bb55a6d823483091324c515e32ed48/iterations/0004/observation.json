@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Replayed the encoding matrix in a fresh process that imported the patched library with cryptography blocked; the module reported its no-crypto branch. The first fallback run found one residual escape: a SEC1 EC private-key DER blob was accepted because it carries a curve object identifier rather than the public-key identifier already in the marker set. Added the common curve identifiers and a PKCS#1 modulus marker, then repeated both environments. The no-crypto matrix rejected all 9 asymmetric forms while four controls still verified; the crypto-present matrix rejected all 11 asymmetric forms with three controls verifying. The upstream suite stayed at its passing baseline, 30 authored checks passed, and the regenerated patch applied to a fresh copy and closed the matrix there. Local evidence only; the official verdict remains host-side.",
+  "next_hint": "Export the minimal patch for the host-side official evaluation, and separately note that a real dependency-free installation was approximated with an import hook."
+}

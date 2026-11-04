@@ -1,0 +1,10 @@
+{
+  "case_id": "case-21af815d7a4e4c8991c6286eb15deff9",
+  "iteration_id": "iteration-0003",
+  "previous_iteration_id": "iteration-0002",
+  "incumbent": {
+    "id": "r2-v2",
+    "text": "Hypothesis: a two-pass design is necessary and sufficient: finish the complete union before emission, and normalize tenant-local IDs and plural/singular scope prefixes to one canonical key before hashing. Prerequisites: read access to all tables, a disposable output directory, and Python 3 with a standard-library on-disk index. Bounded test: run the full corpus, then independently re-read every policy reference column, normalize each value to its canonical key, and assert that all occurrences of one key share one token while file structure is unchanged. Expected support: zero component splits, zero local-versus-scoped mismatches, and peak RSS below 64 MB. Falsifier: any component split, any mismatch between a local row and its scope-qualified handle, or memory above the cap. Cleanup: remove the temporary index and keep the audit report."
+  },
+  "hint": "A full local run over about 2.08 million rows has already passed 43 million structural and cross-file token checks at about 43,500 KB peak RSS. The remaining contract explicitly requires deterministic output for a given seed, seeded transforms that change when the seed changes, and unseeded transforms that should not. The agent may run a linked subset twice with the same seed, once with a different seed, and compare per-column behavior; peak-RSS and structure checks are also available. The official verifier is still unavailable. The next question is which bounded verification set best discriminates genuinely deterministic, seed-responsive behavior from output that merely looks correct."
+}

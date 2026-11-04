@@ -1,0 +1,10 @@
+{
+  "plans": [
+    "Sink-first differential: instantiate the backend operations object with a disposable fake connection, compare EXPLAIN prefixes for legal and crafted option names, repair option-name validation at the public explain boundary, then rerun the matrix plus legal-option regression.",
+    "Public-API-first: configure a minimal model and local connection, temporarily substitute the SQL backend operations object, capture the SQL produced by a public queryset explain call with a crafted dictionary, and use that observed public-path failure to choose the smallest repair.",
+    "Grammar-whitelist-first: derive the legal option-name grammar from the backend and existing explain tests, implement a strict ASCII identifier check, and probe boundary cases (digits, underscore, empty, leading digit, newline, quote, parenthesis, semicolon, comment, Unicode) before deciding where the check belongs.",
+    "Backend-local defense: put the option-name validation inside the backend explain-prefix builder immediately before interpolation, prove the direct sink is safe, then check whether the public explain path also rejects the payload and whether documented options remain compatible.",
+    "Data-flow audit: trace every path from the public explain entry point to raw SQL construction, record each interpolation point and trust boundary, patch the narrowest common point, and add a regression script exercising direct operations, the public method, and existing explain output formats."
+  ],
+  "selected_id": "plan-1"
+}

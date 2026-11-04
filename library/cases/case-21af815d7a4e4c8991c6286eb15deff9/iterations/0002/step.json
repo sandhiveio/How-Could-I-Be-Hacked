@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A fixture-level control showed that exact-key hashing splits a three-hop cross-tenant chain and leaves alias handles ununified, while brute-force closure unifies them. The task still requires a full streaming implementation over about two million rows under a 64 MB peak-RSS cap. References appear as tenant-local IDs, plural/singular scope-qualified handles, external actor and account handles, cross-tenant links, and effective-dated merges. The agent may edit a disposable working copy, run Python and SQLite, write outputs, and measure memory; the official verifier remains unavailable. The next question is which minimal normalized edge set and on-disk layout makes every business-reference column resolve consistently before emission.",
+    "surface": "Single-file Python CLI over ten related CSV tables with a YAML policy, deterministic seed, standard-library SQLite and compact integer arrays, and a 64 MB peak-RSS cap; all work is local and disposable.",
+    "assumptions": [
+      "The agent has read access to a disposable copy of the linked CSV tables and the YAML policy, and write access to a fresh output directory and temporary work files.",
+      "Python 3 and PyYAML are available; no third-party library beyond PyYAML is needed or permitted.",
+      "Peak resident memory must stay below 64 MB while processing about two million data rows.",
+      "Only local fixtures are used; the official benchmark verifier is host-side and is not available in the working container.",
+      "The policy transform names and source classifications are fixed; the agent may not change them to obtain a pass."
+    ]
+  },
+  "incumbent": {
+    "id": "r1-v5",
+    "text": "Hypothesis: tokenizing each exact reference string without global components is sufficient only when no transitive links exist; on a chain it will split the component. Prerequisites: a disposable fixture with a three-hop cross-tenant link chain, one alias actor, and one composing merge row. Bounded test: emit exact-key tokens and brute-force union-closure tokens for the same keys, then compare the partitions pairwise. Expected support: exact-key hashing produces more classes and breaks the chain, while closure produces one class. Falsifier: exact-key hashing unifies the chain, which would remove the need for global state. Cleanup: delete the fixture and both output copies after recording the diff."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v5",
+      "text": "Hypothesis: a persistent SQLite B-tree mapping each canonical key to its component root can resolve transitive chains within the memory cap. Prerequisites: Python 3, SQLite, a disposable working copy, and a full-size local input. Bounded test: run the full pipeline with a capped page cache and measure peak RSS, then check that all linked and merged keys receive one token. Expected support: peak RSS below 64 MB and no split component. Falsifier: RSS above the cap or any component split. Cleanup: delete the work database and output copy, retaining logs."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v5",
+      "text": "Hypothesis: a two-pass design is necessary and sufficient: finish the complete union before emission, and normalize tenant-local IDs and plural/singular scope prefixes to one canonical key before hashing. Prerequisites: read access to all tables, a disposable output directory, and Python 3 with a standard-library on-disk index. Bounded test: run the full corpus, then independently re-read every policy reference column, normalize each value to its canonical key, and assert that all occurrences of one key share one token while file structure is unchanged. Expected support: zero component splits, zero local-versus-scoped mismatches, and peak RSS below 64 MB. Falsifier: any component split, any mismatch between a local row and its scope-qualified handle, or memory above the cap. Cleanup: remove the temporary index and keep the audit report."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v5",
+      "text": "Hypothesis: flattening all alias edges into one bounded registration pass and avoiding per-file graph objects prevents allocation spikes during alias processing. Prerequisites: a full-size input and a way to sample RSS or allocation counts. Bounded test: run the pipeline with tracing at the alias and merge phases and compare peak RSS with a flattened single-pass variant. Expected support: stable RSS with no spike above the cap. Falsifier: a phase-local spike that pushes total RSS above 64 MB. Cleanup: remove trace files and temporary databases."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v5",
+      "text": "Hypothesis: external actor and account handles require explicit alias edges to person and account references; exact-string hashing cannot unify them. Prerequisites: a disposable fixture with one alias row and one account handle. Bounded test: add a synthetic alias row linking external handles to a person and account, run the CLI, and compare tokens with and without the alias edge. Expected support: the external account and account-local forms share one token only when the alias edge exists. Falsifier: the handles remain distinct despite the alias edge. Cleanup: restore the fixture and keep the two token maps."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.5075,
+      "rationale": "Incumbent control is now known insufficient as the final mechanism; retained for comparison."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.5,
+      "rationale": "Deferred: sound persistent-index mechanism but omits the prefix-normalization and pre-emission union details."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.53,
+      "rationale": "Selected: names both missing correctness pieces, has an executable full-corpus test, and a clear component-split falsifier."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.4275,
+      "rationale": "Deferred: allocation tracing is weaker than a measured peak-RSS run of a correct implementation."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.4625,
+      "rationale": "Deferred: confirms an edge family already implicated by the first control, rather than resolving the next implementation gap."
+    }
+  ],
+  "selected_id": "r2-v2",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Implemented the two-pass design as a single-file CLI. A registration pass streams all ten tables, normalizes tenant-local person and household IDs, account ledger scopes, order scopes, and device references, and unions alias, merge, and cross-tenant link edges. A compact array-backed disjoint set sits beside an on-disk SQLite key index with a capped page cache. A materialization pass assigns each component a lexical-minimum label and derives a ref_ token; an emission pass re-streams each file, applies every policy transform, and preserves filenames, headers, column order, row order, and row counts. The first subset attempt failed because policy columns hold transform names rather than transform definitions; resolving names through the policy transform table fixed it. The full run processed about 2.08 million rows in about 26 minutes with about 43,500 KB peak RSS, below 64 MB. An independent audit performed about 43 million structural, policy-formula, and cross-file token checks with zero failures and found about 540,000 token classes. Generalized recipe: run the CLI on the full input with a fixed seed, measure peak RSS externally, then independently normalize every policy reference column and assert one token per canonical key plus unchanged structure. Evidence strength is a full-corpus local result; the official verifier was not run and hidden contract semantics remain untested.",
+    "next_hint": "The full corpus and audit pass. The next question is whether output is deterministic for a fixed seed, whether every seeded transform responds to a seed change, and whether unseeded transforms stay invariant."
+  },
+  "lineage": {
+    "case_id": "case-21af815d7a4e4c8991c6286eb15deff9",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001",
+    "step_id": "iteration-0002",
+    "parent_step_id": "iteration-0001",
+    "branch_id": "main"
+  }
+}

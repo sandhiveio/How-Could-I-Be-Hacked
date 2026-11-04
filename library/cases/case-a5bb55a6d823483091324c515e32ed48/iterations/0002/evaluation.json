@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.681,
+      "rationale": "Selected incumbent. It owns the only executed causal evidence and its defense clause is exactly the repair to implement; the new candidates are more specific but unexecuted."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.642,
+      "rationale": "Deferred, strong runner-up. Directly targets the accepted DER row but is narrower than a full repair and lacks the OpenSSH/object coverage."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.575,
+      "rationale": "Deferred. Would close the observed EC OpenSSH row by repeating the fragile literal-blocklist approach and leaves DER untouched."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.605,
+      "rationale": "Deferred. A real object-input gap, but it cannot stand alone because byte encodings still escape."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.596,
+      "rationale": "Deferred as a required over-rejection control; its generated cleanup sentence was truncated but the test and falsifier are complete."
+    }
+  ]
+}

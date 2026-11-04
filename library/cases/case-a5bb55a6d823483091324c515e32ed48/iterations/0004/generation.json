@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: with the optional crypto package unavailable, the fallback guard still accepts raw DER public-key bytes because only textual checks run. Applicability: a minimal installation without the optional dependency. Bounded test: import the library with cryptography blocked, confirm the no-crypto flag, and replay the DER rows from the encoding matrix with forged HS256 tokens. Expected supporting result: acceptance in the fallback; falsifier: InvalidKeyError for every asymmetric form. Cleanup: restore the import environment. Limit: an import hook is not identical to a real missing installation."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: bare base64 bodies of EC and Ed25519 keys escape a fallback that checks only tags and headers. Applicability: a no-crypto build with precomputed key material. Bounded test: precompute the bodies with crypto present, then feed each as an HMAC secret in a fresh process where cryptography is blocked; keep random-base64 controls. Expected supporting result: asymmetric bodies accepted; falsifier: rejection with controls still accepted. Cleanup: delete fixtures. Limit: requires precomputation because the test process cannot import the optional package."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: a fallback that treats decoded bytes beginning with an ASN.1 sequence tag as a key will falsely reject legitimate random secrets. Applicability: normal HMAC callers in a no-crypto build. Bounded test: construct random secrets whose base64 decode begins with 0x30 or 0x31 and verify HS256 tokens with them. Expected supporting result: all verify; falsifier: any key error. Cleanup: secrets are ephemeral. Limit: favors full structure markers over magic-byte matching."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: a centralized decode-time gate that refuses HMAC whenever the key was prepared by an asymmetric family closes all encodings without per-format heuristics. Applicability: both crypto-present and absent builds; strings pass through a loader shim. Bounded test: run the encoding matrix plus over-rejection controls with the gate, then confirm asymmetric tokens still decode. Expected supporting result: no escaping form and no false rejection; falsifier: any escape, false rejection or asymmetric regression. Cleanup: revert the experimental branch and confirm the exported patch still applies. Limit: extra indirection on a hot path and an unproven caching design."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: an import hook hides lazy-import differences that a real dependency-free installation would expose. Applicability: final patch-integrity verification. Bounded test: apply the exported patch to a pristine copy in a throwaway environment with cryptography genuinely absent, run the suite and the authored checks, and compare results with the hook-based matrix. Expected supporting result: the same rejection matrix and no import errors; falsifier: a passing asymmetric form or a suite regression. Cleanup: discard the throwaway environment. Limit: slower than the hook and may need dependency installation."
+    }
+  ]
+}

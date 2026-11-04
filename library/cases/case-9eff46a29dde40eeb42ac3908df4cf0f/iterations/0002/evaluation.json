@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.6725,
+      "rationale": "Selected incumbent: the bracket-bypass payload is already reproduced, and the repaired assignment guard was implemented as the next action from this hypothesis."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.548,
+      "rationale": "Deferred narrowly: the combined guard is the most complete, but the incumbent action already covered its observed cases."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.524,
+      "rationale": "Deferred: parent identity is the core guard and was used in the repair; the selected incumbent action included it."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.5115,
+      "rationale": "Deferred: normalized segments catch bracket aliases but risk over-blocking terminal constructor/prototype writes."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.502,
+      "rationale": "Deferred: per-segment checking is stronger but more invasive than the observed need."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.489,
+      "rationale": "Deferred: behavioral diff is a validation layer and was executed as part of the incumbent regression."
+    }
+  ]
+}

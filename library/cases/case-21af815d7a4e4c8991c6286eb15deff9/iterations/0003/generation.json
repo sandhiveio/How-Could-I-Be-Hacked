@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: repeating the identical invocation on an unchanged copy produces byte-identical output for every file. Prerequisites: a fixed seed, a clean second output directory, and the same input copy. Bounded test: run twice into separate directories and compare a cryptographic hash of every output file. Expected support: all hashes match. Falsifier: any file differs, which would reveal unordered database rowids, set iteration, or time-dependent transforms. Cleanup: delete the duplicate output tree and keep the hash list."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: changing only the seed changes every seeded business reference, fake email, fake phone, and fake date, while hash, mask, and redact outputs remain byte-identical. Prerequisites: a representative linked subset that retains cross-tenant chains, alias actors, and composing merges. Bounded test: run seed 42 and seed 43 on the same subset and diff column by column according to transform kind. Expected support: seeded columns differ for every applicable row and unseeded columns have zero differences. Falsifier: a seeded column is unchanged across seeds, or a hash/mask/redact column changes with the seed alone. Cleanup: discard both subset outputs after retaining the per-column summary."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: numeric noise is additive with the policy sigma, and fake dates shift by at least the configured minimum offset. Prerequisites: sampled rows spanning small and large magnitudes plus boundary dates. Bounded test: for each numeric field compute output minus input and summarize mean and standard deviation; for each date field compute day differences against the policy formats. Expected support: noise centered near zero with standard deviation close to sigma, and every date shift at least the minimum. Falsifier: zero noise, a strongly biased shift, a date shift below the minimum, or a date format change. Cleanup: remove sampled fixtures and keep the statistics."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: reference-token shape is fixed by the policy prefix, length, and alphabet and remains stable between subset and full runs for overlapping entities. Prerequisites: overlapping entities between a subset run and the full run plus the policy token parameters. Bounded test: assert the token regular expression and length on every emitted business reference and compare shape across runs. Expected support: constant length and alphabet. Falsifier: variable length, forbidden characters, or a shape change between runs. Cleanup: retain the shape summary only."
+    },
+    {
+      "id": "r3-v5",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: structural invariants survive a seed change, and deleting one composing merge row splits exactly the affected component. Prerequisites: a linked fixture and a preserved copy of the unmodified merge table. Bounded test: compare filenames, headers, column order, row counts, and first/last rows across seeds; then delete one merge row and compare token classes. Expected support: structure unchanged and precisely the merged subject splits away. Falsifier: structural drift, no split, or unrelated components changing class. Cleanup: restore the merge row and rerun to confirm the baseline partition."
+    }
+  ]
+}

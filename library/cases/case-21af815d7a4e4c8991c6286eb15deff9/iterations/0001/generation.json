@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: effective-dated merge rows must compose transitively, and a union applied globally or per timestamp must not depend on file order. Prerequisites: a writable disposable copy of the merge table and permission to add synthetic pre/post-effective-date rows. Bounded test: build a small fixture with one actor-to-person merge whose effective date falls between two referencing rows, run the CLI, and compare the tokens emitted for both references and for the ultimate person. Expected support: all references to the merged person share one token when the contract requires global identity; a date-scoped contract instead yields a documented split. Falsifier: two rows with the same effective timestamp receive different tokens, or the merge edge is ignored entirely. Cleanup: delete the synthetic fixture and temporary outputs."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a union-find is order-independent only when every edge is inserted before emission; an implementation that emits while later files still add edges can split a component. Prerequisites: the same input and the ability to reorder file processing. Bounded test: process the edge-bearing files in forward and reversed order, then compare component roots and emitted token equality for a three-hop link chain. Expected support: identical partitions in both orders. Falsifier: any pair linked in one order but split in the other. Cleanup: remove the shuffled copies and keep the comparison output."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an equality-only spot check can pass while tokens are derived from different non-root labels; a pairwise-closure diff is needed to prove transitivity. Prerequisites: a fixture of at most a few hundred entities and a brute-force reachability implementation. Bounded test: compare the emitted token partition with all-pairs reachability computed independently. Expected support: every reachable pair shares one token and no unreachable pair shares one. Falsifier: a reachable pair has different tokens or an unreachable pair collides. Cleanup: discard the scratch fixture and retain the partition diff."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a Python dict of all reference keys or per-family database connections will exceed 64 MB on two million rows, while one shared on-disk index with a small page cache stays below the cap. Prerequisites: a full-size local input and a peak-RSS measurement tool. Bounded test: run the same code with a shared connection and a capped cache, measuring peak RSS with the operating system time utility. Expected support: peak RSS below 64 MB and no second growth spike during the merge phase. Falsifier: peak RSS above 64 MB or more than ten percent growth during that phase. Cleanup: delete the temporary database and timing logs."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: tokenizing each exact reference string without global components is sufficient only when no transitive links exist; on a chain it will split the component. Prerequisites: a disposable fixture with a three-hop cross-tenant link chain, one alias actor, and one composing merge row. Bounded test: emit exact-key tokens and brute-force union-closure tokens for the same keys, then compare the partitions pairwise. Expected support: exact-key hashing produces more classes and breaks the chain, while closure produces one class. Falsifier: exact-key hashing unifies the chain, which would remove the need for global state. Cleanup: delete the fixture and both output copies after recording the diff."
+    }
+  ]
+}

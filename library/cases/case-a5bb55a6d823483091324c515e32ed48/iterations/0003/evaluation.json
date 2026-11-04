@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.751,
+      "rationale": "Incumbent, narrowly deferred. It retains the strongest evidence status after a working repair, but the matrix shows a concrete residual gap, so its information gain is now low."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.759,
+      "rationale": "Selected. The matrix directly confirms that PEM and OpenSSH base64 bodies verify as HS256 secrets before and after the first repair, and the next action is to extend the guard structurally."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.673,
+      "rationale": "Deferred and answered negatively. The SEC1 private-key DER form was accepted before repair but the first guard already rejects it through the DER private-key loader, so it does not need a new action."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.69,
+      "rationale": "Deferred as a required over-rejection control; the matrix confirms random and word-bearing secrets still verify."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.657,
+      "rationale": "Deferred and partly refuted. Truncated OpenSSH input already raises a clean key error on both trees with no crash, so the predicted unhandled exception did not occur."
+    },
+    {
+      "id": "r3-v5",
+      "eligible": true,
+      "score": 0.743,
+      "rationale": "Deferred, close runner-up. Asymmetric JWK text still verifies after the first repair; it is slightly less common than a base64 body and was folded into the same structural extension."
+    }
+  ]
+}

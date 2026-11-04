@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A local CSV anonymizer must map references to one stable token per underlying entity. Ten tables use tenant-local IDs and scope-qualified handles; alias rows connect actor and account handles to person and account references; cross-tenant link rows connect people; effective-dated merge rows connect actor handles to people. The policy also requires format-preserving fake values, hashes, masks, redaction, and numeric noise, with deterministic seeded output and a 64 MB peak-RSS cap over about two million rows. The agent may read a disposable copy, create fixtures, write outputs, and run Python; no official verifier is available. The first question is whether per-key hashing without global components is sufficient, or whether transitive components are load-bearing.",
+    "surface": "Single-file Python CLI over ten related CSV tables with a YAML policy, deterministic seed, standard-library SQLite and compact integer arrays, and a 64 MB peak-RSS cap; all work is local and disposable.",
+    "assumptions": [
+      "The agent has read access to a disposable copy of the linked CSV tables and the YAML policy, and write access to a fresh output directory and temporary work files.",
+      "Python 3 and PyYAML are available; no third-party library beyond PyYAML is needed or permitted.",
+      "Peak resident memory must stay below 64 MB while processing about two million data rows.",
+      "Only local fixtures are used; the official benchmark verifier is host-side and is not available in the working container.",
+      "The policy transform names and source classifications are fixed; the agent may not change them to obtain a pass."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Streaming canonicalization with an on-disk key index: normalize every reference to a scope-qualified key, register keys and perform unions in SQLite while a compact array-backed disjoint set stays in memory, derive one HMAC(seed, root) token per component, and re-stream each CSV applying the policy. Measure peak RSS and validate cross-file token equality."
+  },
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: effective-dated merge rows must compose transitively, and a union applied globally or per timestamp must not depend on file order. Prerequisites: a writable disposable copy of the merge table and permission to add synthetic pre/post-effective-date rows. Bounded test: build a small fixture with one actor-to-person merge whose effective date falls between two referencing rows, run the CLI, and compare the tokens emitted for both references and for the ultimate person. Expected support: all references to the merged person share one token when the contract requires global identity; a date-scoped contract instead yields a documented split. Falsifier: two rows with the same effective timestamp receive different tokens, or the merge edge is ignored entirely. Cleanup: delete the synthetic fixture and temporary outputs."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a union-find is order-independent only when every edge is inserted before emission; an implementation that emits while later files still add edges can split a component. Prerequisites: the same input and the ability to reorder file processing. Bounded test: process the edge-bearing files in forward and reversed order, then compare component roots and emitted token equality for a three-hop link chain. Expected support: identical partitions in both orders. Falsifier: any pair linked in one order but split in the other. Cleanup: remove the shuffled copies and keep the comparison output."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an equality-only spot check can pass while tokens are derived from different non-root labels; a pairwise-closure diff is needed to prove transitivity. Prerequisites: a fixture of at most a few hundred entities and a brute-force reachability implementation. Bounded test: compare the emitted token partition with all-pairs reachability computed independently. Expected support: every reachable pair shares one token and no unreachable pair shares one. Falsifier: a reachable pair has different tokens or an unreachable pair collides. Cleanup: discard the scratch fixture and retain the partition diff."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a Python dict of all reference keys or per-family database connections will exceed 64 MB on two million rows, while one shared on-disk index with a small page cache stays below the cap. Prerequisites: a full-size local input and a peak-RSS measurement tool. Bounded test: run the same code with a shared connection and a capped cache, measuring peak RSS with the operating system time utility. Expected support: peak RSS below 64 MB and no second growth spike during the merge phase. Falsifier: peak RSS above 64 MB or more than ten percent growth during that phase. Cleanup: delete the temporary database and timing logs."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: tokenizing each exact reference string without global components is sufficient only when no transitive links exist; on a chain it will split the component. Prerequisites: a disposable fixture with a three-hop cross-tenant link chain, one alias actor, and one composing merge row. Bounded test: emit exact-key tokens and brute-force union-closure tokens for the same keys, then compare the partitions pairwise. Expected support: exact-key hashing produces more classes and breaks the chain, while closure produces one class. Falsifier: exact-key hashing unifies the chain, which would remove the need for global state. Cleanup: delete the fixture and both output copies after recording the diff."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.573,
+      "rationale": "Incumbent overall design has the best combination of correctness and memory feasibility, but no executed evidence yet."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.5685,
+      "rationale": "Deferred: tests a real temporal semantic ambiguity, but the contract does not clearly require time-indexed pseudonyms."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.583,
+      "rationale": "Deferred: useful order-independence regression, but a correct two-pass union is order-independent by construction."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.543,
+      "rationale": "Deferred: strong verification idea, but needs an implementation to compare against."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.5655,
+      "rationale": "Deferred: cheap memory check, but cannot run before the first implementation exists."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.6385,
+      "rationale": "Selected: cheapest discriminating control that isolates whether global components are necessary; a divergence supports the union design and a match would overturn it."
+    }
+  ],
+  "selected_id": "r1-v5",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Executed the exact-key versus brute-force-closure control on a disposable 11-entity fixture containing a three-hop cross-tenant link chain, one alias actor, one composing merge row, four households, and one account. Exact-key hashing produced 11 distinct tokens and did not unify the chain; closure produced 6 classes and put all five expected person keys into one class. Five keys diverged, including the alias actor and the external account handle. The exact-key prediction was therefore supported: per-key hashing alone violates the cross-file transitive-identity requirement. The control also showed that external account handles need an explicit alias edge to an account reference, not merely exact-string hashing. Evidence strength is one controlled fixture-level result; a full corpus and the official verifier were not run. Generalized recipe: build a small linked fixture, emit exact-key tokens and independently union all explicit edges, then compare pairwise partitions rather than only spot equality.",
+    "next_hint": "The control supports a global component mechanism. The next question is the minimal normalized edge set and streaming layout that can process the full corpus within the memory cap."
+  },
+  "lineage": {
+    "case_id": "case-21af815d7a4e4c8991c6286eb15deff9",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null,
+    "step_id": "iteration-0001",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}

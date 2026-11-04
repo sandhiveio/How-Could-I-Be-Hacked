@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r2-a",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the public-only guard is sufficient because no shipped code path calls the backend prefix builder with caller-controlled options. Prerequisites: a complete call-site inventory of the backend prefix builder in the staged source. Bounded test: grep the source for direct builder calls, then run one public explain call and one direct builder call with the same malicious key and record which rejects. Expected supporting result: only the public call is reachable from user input and rejects; falsifier: any shipped or subclass path sends raw options to the builder. Limitation: a clean inventory does not protect future internal callers."
+    },
+    {
+      "id": "r2-b",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a shared validator in the internal explain-options record covers both public and direct-backend paths without duplicating logic. Prerequisites: every prefix construction flows through that record. Bounded test: add validation to the record constructor, then run legal and malicious keys through the public method and through the backend prefix builder with fake features. Expected supporting result: both entries reject the malicious key and accept legal keys; falsifier: the backend builder constructs a prefix directly from raw options without the record. Cleanup: revert the shared-record patch if the prerequisite is false."
+    },
+    {
+      "id": "r2-c",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: repeating the ASCII-identifier check inside the backend explain-prefix builder immediately before interpolation closes the confirmed direct sink while preserving every documented option. Prerequisites: the builder receives only keyword options, the public guard remains in place, and fake features can drive the builder without a live database. Bounded test: for each documented option (analyze, verbose, costs, buffers, timing, summary, settings, wal) call both the direct builder and the public method and expect the option in the prefix; then repeat with malformed keys and expect ValueError from both paths. Expected supporting result: legal prefixes match baseline and all malformed keys are rejected; falsifier: payload remains in SQL or a documented option is rejected. Cleanup: remove the disposable feature object and harness logs."
+    },
+    {
+      "id": "r2-d",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the option-value channel may become injectable in a future backend if values are rendered as strings rather than literal true/false, so validation must eventually cover both names and values. Prerequisites: a backend or future change that interpolates option values as text. Bounded test: pass boolean, integer and string values through the current fake backend sink and inspect rendering; then simulate a string-interpolating variant. Expected supporting result: the current backend renders every value as true/false, while the simulated variant exposes value injection; falsifier: the current backend already renders a raw string. Limitation: outside the observed vulnerability mechanism and requires a future-code assumption."
+    },
+    {
+      "id": "r2-e",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: keeping the minimal public-only guard and adding a regression assertion from the existing explain test module is enough to close the task without widening the patch. Prerequisites: the existing test module can run locally without a live external database. Bounded test: run the explain tests and a focused public-path assertion, then save the patch diff for export. Expected supporting result: existing tests pass and malformed public keys raise ValueError; falsifier: a normal option is rejected or the test module fails. Limitation: documents the direct-backend bypass as residual risk rather than closing it."
+    }
+  ]
+}

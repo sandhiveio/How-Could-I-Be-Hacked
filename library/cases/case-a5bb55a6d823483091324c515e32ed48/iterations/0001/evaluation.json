@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.654,
+      "rationale": "Broad end-to-end plan retained as the incumbent frame; a specific encoding experiment is now cheaper than executing the whole plan."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.721,
+      "rationale": "Selected. Source inspection shows the HMAC helper only tests four literal substrings and accepts arbitrary bytes, so DER is a precise falsifiable row with a minimal fixture."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.629,
+      "rationale": "Deferred. Source inspection predicts a TypeError from byte coercion, making object acceptance unlikely, but it remains a cheap object-input branch."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.64,
+      "rationale": "Deferred. The ssh-rsa-only blocklist makes non-RSA OpenSSH strings plausible, but the row depends on caller-side parsing and mixes several encodings."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.651,
+      "rationale": "Deferred. A strong repair-precision control whose full value comes only after a concrete repair exists."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.586,
+      "rationale": "Deferred. A plausible repair architecture, but committing before the prepatch measurement would decide the fix prematurely."
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A full local run over about 2.08 million rows has already passed 43 million structural and cross-file token checks at about 43,500 KB peak RSS. The remaining contract explicitly requires deterministic output for a given seed, seeded transforms that change when the seed changes, and unseeded transforms that should not. The agent may run a linked subset twice with the same seed, once with a different seed, and compare per-column behavior; peak-RSS and structure checks are also available. The official verifier is still unavailable. The next question is which bounded verification set best discriminates genuinely deterministic, seed-responsive behavior from output that merely looks correct.",
+    "surface": "Single-file Python CLI over ten related CSV tables with a YAML policy, deterministic seed, standard-library SQLite and compact integer arrays, and a 64 MB peak-RSS cap; all work is local and disposable.",
+    "assumptions": [
+      "The agent has read access to a disposable copy of the linked CSV tables and the YAML policy, and write access to a fresh output directory and temporary work files.",
+      "Python 3 and PyYAML are available; no third-party library beyond PyYAML is needed or permitted.",
+      "Peak resident memory must stay below 64 MB while processing about two million data rows.",
+      "Only local fixtures are used; the official benchmark verifier is host-side and is not available in the working container.",
+      "The policy transform names and source classifications are fixed; the agent may not change them to obtain a pass."
+    ]
+  },
+  "incumbent": {
+    "id": "r2-v2",
+    "text": "Hypothesis: a two-pass design is necessary and sufficient: finish the complete union before emission, and normalize tenant-local IDs and plural/singular scope prefixes to one canonical key before hashing. Prerequisites: read access to all tables, a disposable output directory, and Python 3 with a standard-library on-disk index. Bounded test: run the full corpus, then independently re-read every policy reference column, normalize each value to its canonical key, and assert that all occurrences of one key share one token while file structure is unchanged. Expected support: zero component splits, zero local-versus-scoped mismatches, and peak RSS below 64 MB. Falsifier: any component split, any mismatch between a local row and its scope-qualified handle, or memory above the cap. Cleanup: remove the temporary index and keep the audit report."
+  },
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: repeating the identical invocation on an unchanged copy produces byte-identical output for every file. Prerequisites: a fixed seed, a clean second output directory, and the same input copy. Bounded test: run twice into separate directories and compare a cryptographic hash of every output file. Expected support: all hashes match. Falsifier: any file differs, which would reveal unordered database rowids, set iteration, or time-dependent transforms. Cleanup: delete the duplicate output tree and keep the hash list."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: changing only the seed changes every seeded business reference, fake email, fake phone, and fake date, while hash, mask, and redact outputs remain byte-identical. Prerequisites: a representative linked subset that retains cross-tenant chains, alias actors, and composing merges. Bounded test: run seed 42 and seed 43 on the same subset and diff column by column according to transform kind. Expected support: seeded columns differ for every applicable row and unseeded columns have zero differences. Falsifier: a seeded column is unchanged across seeds, or a hash/mask/redact column changes with the seed alone. Cleanup: discard both subset outputs after retaining the per-column summary."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: numeric noise is additive with the policy sigma, and fake dates shift by at least the configured minimum offset. Prerequisites: sampled rows spanning small and large magnitudes plus boundary dates. Bounded test: for each numeric field compute output minus input and summarize mean and standard deviation; for each date field compute day differences against the policy formats. Expected support: noise centered near zero with standard deviation close to sigma, and every date shift at least the minimum. Falsifier: zero noise, a strongly biased shift, a date shift below the minimum, or a date format change. Cleanup: remove sampled fixtures and keep the statistics."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: reference-token shape is fixed by the policy prefix, length, and alphabet and remains stable between subset and full runs for overlapping entities. Prerequisites: overlapping entities between a subset run and the full run plus the policy token parameters. Bounded test: assert the token regular expression and length on every emitted business reference and compare shape across runs. Expected support: constant length and alphabet. Falsifier: variable length, forbidden characters, or a shape change between runs. Cleanup: retain the shape summary only."
+    },
+    {
+      "id": "r3-v5",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: structural invariants survive a seed change, and deleting one composing merge row splits exactly the affected component. Prerequisites: a linked fixture and a preserved copy of the unmodified merge table. Bounded test: compare filenames, headers, column order, row counts, and first/last rows across seeds; then delete one merge row and compare token classes. Expected support: structure unchanged and precisely the merged subject splits away. Falsifier: structural drift, no split, or unrelated components changing class. Cleanup: restore the merge row and rerun to confirm the baseline partition."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.7844,
+      "rationale": "Incumbent has the strongest evidence and is selected to carry the combined determinism and seed checks; the new candidates are verification variants of its mechanism."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.5863,
+      "rationale": "Deferred as a separate candidate: same-seed equality is the strongest remaining check but the incumbent can absorb it without replacement."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.5884,
+      "rationale": "Deferred: sharp seed test with seeded-versus-unseeded discrimination; incorporated into the incumbent verification action."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.5554,
+      "rationale": "Deferred: raises a real noise-semantics ambiguity but asserts one interpretation rather than comparing alternatives."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.4212,
+      "rationale": "Deferred: token shape was largely covered by the full audit and the candidate is confused about deriving the expected length."
+    },
+    {
+      "id": "r3-v5",
+      "eligible": true,
+      "score": 0.5044,
+      "rationale": "Deferred: good structural and negative control, but structure was already proven on the full corpus."
+    }
+  ],
+  "selected_id": "r2-v2",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Executed the determinism and seed suite on a 20,000-row linked subset. Two independent seed-42 runs produced byte-identical files for all ten outputs, and an approximately 63,000-check comparison found no failure. With seed 43, every seeded business-reference value changed (every applicable row), every fake email and phone value changed, and every noise value changed; hash, mask, and redact columns had zero seed differences and matched their policy formulas. Parsed fake dates shifted by 1 to 3650 days, satisfying the minimum offset, and Gaussian deltas had means near zero with standard deviations of about 0.98-1.02 for sigma=1 fields and 9.61-10.22 for sigma=10 fields. A full ten-file same-seed repeat was started but an environment restart killed it after two outputs; the completed first file was byte-identical and the truncated second file matched the baseline byte-for-byte up to its about 295,000th row. This supports deterministic, seed-responsive behavior but leaves the complete second full run unfinished. Evidence strength is a linked-subset experiment plus a partial full-data prefix; no official verifier was run.",
+    "next_hint": "Determinism and seed behavior are supported. The next question is whether the observed cross-file equality is actually caused by the union edges or is partly an artifact of exact-string normalization."
+  },
+  "lineage": {
+    "case_id": "case-21af815d7a4e4c8991c6286eb15deff9",
+    "iteration_id": "iteration-0003",
+    "previous_iteration_id": "iteration-0002",
+    "step_id": "iteration-0003",
+    "parent_step_id": "iteration-0002",
+    "branch_id": "main"
+  }
+}

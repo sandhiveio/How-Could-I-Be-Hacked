@@ -1,0 +1,10 @@
+{
+  "case_id": "case-9eff46a29dde40eeb42ac3908df4cf0f",
+  "iteration_id": "step-2",
+  "previous_iteration_id": "step-1",
+  "incumbent": {
+    "id": "r1-v2",
+    "text": "Bracket-alias bypass hypothesis. Mechanism: a guard that checks only dot-separated names may miss a quoted bracket segment such as a[\"__proto__\"].x, while the splitter normalizes it into a path that still traverses the shared prototype. Prerequisites: the local splitter, one quoted bracket payload, one unquoted bracket payload and a plain-dot control. Bounded test: run all three and inspect Object.prototype plus the fixture. Expected: removal or blocking of the quoted and dot shared writes. Falsifier: Object.prototype gains the marker from any alias while the dot form is blocked. Cleanup: delete the marker; limitation: a single splitter implementation."
+  },
+  "hint": "The fixture established that dot, constructor-chain, bracket-quoted and star paths reach Object.prototype, an array path reaches Array.prototype, and a bracket-unquoted path only writes a local key. A repair must block shared-prototype writes while preserving deep, shallow, array-index, bracket-read, terminal-constructor and star-selector behavior. The observer may patch the local helper, run the full payload matrix, run a repository test suite, and replay the saved patch on a fresh copy."
+}

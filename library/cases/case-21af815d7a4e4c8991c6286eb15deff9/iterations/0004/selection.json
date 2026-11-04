@@ -1,0 +1,4 @@
+{
+  "selected_id": "r2-v2",
+  "selected_text": "Hypothesis: a two-pass design is necessary and sufficient: finish the complete union before emission, and normalize tenant-local IDs and plural/singular scope prefixes to one canonical key before hashing. Prerequisites: read access to all tables, a disposable output directory, and Python 3 with a standard-library on-disk index. Bounded test: run the full corpus, then independently re-read every policy reference column, normalize each value to its canonical key, and assert that all occurrences of one key share one token while file structure is unchanged. Expected support: zero component splits, zero local-versus-scoped mismatches, and peak RSS below 64 MB. Falsifier: any component split, any mismatch between a local row and its scope-qualified handle, or memory above the cap. Cleanup: remove the temporary index and keep the audit report."
+}

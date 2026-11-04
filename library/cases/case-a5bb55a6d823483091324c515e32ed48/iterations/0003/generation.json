@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: the base64 body of a PEM or OpenSSH public key, with headers and tag removed, has no recognizable text prefix and still verifies as an HMAC secret. Applicability: the verifier stores or passes the bare base64 body; the full default collection is allowed. Bounded test: strip the header/footer or OpenSSH tag from generated RSA, EC and Ed25519 keys, forge HS256 tokens with the body as the secret, and decode with the same body before and after the guard. Expected supporting result: acceptance before repair and rejection after a base64-aware guard; falsifier: early InvalidKeyError. Cleanup: discard generated keys. Limit: a valid shared secret that happens to decode to a key would be indistinguishable."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: an unencrypted EC private key in SEC1 DER lacks the SPKI structure used by the first guard and escapes HMAC rejection. Applicability: the verifier holds EC key bytes and allows HMAC. Bounded test: serialize an EC private key in SEC1 DER, forge an HS256 token with those bytes, and decode with them. Expected supporting result: acceptance; falsifier: InvalidKeyError. Cleanup: delete fixture keys. Limit: private-key material is less often exposed than a public key."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a structural guard based on length or ASN.1 magic bytes will falsely reject high-entropy shared secrets. Applicability: normal HMAC callers with random binary or base64 secrets. Bounded test: after the guard, verify HS256 tokens with 2048 random bytes and with random base64 text; repeat with a secret containing the words BEGIN and PUBLIC. Expected supporting result: every control verifies; falsifier: any key error. Cleanup: secrets are ephemeral. Limit: a precision control."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: malformed or truncated OpenSSH base64 input makes key loaders raise an unexpected exception instead of a clean key error. Applicability: untrusted key configuration or corrupted text. Bounded test: pass a truncated OpenSSH public string and other damaged base64 blocks to decode after the guard; record exception classes. Expected supporting result: a clean key error or acceptance without a crash; falsifier: an unhandled exception type. Cleanup: none. Limit: robustness, not a confusion path."
+    },
+    {
+      "id": "r3-v5",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: JWK JSON text for an asymmetric public key lacks PEM/OpenSSH markers and verifies as an HMAC secret, while symmetric JWK text should remain a legitimate secret. Applicability: the verifier stores a key as JSON text and allows HMAC. Bounded test: forge HS256 with asymmetric RSA/EC/OKP JWK text and decode with the same text; then confirm symmetric oct JWK text still verifies. Expected supporting result: asymmetric JWK text accepted before a JWK-aware guard, symmetric text accepted throughout; falsifier: no acceptance before repair or rejection of the symmetric control. Cleanup: discard fixtures. Limit: depends on callers passing raw JSON instead of parsed keys."
+    }
+  ]
+}

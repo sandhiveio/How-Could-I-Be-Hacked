@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Executed the defense-in-depth candidate: added the same ASCII-identifier option-name check inside the backend explain-prefix builder while retaining the public guard. A combined harness accepted all 12 legal names through both the direct builder and the public method, rejected all 17 malformed names through both paths, and confirmed option values still render only as true/false. The existing explain test module ran against a disposable local file-backed database: 7 tests found, 3 passed, 4 backend-specific tests skipped, overall OK. The two-file patch applied cleanly to the pristine baseline tree and reversed cleanly from the applied tree. Official benchmark evaluation was not available.",
+  "next_hint": "Submit the saved two-file patch to the official host-side patch evaluator. If its hidden test expects a different exception message or only one validation location, adjust from the actual failure; otherwise the remaining work is host verification, not another local mechanism search."
+}

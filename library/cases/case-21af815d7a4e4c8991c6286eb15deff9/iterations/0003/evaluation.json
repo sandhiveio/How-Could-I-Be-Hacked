@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.7844,
+      "rationale": "Incumbent has the strongest evidence and is selected to carry the combined determinism and seed checks; the new candidates are verification variants of its mechanism."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.5863,
+      "rationale": "Deferred as a separate candidate: same-seed equality is the strongest remaining check but the incumbent can absorb it without replacement."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.5884,
+      "rationale": "Deferred: sharp seed test with seeded-versus-unseeded discrimination; incorporated into the incumbent verification action."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.5554,
+      "rationale": "Deferred: raises a real noise-semantics ambiguity but asserts one interpretation rather than comparing alternatives."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.4212,
+      "rationale": "Deferred: token shape was largely covered by the full audit and the candidate is confused about deriving the expected length."
+    },
+    {
+      "id": "r3-v5",
+      "eligible": true,
+      "score": 0.5044,
+      "rationale": "Deferred: good structural and negative control, but structure was already proven on the full corpus."
+    }
+  ]
+}

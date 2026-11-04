@@ -1,0 +1,10 @@
+{
+  "case_id": "case-00bfea1eea0547a49214fd10f10b0e46",
+  "iteration_id": "step-1",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Sink-first differential: instantiate the backend operations object with a disposable fake connection, compare EXPLAIN prefixes for legal and crafted option names, repair option-name validation at the public explain boundary, then rerun the matrix plus legal-option regression."
+  },
+  "hint": "A public queryset explain method forwards keyword options to a query-level explain method, which stores the format and options for a compiler. On a SQL backend the prefix builder uppercases each option name and interpolates it into EXPLAIN (...), and a fake feature object reproduces the vulnerable prefix. The only attacker-controlled field is an option name supplied through dictionary expansion. The next question is whether validating option names at the public query-level explain method removes the injection and how a baseline fixture should distinguish a legitimate option from a malformed one."
+}

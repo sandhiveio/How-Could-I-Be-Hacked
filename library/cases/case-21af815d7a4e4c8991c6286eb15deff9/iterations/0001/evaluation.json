@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.573,
+      "rationale": "Incumbent overall design has the best combination of correctness and memory feasibility, but no executed evidence yet."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.5685,
+      "rationale": "Deferred: tests a real temporal semantic ambiguity, but the contract does not clearly require time-indexed pseudonyms."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.583,
+      "rationale": "Deferred: useful order-independence regression, but a correct two-pass union is order-independent by construction."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.543,
+      "rationale": "Deferred: strong verification idea, but needs an implementation to compare against."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.5655,
+      "rationale": "Deferred: cheap memory check, but cannot run before the first implementation exists."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.6385,
+      "rationale": "Selected: cheapest discriminating control that isolates whether global components are necessary; a divergence supports the union design and a match would overturn it."
+    }
+  ]
+}

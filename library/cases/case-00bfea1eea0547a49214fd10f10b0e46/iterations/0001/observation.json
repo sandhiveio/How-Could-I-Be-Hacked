@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Executed the sink-first plan: added an ASCII-identifier check for option names in the public query-level explain method, then ran a fake-compiler harness. The control matrix accepted 12 legal names (lower and upper case, digits, underscore) and rejected 17 malformed or malicious names with ValueError, including 'analyze) ; SELECT 1; --'. The same run called the backend prefix builder directly and still produced an injected EXPLAIN string, proving the public-only repair leaves a direct-backend bypass. Evidence strength: direct local causal observation for the public path; the official benchmark was not run.",
+  "next_hint": "The public path now rejects malformed option names, but the backend prefix builder still interpolates them. Test whether repeating the same ASCII-identifier validation immediately before that interpolation closes the direct sink without rejecting documented options, and use the existing explain test module as a regression."
+}

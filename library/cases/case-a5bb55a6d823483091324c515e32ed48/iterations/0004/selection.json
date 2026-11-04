@@ -1,0 +1,4 @@
+{
+  "selected_id": "r3-v1",
+  "selected_text": "Hypothesis: the base64 body of a PEM or OpenSSH public key, with headers and tag removed, has no recognizable text prefix and still verifies as an HMAC secret. Applicability: the verifier stores or passes the bare base64 body; the full default collection is allowed. Bounded test: strip the header/footer or OpenSSH tag from generated RSA, EC and Ed25519 keys, forge HS256 tokens with the body as the secret, and decode with the same body before and after the guard. Expected supporting result: acceptance before repair and rejection after a base64-aware guard; falsifier: early InvalidKeyError. Cleanup: discard generated keys. Limit: a valid shared secret that happens to decode to a key would be indistinguishable."
+}

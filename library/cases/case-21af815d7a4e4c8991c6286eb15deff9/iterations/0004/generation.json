@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: removing one composing merge row splits the alias actor from the chain subject, while unrelated classes stay identical. Prerequisites: a disposable linked fixture and permission to delete one merge row. Bounded test: run the baseline, delete that merge row, rerun with the same seed, and compare token partitions. Expected support: exactly the merged subject splits into its own class. Falsifier: the alias and chain subject remain equal, meaning the edge is ignored or another path over-merges. Cleanup: restore the row and rerun to confirm the baseline partition returns."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: an alias row linking an external account handle to an account reference is non-redundant; blanking it splits those tokens into an extra account class. Prerequisites: a fixture with one alias row and a preserved copy. Bounded test: blank only that alias row, rerun, and compare class counts and account tokens. Expected support: one extra account class with no unrelated changes. Falsifier: unchanged class count, or a broader split touching unrelated accounts, which would indicate another over-merging path. Cleanup: restore the row and verify the baseline."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: plural/singular order-scope normalization creates a real edge that raw string matching misses; disabling it raises the class count by splitting order handles from their local rows. Prerequisites: a fixture containing both forms and a way to disable only that normalization. Bounded test: run with and without normalization and diff the order-related classes. Expected support: the normalized run unifies the forms and the disabled run splits them. Falsifier: identical class counts, meaning normalization is decorative. Cleanup: restore the default and confirm byte-identical baseline output."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: removing the middle link of a three-hop chain splits it into two person components, with each side still internally unified. Prerequisites: a disposable chain fixture and a preserved link table. Bounded test: delete the middle link, rerun, and compare the token partition of the three subjects plus the alias actor. Expected support: two person classes, one containing the first two subjects and the actor, the other containing the third subject. Falsifier: the chain remains fully unified, which would indicate the component is not path-derived. Cleanup: restore the link and confirm the baseline partition."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "r2-v2",
+      "text": "Hypothesis: replacing one handle with a fresh unused string yields a new token and changes no other column. Prerequisites: a disposable fixture and a known unused handle value. Bounded test: substitute the handle, rerun, and compare every token column with the baseline. Expected support: exactly one new class and no collateral changes. Falsifier: another column changes in tandem, which would indicate hidden substring or masking logic. Cleanup: delete the mutated copy and confirm untouched outputs remain byte-identical."
+    }
+  ]
+}

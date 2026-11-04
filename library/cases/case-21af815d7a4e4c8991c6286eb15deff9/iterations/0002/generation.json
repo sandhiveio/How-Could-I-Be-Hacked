@@ -1,0 +1,24 @@
+{
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v5",
+      "text": "Hypothesis: a persistent SQLite B-tree mapping each canonical key to its component root can resolve transitive chains within the memory cap. Prerequisites: Python 3, SQLite, a disposable working copy, and a full-size local input. Bounded test: run the full pipeline with a capped page cache and measure peak RSS, then check that all linked and merged keys receive one token. Expected support: peak RSS below 64 MB and no split component. Falsifier: RSS above the cap or any component split. Cleanup: delete the work database and output copy, retaining logs."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v5",
+      "text": "Hypothesis: a two-pass design is necessary and sufficient: finish the complete union before emission, and normalize tenant-local IDs and plural/singular scope prefixes to one canonical key before hashing. Prerequisites: read access to all tables, a disposable output directory, and Python 3 with a standard-library on-disk index. Bounded test: run the full corpus, then independently re-read every policy reference column, normalize each value to its canonical key, and assert that all occurrences of one key share one token while file structure is unchanged. Expected support: zero component splits, zero local-versus-scoped mismatches, and peak RSS below 64 MB. Falsifier: any component split, any mismatch between a local row and its scope-qualified handle, or memory above the cap. Cleanup: remove the temporary index and keep the audit report."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v5",
+      "text": "Hypothesis: flattening all alias edges into one bounded registration pass and avoiding per-file graph objects prevents allocation spikes during alias processing. Prerequisites: a full-size input and a way to sample RSS or allocation counts. Bounded test: run the pipeline with tracing at the alias and merge phases and compare peak RSS with a flattened single-pass variant. Expected support: stable RSS with no spike above the cap. Falsifier: a phase-local spike that pushes total RSS above 64 MB. Cleanup: remove trace files and temporary databases."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v5",
+      "text": "Hypothesis: external actor and account handles require explicit alias edges to person and account references; exact-string hashing cannot unify them. Prerequisites: a disposable fixture with one alias row and one account handle. Bounded test: add a synthetic alias row linking external handles to a person and account, run the CLI, and compare tokens with and without the alias edge. Expected support: the external account and account-local forms share one token only when the alias edge exists. Falsifier: the handles remain distinct despite the alias edge. Cleanup: restore the fixture and keep the two token maps."
+    }
+  ]
+}

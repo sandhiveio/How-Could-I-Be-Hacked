@@ -1,0 +1,9 @@
+{
+  "plans": [
+    "Streaming canonicalization with an on-disk key index: normalize every reference to a scope-qualified key, register keys and perform unions in SQLite while a compact array-backed disjoint set stays in memory, derive one HMAC(seed, root) token per component, and re-stream each CSV applying the policy. Measure peak RSS and validate cross-file token equality.",
+    "External-sort label propagation: write every equivalence edge as directed key pairs, iteratively replace labels by the minimum neighbor through external merge sorts until a fixed point, then hash the converged label. Avoid random access and an in-memory union-find at the cost of extra passes.",
+    "Exact-reference namespace hashing with limited alias edges: treat each exact reference string as its own canonical key, derive only explicit alias edges, and normalize local-ID plus scope columns by string construction. This is simpler but risks splitting transaction handles from their local rows.",
+    "Per-entity union over externally sorted unique keys: emit sorted unique key files per family, merge to a master key file, map keys to dense integer IDs by binary search, union in a memory-mapped parent array, then stream rows and join each key to its label."
+  ],
+  "selected_id": "plan-1"
+}

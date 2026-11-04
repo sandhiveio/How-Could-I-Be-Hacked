@@ -1,0 +1,13 @@
+{
+  "id": "case-9eff46a29dde40eeb42ac3908df4cf0f",
+  "kind": "curated_case",
+  "hint": "A small JavaScript helper reads and writes values at dotted or bracketed property paths on caller-supplied objects. The setter walks the path, resolves a parent object, and assigns the final key; the caller controls every path segment. A property path that reaches a shared built-in prototype can add a property to every object in the process. The local task is to repair the setter so dangerous paths cannot mutate shared prototypes while ordinary deep, shallow, array-index, bracket-read, terminal-constructor and star-selector behavior is preserved. Only a disposable Node.js source tree and local fixtures are available.",
+  "surface": "Single-file CommonJS property-path helper with a splitter for dots and brackets, a getter/setter API, array-index traversal, and star-selector expansion. The repair is a minimal assignment guard in the setter; no server, network peer or deployed target is involved.",
+  "assumptions": [
+    "The observer may read and edit the local library, create disposable objects and run Node.js assertions.",
+    "Caller-controlled path strings are the trust boundary; values may be any JavaScript value.",
+    "The repair must preserve the library's existing public behavior for primitive, null, empty, deep, shallow, array, bracket-key and star-selector cases.",
+    "Only local fixtures are used; the official benchmark verifier is host-side and unavailable in the working container.",
+    "Local test-suite results and self-authored regression assertions are evidence, not an official pass."
+  ]
+}

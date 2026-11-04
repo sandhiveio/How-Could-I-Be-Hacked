@@ -1,0 +1,9 @@
+{
+  "plans": [
+    "Plan A: reproduce key confusion through an asymmetric key encoding the HMAC helper does not parse, then reject asymmetric material on the HMAC path and verify legitimate HMAC and asymmetric decoding.",
+    "Plan B: couple key type to the attacker-selected algorithm family at decode time, rejecting HMAC when the key is asymmetric while keeping the existing whitelist check.",
+    "Plan C: enumerate public-key encodings and HMAC variants as a rejection matrix, then centralize the asymmetric-material test and verify the matrix closes without over-rejection.",
+    "Plan D: enforce a post-preparation contract that requires bytes for HMAC and cryptography key objects for asymmetric algorithms, with valid and invalid-signature controls."
+  ],
+  "selected_id": "plan-1"
+}

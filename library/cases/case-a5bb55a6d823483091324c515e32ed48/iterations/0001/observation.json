@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Against the unmodified local snapshot, a forged HS256 token signed with RSA SubjectPublicKeyInfo DER bytes decoded successfully under the full default algorithm collection and returned the attacker payload. An EC public key in OpenSSH form was also accepted because the blocklist names only ssh-rsa. PEM public text, RSA OpenSSH text and a cryptography key object were rejected, and legitimate HMAC, valid RS256 and wrong-secret controls behaved as expected. Recipe: generate a key pair, serialize the public key as SPKI DER, forge HS256 over a chosen payload with the DER bytes, then call decode with the same bytes and the default algorithm mapping. This is a local causal observation, not an official benchmark result.",
+  "next_hint": "Implement an HMAC-path guard that rejects asymmetric material structurally rather than by adding more literal markers, and measure whether it closes DER and non-RSA OpenSSH forms without breaking legitimate HMAC or RS256 decoding."
+}

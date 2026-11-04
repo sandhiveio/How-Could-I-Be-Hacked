@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A public queryset explain method forwards keyword options to a query-level explain method, which stores the format and options for a compiler. On a SQL backend the prefix builder uppercases each option name and interpolates it into EXPLAIN (...), and a fake feature object reproduces the vulnerable prefix. The only attacker-controlled field is an option name supplied through dictionary expansion. The next question is whether validating option names at the public query-level explain method removes the injection and how a baseline fixture should distinguish a legitimate option from a malformed one.",
+    "surface": "Python ORM query compiler plus a SQL backend operations layer; disposable local Python fixture with a fake connection and feature object, and a file-backed local test database for the existing explain test module.",
+    "assumptions": [
+      "The observer can read and modify a disposable local source tree and run Python locally; no live network service, production database, or public target is used.",
+      "The attacker controls only the option names supplied through dictionary expansion to the public explain API; option values are simple truthy/falsy scalars.",
+      "The public entry point and the backend prefix builder are both reachable within the local source; direct backend calls are allowed by the test fixture but may not be part of the public contract.",
+      "Official benchmark verification is performed outside this container; a saved patch and local regressions are not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Sink-first differential: instantiate the backend operations object with a disposable fake connection, compare EXPLAIN prefixes for legal and crafted option names, repair option-name validation at the public explain boundary, then rerun the matrix plus legal-option regression."
+  },
+  "candidates": [
+    {
+      "id": "r1-a",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a strict lowercase-only regex (^[a-z_]+$) applied to option names in the public query-level explain method rejects SQL punctuation before the backend sees it. Prerequisites: the public method is the reachable entry point and all legitimate names can be lowercased by the caller. Bounded test: call the public explain method with a fake compiler using ANALYZE and a key like 'bad); SELECT 1; --', inspect the generated prefix, and expect ValueError for the malformed key. Expected supporting result: the malformed key never reaches the compiler; falsifier: the prefix contains the payload or an uppercase legal name is rejected. Cleanup: delete the fake compiler and any disposable records."
+    },
+    {
+      "id": "r1-b",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: validating option names inside the backend explain-prefix builder immediately before interpolation protects the exact string-assembly sink. Prerequisites: direct backend callers are in scope and a fake feature object can drive the builder without a live database. Bounded test: construct the backend operations object with the fake features, call its prefix builder with a key like 'analyze); SELECT 1; --' and with legal keys, and inspect the returned SQL. Expected supporting result: ValueError for the malformed key and a normal prefix for legal keys; falsifier: the payload appears in the SQL or a documented option is rejected. Limitation: other backends and public callers remain dependent on this one builder."
+    },
+    {
+      "id": "r1-c",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: Python's standard str.isidentifier() check on option names at both the public method and the backend sink is sufficient and simpler than a custom regex. Prerequisites: option names are always strings and the local interpreter supports isidentifier(). Bounded test: apply the check to keys such as 'analyze', 'ANALYZE', '_x', 'a1', 'bad-name', '1abc', a Unicode identifier and an empty string; expect acceptance only for identifiers. Expected supporting result: dangerous punctuation and empty strings are rejected consistently; falsifier: a SQL metacharacter passes or a documented option such as '_x' is rejected. Limitation: isidentifier() accepts Unicode identifiers and is broader than the backend option vocabulary."
+    },
+    {
+      "id": "r1-d",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: validating only at the public explain method leaves a bypass because internal code can construct the explain-options record directly or call the backend prefix builder with raw options. Prerequisites: an internal caller or test can construct the explain-options record without the public method. Bounded test: build the internal explain-options record with a malicious key, pass it to the backend explain path, and inspect the SQL; then repeat with a legal key. Expected supporting result: the malicious direct call still injects while the public call is blocked; falsifier: an internal guard already validates the key. Cleanup: remove the direct-call fixture after the check."
+    },
+    {
+      "id": "r1-e",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: after adding any option-name validation, a regression matrix over every documented backend explain option is needed to prove the repair did not over-restrict legal callers. Prerequisites: a disposable fake feature object and a list of legal option names such as analyze, verbose, costs, buffers, timing, summary, settings and wal. Bounded test: generate one prefix per legal option and compare it with the unpatched baseline; expect the same option name and true/false value in each prefix. Expected supporting result: all legal options still produce prefixes; falsifier: any legal option raises or changes rendering. Limitation: the matrix proves option acceptance, not that a live database accepts the resulting SQL."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-a",
+      "eligible": true,
+      "score": 0.606,
+      "rationale": "Coherent public-boundary repair, but the lowercase-only character class would reject legal uppercase option names that the backend currently accepts. Deferred as a variant to refine with a case-insensitive ASCII identifier check; not selected as written."
+    },
+    {
+      "id": "r1-b",
+      "eligible": true,
+      "score": 0.651,
+      "rationale": "Directly protects the observed sink and is easy to test, but leaves the public contract and other backends dependent on one builder. Deferred as defense-in-depth behind the public-boundary plan."
+    },
+    {
+      "id": "r1-c",
+      "eligible": true,
+      "score": 0.616,
+      "rationale": "Simple and consistent, but isidentifier() is broader than the SQL option vocabulary because it accepts Unicode identifiers. Deferred behind a stricter ASCII check."
+    },
+    {
+      "id": "r1-d",
+      "eligible": true,
+      "score": 0.617,
+      "rationale": "Correctly identifies the direct-call bypass and motivates a later defense-in-depth check, but its first action is a diagnostic rather than the repair. Deferred until the public guard was observed."
+    },
+    {
+      "id": "r1-e",
+      "eligible": true,
+      "score": 0.645,
+      "rationale": "Essential regression coverage that was absorbed into the selected plan rather than chosen as the next action. It does not by itself decide the validation point."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.728,
+      "rationale": "Selected. The incumbent had the best combination of known sink, executable fixture and bounded repair test, and could absorb the legal-option regression from r1-e and the direct-call check from r1-d."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Executed the sink-first plan: added an ASCII-identifier check for option names in the public query-level explain method, then ran a fake-compiler harness. The control matrix accepted 12 legal names (lower and upper case, digits, underscore) and rejected 17 malformed or malicious names with ValueError, including 'analyze) ; SELECT 1; --'. The same run called the backend prefix builder directly and still produced an injected EXPLAIN string, proving the public-only repair leaves a direct-backend bypass. Evidence strength: direct local causal observation for the public path; the official benchmark was not run.",
+    "next_hint": "The public path now rejects malformed option names, but the backend prefix builder still interpolates them. Test whether repeating the same ASCII-identifier validation immediately before that interpolation closes the direct sink without rejecting documented options, and use the existing explain test module as a regression."
+  },
+  "lineage": {
+    "case_id": "case-00bfea1eea0547a49214fd10f10b0e46",
+    "iteration_id": "step-1",
+    "previous_iteration_id": null,
+    "step_id": "step-1",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}
