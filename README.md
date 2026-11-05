@@ -8,7 +8,19 @@ tests — all locally, without API access.
 
 **Works offline. No API keys required.**
 
-[Use with an agent](#use-with-an-agent) · [Run locally](#run-locally) · [Workflow](references/workflow.md)
+[Install](#install-the-skill) · [Use with an agent](#use-with-an-agent) · [Run locally](#run-locally) · [Workflow](references/workflow.md)
+
+## Install the skill
+
+Run this command to install with the Skills CLI:
+
+```sh
+npx skills add sandhiveio/How-Could-I-Be-Hacked --skill how-could-i-be-hacked
+```
+
+Python 3.10+ with SQLite FTS5 is required. No third-party Python packages or API keys are needed.
+
+Then [ask your agent to review your repository](#use-with-an-agent).
 
 ![Branching investigation: competing hypotheses, discarded paths, a local experiment, evidence, and a regression test. Conceptual illustration.](assets/illustrations/investigation-cover.svg)
 
@@ -32,15 +44,8 @@ case resolution.
 
 [View workflow at full size](assets/illustrations/investigation-workflow.svg)
 
-Install the skill using the Skills CLI:
-
-```sh
-npx skills add sandhiveio/How-Could-I-Be-Hacked --skill how-could-i-be-hacked
-```
-
-Alternatively, copy or clone this repository into a folder named `how-could-i-be-hacked`
+For manual installation, copy or clone this repository into a folder named `how-could-i-be-hacked`
 inside your agent's skills directory, or give your agent the absolute path to [SKILL.md](SKILL.md).
-Python 3.10+ with SQLite FTS5 is required. No third-party Python packages or API keys are needed.
 
 Example request:
 
