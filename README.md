@@ -32,8 +32,14 @@ case resolution.
 
 [View workflow at full size](assets/illustrations/investigation-workflow.svg)
 
-Copy or clone this repository into a folder named `how-could-i-be-hacked` inside your agent's
-skills directory, or give your agent the absolute path to [SKILL.md](SKILL.md).
+Install the skill using the Skills CLI:
+
+```sh
+npx skills add sandhiveio/How-Could-I-Be-Hacked --skill how-could-i-be-hacked
+```
+
+Alternatively, copy or clone this repository into a folder named `how-could-i-be-hacked`
+inside your agent's skills directory, or give your agent the absolute path to [SKILL.md](SKILL.md).
 Python 3.10+ with SQLite FTS5 is required. No third-party Python packages or API keys are needed.
 
 Example request:
