@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A JavaScript cookie parser has a combined patch that replaces overlapping pair regular expressions with a deterministic separator scan and replaces front-removal attribute iteration with index iteration. The combined copy passed about 10000 strict/permissive differential comparisons with zero mismatches, showed linear pair and attribute timing, and kept extension order intact. The patch was normalized for repository-root application. The observer can create brand-new source copies, apply only the patch, run local assertions, and write host instructions. Determine whether the patch alone reproduces all observed behavior from a pristine copy, whether an independent assertion suite passes, and what exact host-side evaluation command and artifacts are needed.",
+    "surface": "Single-process JavaScript cookie parser used by an HTTP client or server, with a strict default mode and an opt-in permissive mode. Tests use disposable local strings, timing probes, and fresh source copies; no deployed service is involved.",
+    "assumptions": [
+      "The observer may read the parser source, copy it, run it locally, and author disposable fixtures and probes.",
+      "Untrusted Set-Cookie text reaches the public parse entry point without client-side normalization.",
+      "The permissive parsing mode is opt-in and changes empty-name and leading-equals handling.",
+      "Ordinary cookies and attribute-bearing cookies are available as functional controls.",
+      "The parser is synchronous and has no internal deadline or cancellation point; a caller may impose an external timeout."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Hypothesis: the strict and permissive pair expressions both use a greedy name class that overlaps following whitespace, so a long whitespace-heavy prefix with no equals sign forces many name/whitespace split attempts and quadratic event-loop CPU use. Prerequisites: read access to the parser source, a local JavaScript runtime, disposable source copies, and untrusted Set-Cookie text reaching the public parse entry point; permissive mode is opt-in and ordinary cookies are available as controls. Bounded test: time parsing 'a'.repeat(n) + ' '.repeat(n) + '!' for n = 2000 through 64000 in both modes with a median of three and a fixed external timeout, compare with a no-whitespace malformed cookie and an early-equals value tail, and add a semicolon-plus-attribute variant to exclude later stages; then replace both pair expressions with a deterministic left-to-right separator scan and re-run the same matrix plus a strict/permissive semantic differential. Expected support: about fourfold growth per doubling before the repair and near-linear growth after, with zero field changes on ordinary, quoted, empty-name, leading and multiple equals, terminator, attribute, and trailing-semicolon cases. Falsifier: before the repair, flat timing or only one mode affected; after the repair, any key, value, or attribute change or more than roughly twofold growth per doubling. Cleanup and limitation: delete disposable fixtures and keep the differential corpus; one input family and one machine do not prove universal equivalence, and a separate attribute-loop sink may remain."
+  },
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the normalized patch reproduces strict and permissive semantics on a large random and edge-case corpus from a pristine source copy without developer artifacts. Prerequisites: a brand-new source copy, the normalized patch, and the captured corpus. Test: apply only the patch, then compare structured snapshots against the unpatched copy over several thousand fixed, seeded-random, and edge-case headers in both modes. Expected support: zero mismatches. Falsifier: any divergence in key, value, flags, or attributes. Limitation: a finite corpus cannot prove universal equivalence; keep it as a regression fixture."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the patched parser keeps pair and attribute paths linear while an unpatched control shows quadratic growth on the same machine. Prerequisites: fresh patched and unpatched copies and a bounded timer. Test: time pathological pair inputs from 1000 to 64000 characters and attribute-heavy inputs at several sizes in both copies, using median-of-three and a fixed timeout. Expected support: patched growth well under twofold per doubling and an unpatched top-size timeout or large slowdown. Falsifier: patched growth above about threefold per doubling or a timeout. Limitation: machine noise and garbage collection can distort small sizes; report raw samples."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an independent native-assert suite that mirrors representative parser expectations passes on the patched copy, providing functional integrity before external evaluation. Prerequisites: the patched fresh copy and a runtime with built-in assertions; the original test framework may be unavailable. Test: assert ordinary pairs, dates, attributes, domain/path behavior, empty names in permissive mode, leading and multiple equals signs, value terminators, control-character rejection, a long lexical fixture, and generous timing bounds. Expected support: every assertion passes. Falsifier: any semantic assertion failure. Limitation: re-authored assertions may encode a wrong expectation; preserve first failures and distinguish test bugs from parser regressions."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the documented apply command works on a pristine copy without manual conflict resolution or helper binaries. Prerequisites: a pristine source copy and the normalized patch. Test: run the repository apply check and then full application at repository root, hash the result, and compare with the tested file. Expected support: both commands exit zero and hashes match. Falsifier: apply failure, residual rejects, or a hash mismatch. Limitation: an absent system patch binary is an environment issue; test a second apply implementation and a plain unified fallback."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: no hidden dependence on the development directory state affects the patched result when the same module is run from two different directory structures. Prerequisites: two fresh copies with the patch, no installed third-party runtime dependencies, and identical fixture inputs. Test: run the assertion and differential suites from both paths, compare outputs and timings, and check that no absolute resource is required. Expected support: identical outputs and comparable timings. Falsifier: path-dependent failures or output differences. Limitation: the package may have no runtime dependencies, so this test mainly checks import-path hygiene."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.828,
+      "rationale": "Selected for final closure. It has a zero-mismatch combined differential, linear pair and attribute timing, a fresh apply check, and packaged patch artifacts. The final action recreates the result from pristine source plus the normalized patch and writes the host handoff. Evidence remains local; no official harness output exists."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.518,
+      "rationale": "Deferred to the incumbent, which runs the same pristine-copy differential. The strongest final-verification suggestion and directly incorporated."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.493,
+      "rationale": "Deferred and folded into final timing: fresh-copy pathological pair inputs and attribute scaling are compared against the unpatched control. The proposed thresholds are reasonable and prior data predicts they pass."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.505,
+      "rationale": "Deferred and adopted. The original test framework is absent, so an independent native-assert suite covering representative expectations is the correct functional gate before external evaluation."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.485,
+      "rationale": "Deferred and adopted. The normalized patch already passed one apply check; the final action repeats it from a pristine source, verifies byte identity, and tests a plain unified fallback because the container lacks a separate patch binary."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.385,
+      "rationale": "Deferred as a weak portability check. The package has no runtime third-party module tree and the patch touches one file, so two-directory dependence is unlikely. A second fresh-copy path is exercised incidentally by the final closure copy."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Rebuilt the result from a brand-new source copy and the normalized patch alone. Apply recipe: copy the pristine source, run the repository apply check at root, apply the normalized patch, and hash the result; both the git-form patch and a plain unified fallback applied cleanly and produced a file byte-identical to the tested copy. Differential recipe: load pristine and patched modules in one process and compare structured snapshots over about 5000 fixed and seeded-random headers in strict and permissive modes; about 10000 comparisons produced zero mismatches. An independent native-assert suite covered ordinary pairs, dates, attributes, domain/path behavior, permissive empty names and leading/multiple equals signs, value terminators, control-character rejection, a 20000-character lexical fixture, a 500000-character timing fixture, and 100000 attributes; all corrected assertions passed. The first assertion run failed only because the local test compared the historical default expiry value, the string 'Infinity', strictly against the number Infinity; the failed log was preserved and the parser behavior matched the unpatched parser. A host handoff with the exact payload and evaluation command was written. Evidence is strong local verification; the official external evaluator was not available, so the source case remains officially unverified.",
+    "next_hint": "Run the official external patch evaluator on the exported payload and inspect its summary. If a hidden functional test fails, add its shape to the preserved differential corpus and localize against the patched copy; do not treat the local pass as an official pass."
+  },
+  "lineage": {
+    "case_id": "case-a15710c157ac4ca08718fbbe62bf3464",
+    "iteration_id": "step-4",
+    "previous_iteration_id": "step-3",
+    "step_id": "step-4",
+    "parent_step_id": "step-3",
+    "branch_id": "main"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "case-a15710c157ac4ca08718fbbe62bf3464",
+  "kind": "curated_case",
+  "hint": "A JavaScript HTTP cookie library exposes a parse entry point for untrusted Set-Cookie strings. It trims the header, strips trailing semicolons, isolates the name/value pair before the first semicolon, and parses the remaining semicolon-separated attributes. The pair split uses regular expressions whose name class also matches whitespace, followed by optional whitespace and an equals sign. A malformed header with a long whitespace-heavy name-like prefix and no equals sign can force many name/whitespace split attempts, consuming event-loop CPU.",
+  "surface": "Single-process JavaScript cookie parser used by an HTTP client or server, with a strict default mode and an opt-in permissive mode. Tests use disposable local strings, timing probes, and fresh source copies; no deployed service is involved.",
+  "assumptions": [
+    "The observer may read the parser source, copy it, run it locally, and author disposable fixtures and probes.",
+    "Untrusted Set-Cookie text reaches the public parse entry point without client-side normalization.",
+    "The permissive parsing mode is opt-in and changes empty-name and leading-equals handling.",
+    "Ordinary cookies and attribute-bearing cookies are available as functional controls.",
+    "The parser is synchronous and has no internal deadline or cancellation point; a caller may impose an external timeout."
+  ]
+}

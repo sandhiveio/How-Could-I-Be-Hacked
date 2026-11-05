@@ -4,7 +4,7 @@ Explore how your code could be attacked using real security investigation trajec
 Find applicable hypotheses, run targeted checks, and turn verified findings into regression
 tests — all locally, without API access.
 
-**11 cases · 34 steps · 197 searchable hypothesis entries**
+**13 cases · 41 steps · 238 searchable hypothesis entries**
 
 **Works offline. No API keys required.**
 
@@ -75,7 +75,7 @@ The toolkit assists an agent; it does not autonomously scan code or execute retr
 
 ## Data and evidence
 
-Snapshot: November 3, 2026. Daily library updates are planned; the update pipeline is not yet configured.
+Snapshot: November 5, 2026. Daily library updates are planned; the update pipeline is not yet configured.
 
 The library is a snapshot of the project's curated local library. Raw producer runs, private
 identity mappings and credentials are excluded. Do not commit assessments or target logs here.

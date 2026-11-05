@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "case_id": "case-3204b3a58c41492e824878008054e084",
+  "iterations": 3,
+  "artifacts": [
+    {
+      "path": "case.json",
+      "sha256": "9b6a06b77f7e17351476a7c8a6366d3c45ceff8f6840c8837eeca62ac0fdc859"
+    },
+    {
+      "path": "planning.json",
+      "sha256": "de9a986c4ebf3ae5942d514ccd2aadf3143c0b52bb39dc2c510de4737e79d3fb"
+    },
+    {
+      "path": "iterations/0001/context.json",
+      "sha256": "37783bf17d36693e2a3a01a83cba42d5e4a255963c1439f32c809ebda43f8f8d"
+    },
+    {
+      "path": "iterations/0001/generation.json",
+      "sha256": "b50772293f3d3b7977150a3a4159bc6a83c0c548adcbe2208076fd8182d679e1"
+    },
+    {
+      "path": "iterations/0001/evaluation.json",
+      "sha256": "093540e48205685e15f48fa9dd96341402d54efbe39af1585aff3c2c307a0edb"
+    },
+    {
+      "path": "iterations/0001/selection.json",
+      "sha256": "dbd0b6170e92601cb8632af8e9be8a5cbbb005b61ec17767de049771aa3ca671"
+    },
+    {
+      "path": "iterations/0001/observation.json",
+      "sha256": "6ba7c7914a89d586a90b85d10159771d6b561adda1b6cd781dfba92edba4d088"
+    },
+    {
+      "path": "iterations/0001/step.json",
+      "sha256": "a6634ba62d590410d222a419e51df205929aa8397f72b8e3b625a50bd00bf245"
+    },
+    {
+      "path": "iterations/0002/context.json",
+      "sha256": "0acb4230c6e54c0ff50ed7cb2330a1e5085b595e91cf26744ecd6a4529d6ea01"
+    },
+    {
+      "path": "iterations/0002/generation.json",
+      "sha256": "c131e62f75e1c841f4f4d6bd69d2402f60c29e963f4463eabeec804aea6b657c"
+    },
+    {
+      "path": "iterations/0002/evaluation.json",
+      "sha256": "2b12fce00054dbe66c975d2dad3810c7a518a434fb35af2b97bb643b8d71d5a5"
+    },
+    {
+      "path": "iterations/0002/selection.json",
+      "sha256": "f70134d7720b31a27239163f253faf48abe903897883875947a303ea314c39c7"
+    },
+    {
+      "path": "iterations/0002/observation.json",
+      "sha256": "ebc11368ecbbb77e9e528a02b795ca60fe7ec6106063549211791d094da28af6"
+    },
+    {
+      "path": "iterations/0002/step.json",
+      "sha256": "31227f26088f56a8b8c3cd4f3651278d9c93f9a20064671f5fee62b8b18b9abf"
+    },
+    {
+      "path": "iterations/0003/context.json",
+      "sha256": "2a425e1e6757ce09bb5d6292a7e75b01b1fb33265df99711abb8e43a42130958"
+    },
+    {
+      "path": "iterations/0003/generation.json",
+      "sha256": "1ce13d9c7f656c52ebd936d655c9a8ab5cd82d552d7e4113db92086ecbe4b751"
+    },
+    {
+      "path": "iterations/0003/evaluation.json",
+      "sha256": "ad11fc94f716daa4c0fb672aa8a72bea76a3d15012b558b5dd1fbeb11cf3c624"
+    },
+    {
+      "path": "iterations/0003/selection.json",
+      "sha256": "a7b0bb7794d4eb4ebac30200ee4a265277cd19fca36c71b3d963722695ff7a85"
+    },
+    {
+      "path": "iterations/0003/observation.json",
+      "sha256": "8a1b5edeef3fb6bf2d07506425ff202b46780f37c08d0aeeef9fed0a650998c7"
+    },
+    {
+      "path": "iterations/0003/step.json",
+      "sha256": "e2c11eae1f798498ac47fbf26b0f9d1e96b421aaeb64745522a3c951c9665865"
+    }
+  ]
+}

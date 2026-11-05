@@ -1,0 +1,24 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: strict-mode superlinear time comes from backtracking over a long whitespace run before a missing separator, while the permissive mode is unaffected. Prerequisites: an unpatched parser copy and permission to run local timing probes; all inputs are disposable. Test: for n = 2000, 4000, 8000, 16000, and 32000, time parsing of 'a'.repeat(n) + ' '.repeat(n) with no equals sign in strict and permissive modes, plus an equals-bearing cookie and a no-whitespace malformed cookie as controls; take a median of three and keep a fixed external timeout. Expected support: strict time grows about fourfold per doubling while controls stay flat. Falsifier: strict time stays flat, or the permissive mode shows the same growth. Limitation: one input shape may miss a second stage; delete scripts and fixture strings after the run."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the superlinearity comes from the greedy name/whitespace ambiguity before the separator, not from trailing-semicolon stripping or attribute parsing. Prerequisites: one unpatched copy and disposable strings whose first semicolon appears after the pathological prefix. Test: compare 'a'.repeat(n) + ' '.repeat(n) + '; Path=/' and a value-heavy 'name=' + 'a'.repeat(n) + ' '.repeat(n) against an attribute-only control, in both modes and across doubling sizes. Expected support: adding a semicolon and attributes leaves the pathological prefix time unchanged, while the early-equals value tail stays fast. Falsifier: the semicolon or attribute variant becomes fast, or the early-equals variant becomes slow. Limitation: wall time is noisy, so use medians and a fixed timeout."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a second superlinear path exists in value or terminator handling, so repairing only the pair expressions would leave a CPU sink. Prerequisites: an unpatched parser and disposable value-heavy strings. Test: time parsing of 'name=' followed by a long payload of ordinary characters with and without embedded newline, carriage-return, and null terminators, across doubling sizes, and compare with the no-separator pair fixture. Expected support: the value tail is linear and only the pair path is quadratic. Falsifier: terminator-free values scale superlinearly, or a terminator variant dominates after the pair path is isolated. Limitation: instrumentation may be needed if two stages overlap; cleanup removes temporary probes."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: replacing the pair expressions with a deterministic scan can preserve every previously valid parse outcome across a semantic matrix, so any behavioral drift signals over-correction. Prerequisites: unpatched and candidate-patched copies, plus recorded baseline outputs from the unpatched parser. Test: for ordinary names, spaced and quoted values, empty values, leading and multiple equals signs, attributes, duplicate keys, trailing semicolons, control characters, and newline/null/carriage-return terminators, compare structured snapshots of key, value, path, domain, expiry, max-age, flags, and extensions in both modes; treat null-versus-object as a difference. Expected support: zero mismatches and no residual timeouts. Falsifier: any field difference on a previously accepted input. Limitation: a finite corpus cannot prove universal equivalence; keep the corpus in the regression suite."
+    }
+  ]
+}

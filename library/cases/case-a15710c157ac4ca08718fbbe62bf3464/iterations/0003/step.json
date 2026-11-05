@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A JavaScript cookie parser now has a deterministic pair split that passed a several-thousand-input strict/permissive differential with zero mismatches and removed the long no-equals pair stall. However, attribute parsing still removes elements from the front of an array in a loop, so headers with many semicolon-separated attributes remain superlinear: about 96000 attributes took 1.4 s in the pair-only copy, while a disposable index-iteration experiment took about 14 ms with the same extension count. The observer can patch and test fresh copies. Determine whether merging index iteration preserves every parsed attribute and extension, removes the residual superlinearity, and leaves the date and memory behavior sound.",
+    "surface": "Single-process JavaScript cookie parser used by an HTTP client or server, with a strict default mode and an opt-in permissive mode. Tests use disposable local strings, timing probes, and fresh source copies; no deployed service is involved.",
+    "assumptions": [
+      "The observer may read the parser source, copy it, run it locally, and author disposable fixtures and probes.",
+      "Untrusted Set-Cookie text reaches the public parse entry point without client-side normalization.",
+      "The permissive parsing mode is opt-in and changes empty-name and leading-equals handling.",
+      "Ordinary cookies and attribute-bearing cookies are available as functional controls.",
+      "The parser is synchronous and has no internal deadline or cancellation point; a caller may impose an external timeout."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Hypothesis: the strict and permissive pair expressions both use a greedy name class that overlaps following whitespace, so a long whitespace-heavy prefix with no equals sign forces many name/whitespace split attempts and quadratic event-loop CPU use. Prerequisites: read access to the parser source, a local JavaScript runtime, disposable source copies, and untrusted Set-Cookie text reaching the public parse entry point; permissive mode is opt-in and ordinary cookies are available as controls. Bounded test: time parsing 'a'.repeat(n) + ' '.repeat(n) + '!' for n = 2000 through 64000 in both modes with a median of three and a fixed external timeout, compare with a no-whitespace malformed cookie and an early-equals value tail, and add a semicolon-plus-attribute variant to exclude later stages; then replace both pair expressions with a deterministic left-to-right separator scan and re-run the same matrix plus a strict/permissive semantic differential. Expected support: about fourfold growth per doubling before the repair and near-linear growth after, with zero field changes on ordinary, quoted, empty-name, leading and multiple equals, terminator, attribute, and trailing-semicolon cases. Falsifier: before the repair, flat timing or only one mode affected; after the repair, any key, value, or attribute change or more than roughly twofold growth per doubling. Cleanup and limitation: delete disposable fixtures and keep the differential corpus; one input family and one machine do not prove universal equivalence, and a separate attribute-loop sink may remain."
+  },
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: replacing front-removal attribute iteration with index iteration preserves identical key, value, and extension content for the existing differential corpus. Prerequisites: the pair-patched copy, an index-iteration candidate, and the captured corpus. Test: run the full strict/permissive differential, compare structured snapshots including extension order, and add empty segments and duplicate keys. Expected support: zero mismatches and identical extension order. Falsifier: any missing, duplicated, or reordered extension, or any key/value change. Limitation: the corpus may not cover every duplicate-attribute interaction; keep the edge cases."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a combined pair-scan plus index-iteration patch reduces attribute-heavy wall time from quadratic to linear without changing parsed content. Prerequisites: the combined patched copy and disposable attribute strings. Test: measure median-of-three runtime at 1000, 10000, 50000, and 100000 attributes, record extension counts, and compare with the pair-only copy at the largest feasible size. Expected support: roughly linear growth and a large absolute drop at the top size. Falsifier: more than about fivefold growth per doubling or a missing extension. Limitation: front-removal cost may be masked by garbage collection at small sizes; use several reps and report samples."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: date parsing has no hidden superlinear stage on long numeric tails, so the remaining CPU work is confined to pair splitting and attribute iteration. Prerequisites: the combined patched copy and disposable headers with long digit-only expiry values. Test: parse 'a=b; Expires=' followed by n digits for n from 1000 to 100000, time each size, and confirm a short valid date still parses to the expected timestamp. Expected support: linear or flat growth and correct short-date parsing. Falsifier: superlinear growth, a throw, or a changed short-date result. Limitation: a numeric-only tail may not exercise every date tokenizer branch; add mixed delimiters if time allows."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the index-boundary rewrite could mishandle empty attribute segments, duplicate keys, or trailing separators that the front-removal loop tolerated. Prerequisites: the combined patched copy and the original corpus plus generated edge cases. Test: append empty segments, repeated semicolons, duplicate attributes, and trailing separators to a sample of corpus inputs; compare structured snapshots and extension order with the unpatched parser. Expected support: perfect match, including null-versus-object cases. Falsifier: any discrepancy in undefined keys, trimmed values, or extension ordering. Limitation: duplicate-key semantics are last-wins for known attributes and append-only for unknown extensions; assert both explicitly."
+    },
+    {
+      "id": "r3-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: switching from destructive front removal to index reading does not retain detached array references or leak heap across repeated large parses. Prerequisites: a runtime with optional garbage collection and the combined patched copy. Test: parse a 100000-attribute cookie twenty times in a loop, force collection before and after, and compare retained heap; also check that every parse returns the expected extension count. Expected support: no meaningful retained growth. Falsifier: retained heap grows roughly with batch size after collection. Limitation: raw heap deltas without forced collection mostly measure uncollected garbage, so report both."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.826,
+      "rationale": "Selected. It carries a zero-mismatch differential, near-linear pair timing, and a measured residual attribute sink. The next action extends the same patch with index iteration and re-runs the discriminating checks. Evidence is local regression evidence, not an official pass."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.551,
+      "rationale": "Deferred to the incumbent, whose action includes exactly this differential after merging index iteration. The most directly verifiable candidate but largely repeats the established regression design."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.543,
+      "rationale": "Deferred and incorporated as the timing gate. Its attribute matrix is run on the combined patch; the proposed residual-sink threshold is a reasonable trigger."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.481,
+      "rationale": "Deferred. The date stage is a plausible third sink and prior date-tail timing looked linear. A numeric expiry scaling check is cheap and kept as a control, but it is lower priority than the directly observed attribute sink."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.519,
+      "rationale": "Deferred and folded into the combined differential: empty segments, duplicate keys, and trailing separators specifically test the index-boundary rewrite. A meaningful edge-case falsifier."
+    },
+    {
+      "id": "r3-v5",
+      "eligible": true,
+      "score": 0.398,
+      "rationale": "Deferred as a weak secondary check. Removing front removal cannot create detached references, so the leak hypothesis is unlikely, but a coarse memory sample during the large-attribute run is harmless and was recorded."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Merged index iteration into the deterministic-split copy and re-ran the discriminating checks. Differential recipe: about 5000 fixed and seeded-random headers in strict and permissive modes, including empty segments, duplicate keys, trailing semicolons, and a 10000-character attribute tail; compare structured snapshots including extension order. Result: about 10000 comparisons with zero mismatches against the unpatched parser. Pair-path timing stayed linear through 500000 characters (strict roughly 0.6 ms, permissive roughly 4-5 ms); a 500000-character closure fixture parsed in under a millisecond. Attribute-heavy parsing dropped from about 1.4 s at 96000 attributes in the pair-only copy to about 19 ms at 100000 attributes, with 100000 extensions preserved. A numeric expiry tail stayed linear through 100000 characters, and short valid dates still parsed correctly. A forced-collection batch of twenty large parses retained no heap growth; without forced collection the raw heap delta reflected uncollected garbage. The normalized patch applied cleanly at repository root to a fresh copy and reproduced the tested file byte for byte. The container lacked a separate patch utility, so the git apply implementation was used and the environment miss was preserved. Local only; no official harness ran.",
+    "next_hint": "The combined patch is linear for pair and attribute stages and preserves the differential. Rebuild the result from a pristine source plus the normalized patch alone, run an independent assertion suite, and prepare the exact host evaluation command for the official external harness."
+  },
+  "lineage": {
+    "case_id": "case-a15710c157ac4ca08718fbbe62bf3464",
+    "iteration_id": "step-3",
+    "previous_iteration_id": "step-2",
+    "step_id": "step-3",
+    "parent_step_id": "step-2",
+    "branch_id": "main"
+  }
+}

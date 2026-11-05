@@ -68,6 +68,18 @@ verify the reproducer fails before the repair and passes after it where feasible
 relevant regressions. Mark tests you could not run and remaining uncertainty explicitly.
 Use existing library/checks checklists only where their prerequisites match.
 
+For parser CPU-exhaustion hypotheses, isolate each parsing stage with size-doubling probes,
+an external timeout and valid-input controls. A repaired regular expression can expose a
+second cost such as repeated array-front removal. Compare baseline and repaired structured
+outputs in every supported parsing mode, including whitespace, empty fields and terminators;
+fast execution alone does not establish semantic compatibility.
+
+For tool-output prompt injection, separate payload exposure, emitted tool calls, persisted
+state, attacker-checker success and legitimate-task utility. Compare call ordering in fresh
+fixtures: successful tool replies can still overwrite earlier state. A checker pass with
+failed legitimate utility does not demonstrate a utility-preserving attack. Inspect the
+actual observation even when its outcome label summarizes a narrower hypothesis.
+
 Keep target reports, raw source, secrets and identity mappings outside the distributable library.
 Do not bake private assessments directly: anonymous corpus export has a separate strict schema
 and producer workflow. Never embed credentials in skill files or generated artifacts.

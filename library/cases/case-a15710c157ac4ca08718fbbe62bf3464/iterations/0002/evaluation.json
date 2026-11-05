@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.728,
+      "rationale": "Selected. It now has the strongest evidence: the prior step directly observed the predicted scaling, ruled out semicolon stripping and attribute parsing as the first sink, and produced a timeout. The next action is its planned structural repair plus semantic regression. Evidence weight increased under the round-two rubric."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.533,
+      "rationale": "Deferred in favor of the incumbent, but its exact proposal is the repair design the incumbent executes: one left-to-right separator scan plus a captured pre-patch corpus. The closest coherent refinement and the strongest unexecuted alternative."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.478,
+      "rationale": "Deferred as a post-repair check, not refuted. It correctly isolates the second stage. Prior evidence suggested attributes were not the first sink, but the test was folded into the selected action and later exposed a real residual attribute cost."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.5,
+      "rationale": "Deferred until the patch exists. Structured deep equality over benign samples, including null-versus-object divergence, is the correct functional-preservation gate and was incorporated into the selected repair step."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.473,
+      "rationale": "Deferred to the same repair step. The large fixture and a larger post-patch probe are good practical acceptance checks, though wall time alone is not an official verdict."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.445,
+      "rationale": "Retained as a meaningful falsifier for the repair, not selected. A lazy-expression alternative could reintroduce backtracking on a different shape, so comparing it with the scan is useful; the observed mechanism already favors the scan and the lazy variant is harder to validate."
+    }
+  ]
+}

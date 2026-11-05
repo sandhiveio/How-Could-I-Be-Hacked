@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: replacing front-removal attribute iteration with index iteration preserves identical key, value, and extension content for the existing differential corpus. Prerequisites: the pair-patched copy, an index-iteration candidate, and the captured corpus. Test: run the full strict/permissive differential, compare structured snapshots including extension order, and add empty segments and duplicate keys. Expected support: zero mismatches and identical extension order. Falsifier: any missing, duplicated, or reordered extension, or any key/value change. Limitation: the corpus may not cover every duplicate-attribute interaction; keep the edge cases."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a combined pair-scan plus index-iteration patch reduces attribute-heavy wall time from quadratic to linear without changing parsed content. Prerequisites: the combined patched copy and disposable attribute strings. Test: measure median-of-three runtime at 1000, 10000, 50000, and 100000 attributes, record extension counts, and compare with the pair-only copy at the largest feasible size. Expected support: roughly linear growth and a large absolute drop at the top size. Falsifier: more than about fivefold growth per doubling or a missing extension. Limitation: front-removal cost may be masked by garbage collection at small sizes; use several reps and report samples."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: date parsing has no hidden superlinear stage on long numeric tails, so the remaining CPU work is confined to pair splitting and attribute iteration. Prerequisites: the combined patched copy and disposable headers with long digit-only expiry values. Test: parse 'a=b; Expires=' followed by n digits for n from 1000 to 100000, time each size, and confirm a short valid date still parses to the expected timestamp. Expected support: linear or flat growth and correct short-date parsing. Falsifier: superlinear growth, a throw, or a changed short-date result. Limitation: a numeric-only tail may not exercise every date tokenizer branch; add mixed delimiters if time allows."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the index-boundary rewrite could mishandle empty attribute segments, duplicate keys, or trailing separators that the front-removal loop tolerated. Prerequisites: the combined patched copy and the original corpus plus generated edge cases. Test: append empty segments, repeated semicolons, duplicate attributes, and trailing separators to a sample of corpus inputs; compare structured snapshots and extension order with the unpatched parser. Expected support: perfect match, including null-versus-object cases. Falsifier: any discrepancy in undefined keys, trimmed values, or extension ordering. Limitation: duplicate-key semantics are last-wins for known attributes and append-only for unknown extensions; assert both explicitly."
+    },
+    {
+      "id": "r3-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: switching from destructive front removal to index reading does not retain detached array references or leak heap across repeated large parses. Prerequisites: a runtime with optional garbage collection and the combined patched copy. Test: parse a 100000-attribute cookie twenty times in a loop, force collection before and after, and compare retained heap; also check that every parse returns the expected extension count. Expected support: no meaningful retained growth. Falsifier: retained heap grows roughly with batch size after collection. Limitation: raw heap deltas without forced collection mostly measure uncollected garbage, so report both."
+    }
+  ]
+}

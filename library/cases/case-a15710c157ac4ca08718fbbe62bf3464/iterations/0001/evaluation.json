@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.686,
+      "rationale": "Selected. It is the only plan whose first action both reproduces the superlinear behavior and yields a bounded timing threshold, then proceeds to a structural repair. The pair split is isolated from attribute parsing, and the falsifier is directly measurable. Evidence at this point was source inspection and a scouting probe, not a saved run result."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.579,
+      "rationale": "Deferred in favor of the broader selected plan. The doubling-step timing design is useful and was incorporated, but the strict-only framing was too narrow: scouting showed the permissive mode also scaled superlinearly. Its equals-bearing and no-whitespace controls remain valuable."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.609,
+      "rationale": "Deferred, not refuted. Its semicolon-placement discriminator is the strongest single test of whether the sink is pair matching rather than semicolon stripping or attribute parsing. The check was incorporated into the selected action."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.531,
+      "rationale": "Deferred as a distinct secondary-mechanism hypothesis. The value class appears linear in source, but the test is coherent and would detect a second stage dominating after pair repair. Lower priority because the pair-split overlap already explains the observed scaling."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.55,
+      "rationale": "Deferred until a patch exists. Its baseline-versus-patch semantic differential is exactly the regression check required after repair, but it cannot discriminate the causal mechanism first. It became the principal verification design in a later step."
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a left-to-right separator scan with one index lookup, followed by the existing trim and control-character checks, reproduces every pair accepted by the strict and permissive expressions. Prerequisites: a captured pre-patch behavior corpus and a disposable patched copy. Test: build several dozen headers covering leading equals signs, multiple equals signs, empty names, whitespace around the separator, quoted and spaced values, tabs/newlines/nulls, and trailing semicolons; snapshot each parsed object in both modes and compare patched versus unpatched. Expected support: zero mismatches. Falsifier: any key, value, flag, or attribute difference on a captured case. Limitation: a finite hand-built corpus may miss unusual combinations; add seeded random strings. Cleanup keeps only the expectation snapshots."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: after pair linearization, attribute parsing is still sub-quadratic for long inputs such as many semicolon-separated attributes. Prerequisites: a patched copy and disposable attribute-heavy strings. Test: generate 'a=b' followed by k repetitions of '; Attr<index>=x' for k from 2000 to 128000, time median-of-three parses per size, and count parsed extensions at each size. Expected support: near-linear growth and the exact extension count. Falsifier: more than about 2.5-fold growth per doubling, or a missing/duplicated extension, identifies a second sink or semantic drift. Limitation: large extension arrays stress memory as well as CPU; sample process memory when sizes are large."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: ordinary cookies, including attribute-rich and quoted-value cookies, retain identical parsed fields under patched versus unpatched parsers in both modes. Prerequisites: a curated benign corpus captured before patching and a patched copy. Test: compare structured objects for key, value, path, domain, expiry, max-age, secure, http-only, same-site, and extension order on about one hundred benign samples, including spaces in values and empty attribute values; treat null-versus-object as a divergence. Expected support: every field matches. Falsifier: any field divergence indicates over-correction. Limitation: structured snapshots normalize object ordering but not semantic differences in date objects; compare normalized ISO strings."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the pair repair removes the practical stall at large but plausible header sizes and keeps memory bounded. Prerequisites: the baseline stalled fixture and the patched copy under the same external harness. Test: rerun a 250000-character no-equals fixture with the same five-second timeout, record exit status, wall time, and peak resident memory, then probe 500000 characters. Expected support: normal exit in well under a second and bounded memory. Falsifier: a timeout, crash, or wall time above about 500 ms at 250000 characters indicates residual backtracking. Limitation: one machine and one runtime; keep the raw timing line for host-side comparison."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a lazy or otherwise rewritten regular expression could restore linear behavior only until a different overlapping shape reintroduces backtracking, so it is a weaker repair than a deterministic scan. Prerequisites: a disposable copy and two candidate implementations: a lazy-expression variant and the separator scan. Test: compare both on normal cases, on repeated whitespace-plus-equals shapes, and on long prefixes that starve the expression of a separator; time doubling sizes and compare structured outputs. Expected support: the scan stays linear and matches the lazy variant on normal cases. Falsifier: the scan changes a normal case, or the lazy variant is linear on every adversarial shape tested. Limitation: a negative result for one lazy pattern does not prove all regex variants fail."
+    }
+  ]
+}

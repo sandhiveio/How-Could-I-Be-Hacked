@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.826,
+      "rationale": "Selected. It carries a zero-mismatch differential, near-linear pair timing, and a measured residual attribute sink. The next action extends the same patch with index iteration and re-runs the discriminating checks. Evidence is local regression evidence, not an official pass."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.551,
+      "rationale": "Deferred to the incumbent, whose action includes exactly this differential after merging index iteration. The most directly verifiable candidate but largely repeats the established regression design."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.543,
+      "rationale": "Deferred and incorporated as the timing gate. Its attribute matrix is run on the combined patch; the proposed residual-sink threshold is a reasonable trigger."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.481,
+      "rationale": "Deferred. The date stage is a plausible third sink and prior date-tail timing looked linear. A numeric expiry scaling check is cheap and kept as a control, but it is lower priority than the directly observed attribute sink."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.519,
+      "rationale": "Deferred and folded into the combined differential: empty segments, duplicate keys, and trailing separators specifically test the index-boundary rewrite. A meaningful edge-case falsifier."
+    },
+    {
+      "id": "r3-v5",
+      "eligible": true,
+      "score": 0.398,
+      "rationale": "Deferred as a weak secondary check. Removing front removal cannot create detached references, so the leak hypothesis is unlikely, but a coarse memory sample during the large-attribute run is harmless and was recorded."
+    }
+  ]
+}

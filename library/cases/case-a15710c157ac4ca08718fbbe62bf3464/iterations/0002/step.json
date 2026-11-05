@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A JavaScript cookie parser splits an untrusted Set-Cookie pair with two regular expressions whose greedy name class overlaps following whitespace. A prior timing matrix showed about fourfold growth per input doubling in both strict and permissive modes, while a no-whitespace malformed cookie and an early-equals value tail stayed fast. Adding a semicolon and attributes after the pathological prefix did not change the cost, so semicolon stripping and attribute parsing were not the first sink. Strict mode returns no cookie for a long no-equals prefix; permissive mode returns an empty key and a value equal to the full input. The observer can run local copies and disposable fixtures. Determine a deterministic separator-scan implementation that preserves strict and permissive observable behavior, including edge cases, and a differential that would falsify an over-correction.",
+    "surface": "Single-process JavaScript cookie parser used by an HTTP client or server, with a strict default mode and an opt-in permissive mode. Tests use disposable local strings, timing probes, and fresh source copies; no deployed service is involved.",
+    "assumptions": [
+      "The observer may read the parser source, copy it, run it locally, and author disposable fixtures and probes.",
+      "Untrusted Set-Cookie text reaches the public parse entry point without client-side normalization.",
+      "The permissive parsing mode is opt-in and changes empty-name and leading-equals handling.",
+      "Ordinary cookies and attribute-bearing cookies are available as functional controls.",
+      "The parser is synchronous and has no internal deadline or cancellation point; a caller may impose an external timeout."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Hypothesis: the strict and permissive pair expressions both use a greedy name class that overlaps following whitespace, so a long whitespace-heavy prefix with no equals sign forces many name/whitespace split attempts and quadratic event-loop CPU use. Prerequisites: read access to the parser source, a local JavaScript runtime, disposable source copies, and untrusted Set-Cookie text reaching the public parse entry point; permissive mode is opt-in and ordinary cookies are available as controls. Bounded test: time parsing 'a'.repeat(n) + ' '.repeat(n) + '!' for n = 2000 through 64000 in both modes with a median of three and a fixed external timeout, compare with a no-whitespace malformed cookie and an early-equals value tail, and add a semicolon-plus-attribute variant to exclude later stages; then replace both pair expressions with a deterministic left-to-right separator scan and re-run the same matrix plus a strict/permissive semantic differential. Expected support: about fourfold growth per doubling before the repair and near-linear growth after, with zero field changes on ordinary, quoted, empty-name, leading and multiple equals, terminator, attribute, and trailing-semicolon cases. Falsifier: before the repair, flat timing or only one mode affected; after the repair, any key, value, or attribute change or more than roughly twofold growth per doubling. Cleanup and limitation: delete disposable fixtures and keep the differential corpus; one input family and one machine do not prove universal equivalence, and a separate attribute-loop sink may remain."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a left-to-right separator scan with one index lookup, followed by the existing trim and control-character checks, reproduces every pair accepted by the strict and permissive expressions. Prerequisites: a captured pre-patch behavior corpus and a disposable patched copy. Test: build several dozen headers covering leading equals signs, multiple equals signs, empty names, whitespace around the separator, quoted and spaced values, tabs/newlines/nulls, and trailing semicolons; snapshot each parsed object in both modes and compare patched versus unpatched. Expected support: zero mismatches. Falsifier: any key, value, flag, or attribute difference on a captured case. Limitation: a finite hand-built corpus may miss unusual combinations; add seeded random strings. Cleanup keeps only the expectation snapshots."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: after pair linearization, attribute parsing is still sub-quadratic for long inputs such as many semicolon-separated attributes. Prerequisites: a patched copy and disposable attribute-heavy strings. Test: generate 'a=b' followed by k repetitions of '; Attr<index>=x' for k from 2000 to 128000, time median-of-three parses per size, and count parsed extensions at each size. Expected support: near-linear growth and the exact extension count. Falsifier: more than about 2.5-fold growth per doubling, or a missing/duplicated extension, identifies a second sink or semantic drift. Limitation: large extension arrays stress memory as well as CPU; sample process memory when sizes are large."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: ordinary cookies, including attribute-rich and quoted-value cookies, retain identical parsed fields under patched versus unpatched parsers in both modes. Prerequisites: a curated benign corpus captured before patching and a patched copy. Test: compare structured objects for key, value, path, domain, expiry, max-age, secure, http-only, same-site, and extension order on about one hundred benign samples, including spaces in values and empty attribute values; treat null-versus-object as a divergence. Expected support: every field matches. Falsifier: any field divergence indicates over-correction. Limitation: structured snapshots normalize object ordering but not semantic differences in date objects; compare normalized ISO strings."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the pair repair removes the practical stall at large but plausible header sizes and keeps memory bounded. Prerequisites: the baseline stalled fixture and the patched copy under the same external harness. Test: rerun a 250000-character no-equals fixture with the same five-second timeout, record exit status, wall time, and peak resident memory, then probe 500000 characters. Expected support: normal exit in well under a second and bounded memory. Falsifier: a timeout, crash, or wall time above about 500 ms at 250000 characters indicates residual backtracking. Limitation: one machine and one runtime; keep the raw timing line for host-side comparison."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a lazy or otherwise rewritten regular expression could restore linear behavior only until a different overlapping shape reintroduces backtracking, so it is a weaker repair than a deterministic scan. Prerequisites: a disposable copy and two candidate implementations: a lazy-expression variant and the separator scan. Test: compare both on normal cases, on repeated whitespace-plus-equals shapes, and on long prefixes that starve the expression of a separator; time doubling sizes and compare structured outputs. Expected support: the scan stays linear and matches the lazy variant on normal cases. Falsifier: the scan changes a normal case, or the lazy variant is linear on every adversarial shape tested. Limitation: a negative result for one lazy pattern does not prove all regex variants fail."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.728,
+      "rationale": "Selected. It now has the strongest evidence: the prior step directly observed the predicted scaling, ruled out semicolon stripping and attribute parsing as the first sink, and produced a timeout. The next action is its planned structural repair plus semantic regression. Evidence weight increased under the round-two rubric."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.533,
+      "rationale": "Deferred in favor of the incumbent, but its exact proposal is the repair design the incumbent executes: one left-to-right separator scan plus a captured pre-patch corpus. The closest coherent refinement and the strongest unexecuted alternative."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.478,
+      "rationale": "Deferred as a post-repair check, not refuted. It correctly isolates the second stage. Prior evidence suggested attributes were not the first sink, but the test was folded into the selected action and later exposed a real residual attribute cost."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.5,
+      "rationale": "Deferred until the patch exists. Structured deep equality over benign samples, including null-versus-object divergence, is the correct functional-preservation gate and was incorporated into the selected repair step."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.473,
+      "rationale": "Deferred to the same repair step. The large fixture and a larger post-patch probe are good practical acceptance checks, though wall time alone is not an official verdict."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.445,
+      "rationale": "Retained as a meaningful falsifier for the repair, not selected. A lazy-expression alternative could reintroduce backtracking on a different shape, so comparing it with the scan is useful; the observed mechanism already favors the scan and the lazy variant is harder to validate."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Executed the selected structural repair in a second disposable copy. Recipe: replace both pair expressions with one left-to-right separator scan, preserve strict nonempty-name behavior, preserve permissive empty-name and leading-equals behavior, skip pair-syntax whitespace before the value, cut the value at the first newline/carriage-return/null, then apply the existing trim and control-character checks. Differential recipe: load unpatched and patched modules in one process; for each header build a structured snapshot of key, value, path, domain, expiry, max-age, secure, http-only, same-site, and extensions; compare strict and permissive parses over about 3000 fixed and seeded-random strings. The first two differential runs exposed two real edge corrections: leading whitespace after the separator must be skipped before value termination, and the permissive leading-equals fallback must skip that whitespace too. After those corrections the corpus reached about 6000 comparisons with zero mismatches. The patched 250000-character pair fixture completed in about 0.4 ms versus the earlier five-second timeout, and scaling through 250000 characters was near-linear. A secondary sink appeared: many semicolon-separated attributes still grew superlinearly because the parser removed elements from the front of an array in a loop. About 96000 attributes took 1.4 s in the pair-patched copy, while an experimental index-iteration copy took about 14 ms with identical extension counts. Evidence is strong local regression evidence; the second repair was not yet in the final copy, and no official harness ran.",
+    "next_hint": "The deterministic pair split matches the original on the differential corpus and removes the pair stall, but the attribute loop has its own front-removal cost. Decide whether merging index iteration into the same patch preserves every attribute and extension, and re-run the combined differential and scaling gates."
+  },
+  "lineage": {
+    "case_id": "case-a15710c157ac4ca08718fbbe62bf3464",
+    "iteration_id": "step-2",
+    "previous_iteration_id": "step-1",
+    "step_id": "step-2",
+    "parent_step_id": "step-1",
+    "branch_id": "main"
+  }
+}

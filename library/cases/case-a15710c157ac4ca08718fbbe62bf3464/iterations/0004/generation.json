@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the normalized patch reproduces strict and permissive semantics on a large random and edge-case corpus from a pristine source copy without developer artifacts. Prerequisites: a brand-new source copy, the normalized patch, and the captured corpus. Test: apply only the patch, then compare structured snapshots against the unpatched copy over several thousand fixed, seeded-random, and edge-case headers in both modes. Expected support: zero mismatches. Falsifier: any divergence in key, value, flags, or attributes. Limitation: a finite corpus cannot prove universal equivalence; keep it as a regression fixture."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the patched parser keeps pair and attribute paths linear while an unpatched control shows quadratic growth on the same machine. Prerequisites: fresh patched and unpatched copies and a bounded timer. Test: time pathological pair inputs from 1000 to 64000 characters and attribute-heavy inputs at several sizes in both copies, using median-of-three and a fixed timeout. Expected support: patched growth well under twofold per doubling and an unpatched top-size timeout or large slowdown. Falsifier: patched growth above about threefold per doubling or a timeout. Limitation: machine noise and garbage collection can distort small sizes; report raw samples."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an independent native-assert suite that mirrors representative parser expectations passes on the patched copy, providing functional integrity before external evaluation. Prerequisites: the patched fresh copy and a runtime with built-in assertions; the original test framework may be unavailable. Test: assert ordinary pairs, dates, attributes, domain/path behavior, empty names in permissive mode, leading and multiple equals signs, value terminators, control-character rejection, a long lexical fixture, and generous timing bounds. Expected support: every assertion passes. Falsifier: any semantic assertion failure. Limitation: re-authored assertions may encode a wrong expectation; preserve first failures and distinguish test bugs from parser regressions."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the documented apply command works on a pristine copy without manual conflict resolution or helper binaries. Prerequisites: a pristine source copy and the normalized patch. Test: run the repository apply check and then full application at repository root, hash the result, and compare with the tested file. Expected support: both commands exit zero and hashes match. Falsifier: apply failure, residual rejects, or a hash mismatch. Limitation: an absent system patch binary is an environment issue; test a second apply implementation and a plain unified fallback."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: no hidden dependence on the development directory state affects the patched result when the same module is run from two different directory structures. Prerequisites: two fresh copies with the patch, no installed third-party runtime dependencies, and identical fixture inputs. Test: run the assertion and differential suites from both paths, compare outputs and timings, and check that no absolute resource is required. Expected support: identical outputs and comparable timings. Falsifier: path-dependent failures or output differences. Limitation: the package may have no runtime dependencies, so this test mainly checks import-path hygiene."
+    }
+  ]
+}

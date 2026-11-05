@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A JavaScript cookie parser takes an untrusted Set-Cookie string, trims it, strips trailing semicolons, isolates the substring before the first semicolon as the name/value pair, and applies one of two regular expressions to that pair. The strict expression requires a nonempty name; the opt-in permissive expression accepts empty names and a leading equals sign. Both use a greedy name class that also matches whitespace, followed by optional whitespace and an equals sign, so a long whitespace run with no equals sign may force many split attempts. The observer can read the parser, copy it, and run local timing probes. Ordinary cookies and attribute-bearing cookies are available as controls. Determine whether parse time grows superlinearly, in which modes, and whether semicolon stripping or attribute parsing causes it.",
+    "surface": "Single-process JavaScript cookie parser used by an HTTP client or server, with a strict default mode and an opt-in permissive mode. Tests use disposable local strings, timing probes, and fresh source copies; no deployed service is involved.",
+    "assumptions": [
+      "The observer may read the parser source, copy it, run it locally, and author disposable fixtures and probes.",
+      "Untrusted Set-Cookie text reaches the public parse entry point without client-side normalization.",
+      "The permissive parsing mode is opt-in and changes empty-name and leading-equals handling.",
+      "Ordinary cookies and attribute-bearing cookies are available as functional controls.",
+      "The parser is synchronous and has no internal deadline or cancellation point; a caller may impose an external timeout."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Hypothesis: the strict and permissive pair expressions both use a greedy name class that overlaps following whitespace, so a long whitespace-heavy prefix with no equals sign forces many name/whitespace split attempts and quadratic event-loop CPU use. Prerequisites: read access to the parser source, a local JavaScript runtime, disposable source copies, and untrusted Set-Cookie text reaching the public parse entry point; permissive mode is opt-in and ordinary cookies are available as controls. Bounded test: time parsing 'a'.repeat(n) + ' '.repeat(n) + '!' for n = 2000 through 64000 in both modes with a median of three and a fixed external timeout, compare with a no-whitespace malformed cookie and an early-equals value tail, and add a semicolon-plus-attribute variant to exclude later stages; then replace both pair expressions with a deterministic left-to-right separator scan and re-run the same matrix plus a strict/permissive semantic differential. Expected support: about fourfold growth per doubling before the repair and near-linear growth after, with zero field changes on ordinary, quoted, empty-name, leading and multiple equals, terminator, attribute, and trailing-semicolon cases. Falsifier: before the repair, flat timing or only one mode affected; after the repair, any key, value, or attribute change or more than roughly twofold growth per doubling. Cleanup and limitation: delete disposable fixtures and keep the differential corpus; one input family and one machine do not prove universal equivalence, and a separate attribute-loop sink may remain."
+  },
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: strict-mode superlinear time comes from backtracking over a long whitespace run before a missing separator, while the permissive mode is unaffected. Prerequisites: an unpatched parser copy and permission to run local timing probes; all inputs are disposable. Test: for n = 2000, 4000, 8000, 16000, and 32000, time parsing of 'a'.repeat(n) + ' '.repeat(n) with no equals sign in strict and permissive modes, plus an equals-bearing cookie and a no-whitespace malformed cookie as controls; take a median of three and keep a fixed external timeout. Expected support: strict time grows about fourfold per doubling while controls stay flat. Falsifier: strict time stays flat, or the permissive mode shows the same growth. Limitation: one input shape may miss a second stage; delete scripts and fixture strings after the run."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the superlinearity comes from the greedy name/whitespace ambiguity before the separator, not from trailing-semicolon stripping or attribute parsing. Prerequisites: one unpatched copy and disposable strings whose first semicolon appears after the pathological prefix. Test: compare 'a'.repeat(n) + ' '.repeat(n) + '; Path=/' and a value-heavy 'name=' + 'a'.repeat(n) + ' '.repeat(n) against an attribute-only control, in both modes and across doubling sizes. Expected support: adding a semicolon and attributes leaves the pathological prefix time unchanged, while the early-equals value tail stays fast. Falsifier: the semicolon or attribute variant becomes fast, or the early-equals variant becomes slow. Limitation: wall time is noisy, so use medians and a fixed timeout."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a second superlinear path exists in value or terminator handling, so repairing only the pair expressions would leave a CPU sink. Prerequisites: an unpatched parser and disposable value-heavy strings. Test: time parsing of 'name=' followed by a long payload of ordinary characters with and without embedded newline, carriage-return, and null terminators, across doubling sizes, and compare with the no-separator pair fixture. Expected support: the value tail is linear and only the pair path is quadratic. Falsifier: terminator-free values scale superlinearly, or a terminator variant dominates after the pair path is isolated. Limitation: instrumentation may be needed if two stages overlap; cleanup removes temporary probes."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: replacing the pair expressions with a deterministic scan can preserve every previously valid parse outcome across a semantic matrix, so any behavioral drift signals over-correction. Prerequisites: unpatched and candidate-patched copies, plus recorded baseline outputs from the unpatched parser. Test: for ordinary names, spaced and quoted values, empty values, leading and multiple equals signs, attributes, duplicate keys, trailing semicolons, control characters, and newline/null/carriage-return terminators, compare structured snapshots of key, value, path, domain, expiry, max-age, flags, and extensions in both modes; treat null-versus-object as a difference. Expected support: zero mismatches and no residual timeouts. Falsifier: any field difference on a previously accepted input. Limitation: a finite corpus cannot prove universal equivalence; keep the corpus in the regression suite."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.686,
+      "rationale": "Selected. It is the only plan whose first action both reproduces the superlinear behavior and yields a bounded timing threshold, then proceeds to a structural repair. The pair split is isolated from attribute parsing, and the falsifier is directly measurable. Evidence at this point was source inspection and a scouting probe, not a saved run result."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.579,
+      "rationale": "Deferred in favor of the broader selected plan. The doubling-step timing design is useful and was incorporated, but the strict-only framing was too narrow: scouting showed the permissive mode also scaled superlinearly. Its equals-bearing and no-whitespace controls remain valuable."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.609,
+      "rationale": "Deferred, not refuted. Its semicolon-placement discriminator is the strongest single test of whether the sink is pair matching rather than semicolon stripping or attribute parsing. The check was incorporated into the selected action."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.531,
+      "rationale": "Deferred as a distinct secondary-mechanism hypothesis. The value class appears linear in source, but the test is coherent and would detect a second stage dominating after pair repair. Lower priority because the pair-split overlap already explains the observed scaling."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.55,
+      "rationale": "Deferred until a patch exists. Its baseline-versus-patch semantic differential is exactly the regression check required after repair, but it cannot discriminate the causal mechanism first. It became the principal verification design in a later step."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Executed the selected reproduction step in a disposable copy with a median-of-three timing matrix. Recipe: build input = 'a'.repeat(n) + ' '.repeat(n) + '!', parse it in strict and permissive modes for n from 2000 to 64000, and compare with 'a'.repeat(n) + '!' and 'name=' + 'a'.repeat(n) + ' '.repeat(n). Strict time rose from about 2.4 ms at n=2000 to about 2.3 s at n=64000, roughly fourfold per doubling; permissive mode behaved the same. A 250000-character fixture under a five-second external timeout was terminated. The no-whitespace name and the early-equals value tail stayed near 0.1 ms at n=64000. Adding '; Path=/' after the pathological prefix left timing unchanged, so semicolon stripping and attribute parsing were not the sink. Strict mode returned no cookie for the no-equals fixture; permissive mode returned an empty key and the full value, matching the overlapping optional-group semantics. This supports the quadratic pair-split hypothesis and contradicts the strict-only framing. Evidence is a local causal result, not an official harness result. Limits: one process and one machine, one input family, and no patched comparison yet.",
+    "next_hint": "Both strict and permissive pair paths are quadratic, and the sink is before attribute parsing. Determine the exact deterministic split semantics for empty names, leading and multiple equals signs, whitespace after the separator, and newline/carriage-return/null value termination, then build a baseline-versus-patch differential before trusting a repair."
+  },
+  "lineage": {
+    "case_id": "case-a15710c157ac4ca08718fbbe62bf3464",
+    "iteration_id": "step-1",
+    "previous_iteration_id": null,
+    "step_id": "step-1",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}

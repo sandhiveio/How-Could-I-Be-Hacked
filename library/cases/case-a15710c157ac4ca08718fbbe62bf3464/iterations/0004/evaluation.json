@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.828,
+      "rationale": "Selected for final closure. It has a zero-mismatch combined differential, linear pair and attribute timing, a fresh apply check, and packaged patch artifacts. The final action recreates the result from pristine source plus the normalized patch and writes the host handoff. Evidence remains local; no official harness output exists."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.518,
+      "rationale": "Deferred to the incumbent, which runs the same pristine-copy differential. The strongest final-verification suggestion and directly incorporated."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.493,
+      "rationale": "Deferred and folded into final timing: fresh-copy pathological pair inputs and attribute scaling are compared against the unpatched control. The proposed thresholds are reasonable and prior data predicts they pass."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.505,
+      "rationale": "Deferred and adopted. The original test framework is absent, so an independent native-assert suite covering representative expectations is the correct functional gate before external evaluation."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.485,
+      "rationale": "Deferred and adopted. The normalized patch already passed one apply check; the final action repeats it from a pristine source, verifies byte identity, and tests a plain unified fallback because the container lacks a separate patch binary."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.385,
+      "rationale": "Deferred as a weak portability check. The package has no runtime third-party module tree and the patch touches one file, so two-directory dependence is unlikely. A second fresh-copy path is exercised incidentally by the final closure copy."
+    }
+  ]
+}
