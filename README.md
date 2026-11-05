@@ -8,6 +8,8 @@ tests — all locally, without API access.
 
 **Works offline. No API keys required.**
 
+The public corpus and its original examples are available under the [MIT License](library/LICENSE).
+
 [Install](#install-the-skill) · [Use with an agent](#use-with-an-agent) · [Run locally](#run-locally) · [Workflow](references/workflow.md)
 
 ## Install the skill
@@ -25,6 +27,22 @@ Then [ask your agent to review your repository](#use-with-an-agent).
 ![Branching investigation: competing hypotheses, discarded paths, a local experiment, evidence, and a regression test. Conceptual illustration.](assets/illustrations/investigation-cover.svg)
 
 [View investigation map at full size](assets/illustrations/investigation-cover.svg)
+
+## Corpus coverage
+
+- **Python and JavaScript libraries and web components.** Reproduction and regression
+  checks cover SQL injection, SSRF, path traversal, prototype pollution, HTTP request
+  smuggling, redirect credential leaks, JWT algorithm confusion, and regex denial of service.
+- **Tool-using assistants.** Indirect prompt injection investigations cover payments,
+  travel booking, calendars, and messaging. They track the injected objective and
+  legitimate task separately.
+- **Data anonymization CLI.** Checks cover consistent pseudonyms across linked
+  tables and time-dependent identities under a memory limit.
+
+Planned coverage includes command and option injection, authorization and session
+handling, archive symlinks, CSRF, secret redaction, signature verification, and
+cryptography challenges. The queue also includes release provenance, sanitizer
+compatibility, and behavioral replay.
 
 ## Spend fewer tokens. Reuse investigation paths.
 

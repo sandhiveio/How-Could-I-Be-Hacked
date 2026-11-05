@@ -4,6 +4,10 @@ This directory is the offline, reusable output of a curated security-case trajec
 contains anonymous **step examples**: each step can be retrieved and understood without the
 source case or the preceding steps.
 
+The original corpus materials in this directory, including the curated examples,
+are available under the [MIT License](LICENSE). Third-party materials remain
+subject to their original license terms.
+
 ## Contents
 
 - `index.sqlite` — local lexical full-text index over pre-action context and candidate actions.
