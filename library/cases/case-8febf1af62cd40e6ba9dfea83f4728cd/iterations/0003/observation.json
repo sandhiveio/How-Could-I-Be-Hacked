@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "The disposable formatter was generalized to a DOTALL header/body/footer span that preserves escaped-newline style, then extended with key-name authentication-code, authorization-scheme, and double-quoted cloud-key maskers. A pristine-versus-patched matrix of 23 checks passed: seven private-key shapes (generic/RSA/ENCRYPTED, real/escaped/mixed endings, two blocks) lost the base64 marker and kept END headers; six authentication-code carriers masked; authorization-scheme and double-quoted cloud-key carriers masked; benign six-digit/zip text, a prose sentence containing an otp word, and public-certificate text stayed byte-unchanged; token, password, and long-signature controls stayed identical. Evidence strength: direct local differential matrix with benign controls. Limits: formatter-level; package dependency suite not yet run; no official verdict.",
+  "next_hint": "Export the diff, replay it on a fresh pristine copy, and check repository secret-detector tests plus PEM-adjacent benign text before treating the local repair as complete."
+}

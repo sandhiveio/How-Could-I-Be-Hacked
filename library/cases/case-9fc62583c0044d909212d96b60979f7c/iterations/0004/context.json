@@ -1,0 +1,10 @@
+{
+  "case_id": "case-9fc62583c0044d909212d96b60979f7c",
+  "iteration_id": "step-4",
+  "previous_iteration_id": "step-3",
+  "incumbent": {
+    "id": "r3-v1",
+    "text": "Skip cache insertion when the resolved response carries a cycle marker, leaving ordinary responses cacheable. Prerequisites: cycle state is available on the response and recomputation is acceptable for cycle cases. Bounded test: apply the guard to the working copy, rerun the two-server fixture, rerun the counting-delegate probe for cycle and acyclic responses, and run the resolver and storage package suites. Expected result: fixture parity, two delegate calls for the cycle case, one for the acyclic case, and passing suites after the single expectation update; falsifier: parity fails or an acyclic hit is lost. Cleanup: revert the guard and the test expectation."
+  },
+  "hint": "The insertion guard removed the detected Check divergence, preserved an acyclic cache hit, and passed the resolver and storage suites after one expectation update. Remaining uncertainty is breadth: object listing consumes the same resolver, existing cache-enabled functional tests cover contextual tuples, and a cached ordinary answer might still be reused in a cycle context through an exclusion rewrite."
+}

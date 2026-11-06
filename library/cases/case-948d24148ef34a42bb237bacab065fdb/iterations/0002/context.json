@@ -1,0 +1,10 @@
+{
+  "case_id": "case-948d24148ef34a42bb237bacab065fdb",
+  "iteration_id": "step-2",
+  "previous_iteration_id": "step-1",
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Normalization-mismatch plan: inspect the clone entry point and the option-safety helper, then test whether a leading-space unsafe option is invisible to the raw-string check but becomes a normal option after shlex splitting. Use a disposable local origin and a harmless upload-pack wrapper that writes a marker. Repair by validating the exact token list passed to git, and rerun the reproducer plus ordinary clone controls before exporting a minimal patch."
+  },
+  "hint": "A Python git wrapper joins caller-controlled extra clone options, shlex-splits them for execution, and validates the original raw list. A previous local test showed that an exact unsafe upload-pack option is rejected, but the same option with a leading space executes a marker wrapper, while an ordinary clone does not. The next step is to repair the mismatch: validate the exact token list that git will receive, then rerun the attack form and benign controls. Question: does single-pass normalization close the bypass without breaking ordinary or common benign options?"
+}

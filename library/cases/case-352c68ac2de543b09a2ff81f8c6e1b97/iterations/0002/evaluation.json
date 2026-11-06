@@ -1,0 +1,46 @@
+{
+  "evaluations": [
+    {
+      "id": "c2-1",
+      "eligible": true,
+      "score": 0.73,
+      "rationale": "Selected. It is the narrowest source repair directly implied by the baseline and its test matrix covers the observed mechanisms; the layout interaction is the main unknown."
+    },
+    {
+      "id": "c2-2",
+      "eligible": true,
+      "score": 0.61,
+      "rationale": "Deferred. Explicitly setting true would repair independent sets but retains a global write and adds a concurrency variable before the simpler deletion is tested."
+    },
+    {
+      "id": "c2-3",
+      "eligible": true,
+      "score": 0.47,
+      "rationale": "Deferred. Pre-escaping bindings is more invasive, must preserve safe values, and leaves the global mutation for other consumers of the library."
+    },
+    {
+      "id": "c2-4",
+      "eligible": true,
+      "score": 0.64,
+      "rationale": "Deferred. Sequential-load idempotence is a useful verification, but it assumes the repair works and does not decide the repair choice."
+    },
+    {
+      "id": "c2-5",
+      "eligible": true,
+      "score": 0.67,
+      "rationale": "Deferred. The test-only counterexample is already implied by the baseline, where a markup assertion would fail; it becomes a property of the selected repair."
+    },
+    {
+      "id": "c2-6",
+      "eligible": true,
+      "score": 0.71,
+      "rationale": "Deferred narrowly behind c2-1. The incumbent has the same source action and broader acceptance criteria; c2-1 states the bounded test and falsifier more concretely."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.71,
+      "rationale": "Incumbent broad global-state plan from the previous step. The baseline supported its mechanism; this step tested the narrower deletion candidate, so the incumbent remains a valid but unadvanced route."
+    }
+  ]
+}

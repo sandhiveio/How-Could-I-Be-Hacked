@@ -1,0 +1,9 @@
+{
+  "plans": [
+    "Credential-format coverage matrix: enumerate structured ways secrets appear in connector logs (key=value, JSON, URL query, multiline PEM, numeric authentication code, authorization-scheme headers), run each through the central formatter, and repair only demonstrated gaps at the formatter boundary with benign parity checks.",
+    "Call-site trace and data-flow plan: follow every log statement that can receive authentication material, classify leaks by whether the call site masks, omits, or delegates to the formatter, then choose between a central masker fix and a narrower call-site fix based on observed exposure and regression risk.",
+    "Differential redaction invariants: test mask/unmask round trips for full, partial, quoted, whitespace-padded, truncated, and case-varied secrets, looking for prefixes or suffixes that survive; treat any surviving secret substring as a falsifier and add the smallest normalization that closes it.",
+    "Parser-boundary comparison: contrast regex substitution with a structural policy over recognized credential keys, then repair the regex set only for key names and value alphabets that the connector actually emits, checking false positives against innocuous log lines."
+  ],
+  "selected_id": "plan-1"
+}

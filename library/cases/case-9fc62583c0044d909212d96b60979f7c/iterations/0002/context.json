@@ -1,0 +1,10 @@
+{
+  "case_id": "case-9fc62583c0044d909212d96b60979f7c",
+  "iteration_id": "step-2",
+  "previous_iteration_id": "step-1",
+  "incumbent": {
+    "id": "r1-v1",
+    "text": "Skip cache insertion when the delegate's response reports a detected cycle, leaving ordinary responses cacheable. Prerequisites: cycle state is exposed in response metadata and a missing entry is safe to recompute. Bounded test: call the cache resolver twice with one delegate that returns an allowed:false, cycle-marked response and count delegate invocations; then repeat with an allowed:true response. Expected result: the cycle response is not cached (two calls) while the acyclic response is cached (one call); falsifier: either case violates the expected count or changes the returned decision. Cleanup: remove the guard."
+  },
+  "hint": "A unit probe established that a cycle-marked subanswer is cached and replayed, but not whether that changes a real permission decision. A disposable two-server fixture can share one authorization model and tuple set, enable the cache on one server only, and issue the same checks in a fixed order. The key design problem is making a recursive child subproblem complete and cache while an ancestor with an acyclic allow path is still resolving, so the later root query exercises the stale entry."
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A cached recursive permission resolver is outermost in the resolver chain, so a cache hit returns before the inner visited-path cycle guard runs. The cache key covers tuple identity, store, model, contextual tuples and request context but not the visited-path set. The immediate uncertainty is whether a response whose metadata reports a detected cycle is inserted and replayed at all; a counting delegate and two identical subproblem calls can answer that without a full server.",
+    "surface": "Go authorization service with a recursive check resolver, an optional in-memory check-query cache, a visited-path cycle guard, and Check plus object-listing APIs over disposable in-process servers.",
+    "assumptions": [
+      "The analyst may read and edit a local source snapshot and build it with a local Go toolchain.",
+      "The cache can be enabled or disabled independently on two disposable local servers.",
+      "Tuple data is attacker-influenced but the authorization model is fixed by the service owner.",
+      "Only loopback traffic and local fixtures are used; no public deployment is contacted.",
+      "Patch mode: the deliverable is a minimal source repair plus local regression evidence and a host-side official-evaluation handoff."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Skip cache insertion when the resolved subproblem response carries a cycle marker, then compare cache-enabled and cache-disabled results on a cyclic traversal and verify that ordinary acyclic subproblems still hit."
+  },
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Skip cache insertion when the delegate's response reports a detected cycle, leaving ordinary responses cacheable. Prerequisites: cycle state is exposed in response metadata and a missing entry is safe to recompute. Bounded test: call the cache resolver twice with one delegate that returns an allowed:false, cycle-marked response and count delegate invocations; then repeat with an allowed:true response. Expected result: the cycle response is not cached (two calls) while the acyclic response is cached (one call); falsifier: either case violates the expected count or changes the returned decision. Cleanup: remove the guard."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Gate cache lookup on visited-path membership so a tuple already on the current traversal path returns a cycle denial before any cached value is read. Prerequisites: the wrapper has the same tuple-key normalization as the inner guard. Bounded test: seed a cache entry through one path, then evaluate the same tuple while it is already visited and assert the delegate is not consulted. Expected result: no stale replay; falsifier: a legitimate non-cycle recursive request loses its hit or returns a different decision. Cleanup: remove the lookup gate."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Include a canonical digest of the visited-path set in the cache key so each traversal context gets a distinct entry. Prerequisites: deterministic tuple ordering and a bounded fingerprint. Bounded test: build two requests with identical tuple/store/model/context but different visited sets, compare keys, then repeat a cyclic workload and count distinct keys. Expected result: keys differ and the wrong-path hit disappears; falsifier: unbounded key growth or unchanged keys. Cleanup: revert the key construction."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Shorten the cache TTL so path-dependent entries expire before reuse. Prerequisites: a configurable clock or short interval and toleration of a stale window. Bounded test: populate a cycle-marked entry, advance time past the TTL, and re-evaluate the tuple. Expected result: the entry is gone; falsifier: a wrong decision is still served within the TTL. Limitation: probabilistic mitigation, not a correctness guard. Cleanup: restore the original TTL."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.72,
+      "rationale": "Initial overall plan retained as the incumbent; it proposes the direct insertion guard that the trajectory later tests."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.71,
+      "rationale": "Selected: smallest testable repair tied directly to the suspected cache insertion behavior, with a counting-delegate falsifier."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.64,
+      "rationale": "Deferred: plausible and compatible with the incumbent, but the observed uncertainty is insertion, so lookup gating is tested later."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.63,
+      "rationale": "Deferred: sound but more invasive; key cardinality and canonicalization need measurement first."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.47,
+      "rationale": "Deferred: short TTL only narrows the stale window and introduces timing flakiness."
+    }
+  ],
+  "selected_id": "r1-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "A counting delegate returned an allowed:false response with a cycle marker. Two identical cache-resolver calls produced two identical responses but only one delegate invocation, proving that the cycle-marked answer was inserted and replayed. The acyclic control in the same probe was not yet run; the result establishes the insertion behavior, not an end-to-end authorization change.",
+    "next_hint": "Construct an end-to-end cyclic fixture where a cycle-marked subanswer is cached during one traversal and the same tuple is later queried as a root, then compare a cache-enabled server with a cache-disabled server."
+  },
+  "lineage": {
+    "case_id": "case-9fc62583c0044d909212d96b60979f7c",
+    "iteration_id": "step-1",
+    "previous_iteration_id": null,
+    "step_id": "step-1",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}

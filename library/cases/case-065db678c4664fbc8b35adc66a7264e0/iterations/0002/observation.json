@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Applied the minimal repair in the disposable copy: server configuration carries a streaming interceptor chain, startup installs it, the service supplies the same preshared authenticator for streams, and the streaming handler uses the server stream context. The credential matrix passed: missing and invalid credentials were rejected on both unary and streaming calls, while valid credentials returned the seeded object. A separate fake-stream probe injected a marker into the stream context and a datastore stub observed it, confirming context adoption. The package build passed. The first probe run failed only on a capitalization assertion; the failure note and corrected passing log are saved. Local evidence only; official evaluation was not run.",
+  "next_hint": "Run the host-side official evaluation for the exported patch, then optionally exercise the OIDC authenticator and a no-auth service with the same unary/streaming credential matrix."
+}

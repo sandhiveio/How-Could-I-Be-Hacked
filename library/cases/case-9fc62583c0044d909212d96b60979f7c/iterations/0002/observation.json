@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "The two-server fixture used a short recursive viewer path, a longer acyclic admin allow path, and a shared cyclic tuple. The cache-enabled server returned false for the later viewer check while the cache-disabled server returned true. Debug logs showed the viewer tuple present in the cache after the first query, confirming that a cycle-marked subanswer had been replayed as a root decision. This is a path-dependent denial, not a false allow.",
+  "next_hint": "Apply the minimal insertion guard and rerun the same fixture; separately verify that an acyclic response still produces exactly one delegate call and that existing cache tests either pass or have an explainable expectation change."
+}

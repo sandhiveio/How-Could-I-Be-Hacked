@@ -1,0 +1,10 @@
+{
+  "case_id": "case-9fc62583c0044d909212d96b60979f7c",
+  "iteration_id": "step-1",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Skip cache insertion when the resolved subproblem response carries a cycle marker, then compare cache-enabled and cache-disabled results on a cyclic traversal and verify that ordinary acyclic subproblems still hit."
+  },
+  "hint": "A cached recursive permission resolver is outermost in the resolver chain, so a cache hit returns before the inner visited-path cycle guard runs. The cache key covers tuple identity, store, model, contextual tuples and request context but not the visited-path set. The immediate uncertainty is whether a response whose metadata reports a detected cycle is inserted and replayed at all; a counting delegate and two identical subproblem calls can answer that without a full server."
+}

@@ -1,0 +1,4 @@
+{
+  "selected_id": "plan-1",
+  "selected_text": "Trace the load path to the process-wide autoescape write, reproduce raw caller markup through the adapter and an independent library set, remove the write, and verify escaping plus preserved layout and escape-hatch behavior."
+}

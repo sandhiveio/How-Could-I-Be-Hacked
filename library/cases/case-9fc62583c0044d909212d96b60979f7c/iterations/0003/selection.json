@@ -1,0 +1,4 @@
+{
+  "selected_id": "r3-v1",
+  "selected_text": "Skip cache insertion when the resolved response carries a cycle marker, leaving ordinary responses cacheable. Prerequisites: cycle state is available on the response and recomputation is acceptable for cycle cases. Bounded test: apply the guard to the working copy, rerun the two-server fixture, rerun the counting-delegate probe for cycle and acyclic responses, and run the resolver and storage package suites. Expected result: fixture parity, two delegate calls for the cycle case, one for the acyclic case, and passing suites after the single expectation update; falsifier: parity fails or an acyclic hit is lost. Cleanup: revert the guard and the test expectation."
+}

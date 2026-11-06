@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "The guard was applied in the working copy. The two-server fixture now returned true on both servers, the cycle probe recorded two delegate calls, the acyclic control recorded one delegate call across three resolutions, and the resolver and storage suites passed. One existing test expected a cycle-marked answer to be cached; its delegate expectation was changed from one call to two to match the intentional no-cache-cycle behavior.",
+  "next_hint": "Verify the same repair on an object-listing path and against the repository's existing cache-enabled functional tests; if those pass, the remaining gap is only an exclusion-specific false-allow construction that was designed but not executed."
+}

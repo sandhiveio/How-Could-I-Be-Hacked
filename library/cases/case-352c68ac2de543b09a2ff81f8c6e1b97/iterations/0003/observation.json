@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Applied the targeted layout repair on top of the global-write removal: the child-render string is wrapped as a trusted safe value only when inserted into the layout placeholder. The disposable matrix then showed caller markup escaped in plain templates, includes, layout bodies, an independent library set created after load, and a second adapter; the safe filter and explicit autoescape-off block stayed literal. The complete module test suite passed, including the previously failing layout and filesystem tests. The local source change is two edits: remove the global autoescape write and mark the engine-generated layout fragment safe. Local result only; no official harness ran.",
+  "next_hint": "The two-edit repair passed the working tree. The next question is whether the exact exported diff applies to a pristine copy, reproduces the escaping matrix there, and remains correct across all loader constructors."
+}

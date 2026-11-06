@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.675,
+      "rationale": "Selected. The most complete repair-validation action: it covers the authorization matrix and independently checks that the handler adopts the stream context. It incorporates the baseline evidence while still testing the unexecuted repair."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Incumbent retained. Its baseline bypass is directly observed, but it has low remaining information gain because the next step should move from diagnosis to repair."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.645,
+      "rationale": "Deferred. Useful cancellation discriminator, but its premise that deadline handling is the main remaining defect is secondary; a complete repair should be applied first."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.6,
+      "rationale": "Deferred. Health and reflection regression is important, but the health service has no streaming data RPC and its unary override is already exercised by service startup."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.537,
+      "rationale": "Deferred. A concurrency stress test could reveal races, but it is more expensive and less discriminating than the credential and context matrix."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": false,
+      "score": 0.33,
+      "rationale": "Ineligible as generated. The core malformed-metadata idea is testable, but the original generation ended in incoherent filler, so it was not used without formalizing a stable hypothesis. It remains a valid alternative for another target."
+    }
+  ]
+}

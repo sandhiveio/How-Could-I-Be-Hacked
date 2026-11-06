@@ -1,0 +1,13 @@
+{
+  "id": "case-948d24148ef34a42bb237bacab065fdb",
+  "kind": "curated_case",
+  "hint": "A Python library wraps the local git executable and exposes clone APIs to application code. A caller can supply a list of extra clone options. The clone entry point joins that list with spaces and shlex-splits the result before spawning git, while a separate option-safety helper checks the original list strings for options that can execute commands or inject configuration. Determine whether every unsafe option that reaches git is rejected, repair the mismatch minimally, and verify that ordinary cloning still works.",
+  "surface": "Python library process invoking the local git CLI. The clone entry point accepts a text URL, a destination path, and an optional list of caller-controlled extra options. The safety helper receives option strings and rejects a small unsafe-option set including upload-pack and config forms. No network service is involved; the origin and destination are disposable local directories.",
+  "assumptions": [
+    "The attacker controls the extra clone-option list through application input, but not the Python process, the local git binary, or the destination root.",
+    "The local git executable is trusted and may accept abbreviated long options.",
+    "Tests may create disposable local repositories, wrapper scripts, hook directories, and marker files; no public targets or network clones are used.",
+    "The task is patch mode: a minimal source repair plus local regression evidence, with the official harness verdict supplied separately by the host.",
+    "The working copy is fresh from the staged source, and no reference patch is consulted."
+  ]
+}

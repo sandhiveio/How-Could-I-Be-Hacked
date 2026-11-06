@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A two-edit repair passed the working-tree regression matrix: remove the process-wide autoescape-disabling write and wrap only the child-render string as a trusted safe value at the layout insertion. The remaining risk is artifact fidelity rather than mechanism. Export the change as a unified diff, apply it to a pristine copy of the staged source with a check-then-apply sequence, and rerun the escaping matrix there. Also exercise every loader constructor (local directory, virtual filesystem and path-forwarding filesystem) and record whether a race-detector run is available in the local toolchain.",
+    "surface": "Single Go module: an adapter over a third-party template engine, a walk-based loader for local directories and virtual filesystems, a child-render string composed into an optional layout, and disposable template fixtures. Caller data arrives as map bindings; template source is fixed.",
+    "assumptions": [
+      "The observer can read and modify a disposable local source tree, build it with a local Go toolchain and run unit tests; no public service, network target or production data is used.",
+      "The attacker controls string values interpolated into templates, not template source, layout names or adapter configuration.",
+      "The third-party library exposes a process-wide autoescape flag and a safe-value wrapper; it has no per-template-set autoescape option.",
+      "The adapter's existing behavior for layouts, includes, safe filters and explicit autoescape-off blocks must be preserved.",
+      "Official benchmark verification is host-side; local tests and an exported diff are supporting evidence, not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "c3-1",
+    "text": "Hypothesis: wrapping only the child-render string in the library's safe-value wrapper before inserting it into the layout placeholder restores raw layout structure while caller bindings stay escaped. Prerequisites: the library exports a safe-value type or wrapper, and the layout path has a single insertion point. Bounded test: keep the global write removed, wrap the child string at that insertion, then render caller markup through a plain template, an include, a layout and an independent set; check safe filter, autoescape-off block and a second adapter. Expected: caller occurrences escaped, layout tags literal, escape hatches literal, full module suite green. Falsifier: any double-escaped layout entity, raw caller variable, or failing existing test. Cleanup: remove probe templates and retain the two-edit diff."
+  },
+  "candidates": [
+    {
+      "id": "c4-1",
+      "parent_id": "c3-1",
+      "text": "Hypothesis: the exported two-edit diff applies cleanly to a pristine source copy and reproduces the repaired behavior there. Prerequisites: a unified diff generated from the worked copy and a fresh copy of the staged source. Bounded test: run a check-only apply, apply the diff, add the disposable escaping probe, and run the probe plus the full module suite. Expected: check and apply succeed; caller markup escaped in plain, include, layout and independent-set paths; safe and autoescape-off hatches literal; suite green. Falsifier: whitespace or context mismatch, double-escaped layout, raw caller data, or a failing module test. Cleanup: delete the replay copy after saving logs; keep the diff and evidence private."
+    },
+    {
+      "id": "c4-2",
+      "parent_id": "c3-1",
+      "text": "Hypothesis: the repair is independent of loader constructor, so the local-directory engine, virtual-filesystem engine and path-forwarding filesystem engine all escape caller data while preserving layout handling. Prerequisites: each constructor can load a small disposable template and layout. Bounded test: in one process, build all three engines, render the same caller marker and a layout through each, and compare escaped output. Expected: identical escaping and no double-escaped layout entities across constructors. Falsifier: any constructor emits literal caller markup or entity-escaped layout structure. Cleanup: remove constructor fixtures and probe files."
+    },
+    {
+      "id": "c4-3",
+      "parent_id": "c3-1",
+      "text": "Hypothesis: concurrent renders after repeated loads remain correct and race-free because the repair removes the load-time global write. Prerequisites: multiple adapters and independent sets can run in one process; a race detector or equivalent instrumentation is available. Bounded test: spawn several goroutines that load separate adapters and render caller markers and layouts while independent sets render the same marker; run under the race detector. Expected: no data race and every marker escaped. Falsifier: a race report on the autoescape state or raw caller markup from any interleaving. Cleanup: stop workers and remove probes; if the detector is unavailable, record the environment blocker."
+    },
+    {
+      "id": "c4-4",
+      "parent_id": "c3-1",
+      "text": "Hypothesis: applying the exported diff to pristine source preserves escape-hatch contracts exactly as observed in the worked tree. Prerequisites: golden outputs for safe-filter and autoescape-off markers captured before replay. Bounded test: on the replayed copy, render a plain caller marker, a safe-filter marker and an autoescape-off block in one template; compare the hatch outputs with the goldens. Expected: plain marker escaped, both hatches literal, goldens unchanged. Falsifier: a hatch loses rawness, gains entities, or plain marker stays raw. Cleanup: discard replay copy and preserve golden comparison log."
+    },
+    {
+      "id": "c4-5",
+      "parent_id": "c3-1",
+      "text": "Hypothesis: no residual path, such as nested layouts or repeated loads, can re-enable trust leakage after the safe-value repair. Prerequisites: nested composition can be built from disposable templates. Bounded test: compose two layout levels, place caller markup in the innermost child, render through both levels, then load a second adapter and repeat. Expected: innermost caller marker escaped once, both layout structures literal, second adapter identical. Falsifier: caller markup becomes literal at either level or layout structure is entity-escaped. Cleanup: remove nested fixtures and probe."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "c4-1",
+      "eligible": true,
+      "score": 0.78,
+      "rationale": "Selected. Artifact replay is the decisive remaining verification for a host-side patch benchmark; the worked tree alone does not prove the exported diff is complete or context-correct."
+    },
+    {
+      "id": "c4-2",
+      "eligible": true,
+      "score": 0.71,
+      "rationale": "Deferred. Constructor coverage is valuable and was folded into the replay round; it is less decisive than applying the exact exported artifact."
+    },
+    {
+      "id": "c4-3",
+      "eligible": true,
+      "score": 0.67,
+      "rationale": "Deferred. The repair removes the global write, so the historical concurrency risk is reduced; race detection is also environment-dependent."
+    },
+    {
+      "id": "c4-4",
+      "eligible": true,
+      "score": 0.71,
+      "rationale": "Deferred. Escape-hatch parity was already demonstrated in the worked tree and is included in the replay matrix; standalone it is redundant."
+    },
+    {
+      "id": "c4-5",
+      "eligible": true,
+      "score": 0.7,
+      "rationale": "Deferred. Nested composition is a useful additional robustness case but does not verify the exported artifact as directly as replay."
+    },
+    {
+      "id": "c3-1",
+      "eligible": true,
+      "score": 0.77,
+      "rationale": "Incumbent from the previous step. The targeted safe-value repair passed the working-tree matrix and is the artifact replayed in this step."
+    }
+  ],
+  "selected_id": "c4-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Exported the two-edit source change as a unified diff and replayed it onto a pristine copy with a check-only apply followed by a real apply. The replay copy passed the full module suite and the disposable escaping probe: caller markup was escaped in plain, include, layout and independent-set paths; safe and autoescape-off hatches stayed literal; a second adapter stayed escaped. A constructor matrix also passed for local-directory with layout, virtual-filesystem and path-forwarding filesystem engines. A race-detector run could not start because the local toolchain lacks cgo/gcc, so concurrency remains an environment-limited check. The exported diff is the handoff artifact; official host evaluation was not run.",
+    "next_hint": "Local replay is green and the exported diff is ready. The remaining step is the official host-side patch benchmark evaluation; its result determines the source-case verdict, not the local tests."
+  },
+  "lineage": {
+    "case_id": "case-352c68ac2de543b09a2ff81f8c6e1b97",
+    "iteration_id": "step-4",
+    "previous_iteration_id": "step-3",
+    "step_id": "step-4",
+    "parent_step_id": "step-3",
+    "branch_id": "main"
+  }
+}

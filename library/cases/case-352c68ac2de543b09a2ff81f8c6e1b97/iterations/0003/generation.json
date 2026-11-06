@@ -1,0 +1,34 @@
+{
+  "candidates": [
+    {
+      "id": "c3-1",
+      "parent_id": "c2-1",
+      "text": "Hypothesis: wrapping only the child-render string in the library's safe-value wrapper before inserting it into the layout placeholder restores raw layout structure while caller bindings stay escaped. Prerequisites: the library exports a safe-value type or wrapper, and the layout path has a single insertion point. Bounded test: keep the global write removed, wrap the child string at that insertion, then render caller markup through a plain template, an include, a layout and an independent set; check safe filter, autoescape-off block and a second adapter. Expected: caller occurrences escaped, layout tags literal, escape hatches literal, full module suite green. Falsifier: any double-escaped layout entity, raw caller variable, or failing existing test. Cleanup: remove probe templates and retain the two-edit diff."
+    },
+    {
+      "id": "c3-2",
+      "parent_id": "c2-1",
+      "text": "Hypothesis: rendering the child directly into the layout's block stream, instead of executing it to a string and injecting that string, eliminates double escaping without trusting a string. Prerequisites: the library supports block composition or a writer-based layout path for arbitrary caller templates. Bounded test: replace string injection with block or writer composition, then run existing layout and filesystem tests plus a caller-markup layout probe. Expected: child HTML appears literally in the layout and caller variables are escaped once. Falsifier: layout tags remain escaped, caller data becomes raw, or existing layout semantics change. Cleanup: revert the composition experiment if arbitrary layouts cannot be supported."
+    },
+    {
+      "id": "c3-3",
+      "parent_id": "c2-1",
+      "text": "Hypothesis: wrapping the layout binding in a safe value while leaving every other binding plain preserves per-variable trust boundaries even when an include reads the same context map. Prerequisites: the layout execution path can wrap one key without mutating caller maps. Bounded test: wrap only the layout placeholder key, render a template that includes a partial reading caller data and also uses a nested layout, and compare escaping of include data versus layout fragment. Expected: include data escaped, layout structure literal. Falsifier: included caller markup raw, layout still double-escaped, or caller map mutated. Cleanup: remove the nested fixture and probe."
+    },
+    {
+      "id": "c3-4",
+      "parent_id": "c2-1",
+      "text": "Hypothesis: introducing a per-adapter autoescape option, instead of relying on the library's package-global flag, prevents cross-adapter leakage while allowing the adapter's own fragment to be marked safe. Prerequisites: the library accepts per-set or per-execution escape configuration, or the adapter implements its own escaping. Bounded test: add an adapter field gating autoescape, build two adapters with different settings, render caller markers and layouts from each, and create independent sets around them. Expected: each adapter honors its setting without changing the other. Falsifier: cross-contamination, a required global write, or existing constructor tests fail. Cleanup: remove the experimental field if the library cannot support it."
+    },
+    {
+      "id": "c3-5",
+      "parent_id": "c2-1",
+      "text": "Hypothesis: after the targeted safe-value repair, repeated loads, multiple adapters and concurrent renders cannot re-disable escaping or bypass caller-data escaping. Prerequisites: the repair is applied; concurrency tooling is available or a sequential interleaving is used. Bounded test: create two adapters sequentially, interleave independent-set renders with adapter renders, render caller markup and a layout, and repeat the matrix twice; run under a race detector if available. Expected: every caller marker escaped, layouts structurally literal, no race report. Falsifier: a later render emits raw caller markup or the race detector flags the global flag. Cleanup: stop workers and remove probes. This is a closure check."
+    },
+    {
+      "id": "c3-6",
+      "parent_id": "c2-1",
+      "text": "Hypothesis: the single-write deletion remains the best repair despite the layout regression, and the layout failure is an acceptable compatibility break. Prerequisites: the existing layout tests can be updated. Bounded test: keep the deletion, update layout expectations to escaped child HTML, and run the suite plus a caller-markup layout probe. Expected: suite green and caller data escaped. Falsifier: any consumer relying on literal layout HTML breaks, which would show the repair changes documented layout semantics. Cleanup: restore original layout tests. This incumbent tests whether the observed regression is a test artifact or a real contract break."
+    }
+  ]
+}

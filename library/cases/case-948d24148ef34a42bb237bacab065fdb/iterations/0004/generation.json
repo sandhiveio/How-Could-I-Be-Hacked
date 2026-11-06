@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r3-v4",
+      "text": "Hypothesis: the abbreviation matcher over-blocks a benign long option whose name is a prefix of an unsafe option name. Prerequisites: the combined patch, a local enumeration of documented clone options, and disposable repositories. Bounded test: run every documented benign long option through the matcher and through a real clone, comparing acceptance and success; supporting result is parity for all valid options. Falsifier: a valid option is rejected or an invalid one is accepted. Cleanup: delete fixture repositories; limitation: enumerating all options is broader than the closure matrix and may vary by git build."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r3-v4",
+      "text": "Hypothesis: an unsafe option split across two list entries becomes executable after the join step even though each raw entry looks harmless. Prerequisites: the combined patch, a disposable origin, and a marker wrapper. Bounded test: supply an upload-pack prefix and the remainder as separate entries, alongside a whitespace-injected variant, then check for marker creation and compare with ordinary clone. Supporting result is clean rejection of all split forms and successful ordinary clone. Falsifier: any split form executes a marker. Cleanup: delete fixtures; limitation: git may treat the second token as a value rather than completing the option name, so the result can be non-executing even without the patch."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r3-v4",
+      "text": "Hypothesis: short options with separate value arguments bypass config injection because the value lives in the next token rather than behind an equals sign. Prerequisites: the combined patch and disposable local repositories. Bounded test: supply a separate short config flag and value, plus a concatenated short form, and check for hook execution or accepted configuration. Supporting result is rejection of both forms with no marker. Falsifier: a hook runs or config is silently applied. Cleanup: delete fixtures; limitation: the existing short-option prefix check may already cover the flag token."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r3-v4",
+      "text": "Hypothesis: the stricter matcher changes behavior for ordinary public clone calls that synthesize options from keyword arguments, even when the raw extra-option list is empty. Prerequisites: the combined patch, a pristine source copy, a local origin with one branch and no submodules, and a set of benign keyword combinations. Bounded test: run the same benign calls against patched and pristine copies and compare pass/fail and checked-out file content. Supporting result is parity across all cases. Falsifier: a benign call raises or produces different content on the patched copy. Cleanup: remove both fixture trees; limitation: parity on a representative set is not proof for every possible call."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "r3-v4",
+      "text": "Hypothesis: the combined two-file diff is the minimal closure artifact and will apply cleanly to a fresh pristine copy while passing one differential attack-and-benign matrix. Prerequisites: the combined patch, a pristine source copy, disposable local origins, a marker wrapper, and a hook directory. Bounded test: export the unified diff, run a dry-run apply and then apply it, run the same matrix against patched and pristine copies, and emit a patch-evaluation JSON record. Supporting result is a clean apply, three or more executed markers on the pristine copy, zero markers on the patched copy, and all benign rows successful on both. Falsifier: the patch fails to apply, a marker survives on the patched copy, or a benign row regresses. Cleanup: delete fixture copies and repositories; limitation: the host-side official evaluator is still required for a benchmark verdict."
+    }
+  ]
+}

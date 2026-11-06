@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.685,
+      "rationale": "Selected. Directly tests the suspected wiring gap with a cheap behavioral discriminator: the same unauthenticated caller should be rejected on the unary path and accepted on the streaming path. This distinguishes a missing stream interceptor from a broken authorizer and uses only the local fixture."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.606,
+      "rationale": "Deferred. Context-only repair is plausible but incomplete unless the streaming interceptor already exists; the candidate would mainly prove that context replacement alone is insufficient."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.625,
+      "rationale": "Deferred. Strong closure plan that tests both changes independently, but premature before the baseline bypass is observed and the repair is written."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.531,
+      "rationale": "Deferred. Revocation persistence is a real but secondary property and needs a mutable authenticator plus long-lived stream fixture, making it more expensive than the initial discriminator."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.468,
+      "rationale": "Deferred. Error-shape information disclosure is secondary to the authorization bypass and requires a two-store comparison matrix."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.65,
+      "rationale": "Incumbent retained. It remains the best end-state repair, but it had not been executed when this step was selected; the winning candidate supplies the first discriminating observation."
+    }
+  ]
+}

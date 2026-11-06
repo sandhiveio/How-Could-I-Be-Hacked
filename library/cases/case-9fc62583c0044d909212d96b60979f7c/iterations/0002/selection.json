@@ -1,0 +1,4 @@
+{
+  "selected_id": "r2-v1",
+  "selected_text": "Build an end-to-end cyclic fixture with one cyclic branch and one acyclic branch sharing a tuple key, and issue checks in an order that leaves a cycle-marked subanswer cached before the same tuple is queried as a root. Prerequisites: an acyclic allow path long enough for the recursive child to finish while the ancestor is still resolving. Bounded test: two identical local servers, cache on versus off, same model/tuples, fixed query order; log each allowed value. Expected result: the cached server returns false where the cache-disabled server returns true; falsifier: both orders agree. Cleanup: delete the fixture store."
+}

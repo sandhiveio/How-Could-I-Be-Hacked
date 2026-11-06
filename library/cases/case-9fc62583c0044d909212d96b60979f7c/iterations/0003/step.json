@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "The same tuple produced false on the cache-enabled server and true on the cache-disabled server, and debug logs confirmed a cached cycle-marked viewer subanswer. The next step is implementation: apply the smallest guard that prevents cycle-marked insertion, then use the identical fixture as the before/after control. An acyclic response must still be cached, and the one existing test that asserts a cycle answer is cached must be reconciled with the intentional new behavior.",
+    "surface": "Go authorization service with a recursive check resolver, an optional in-memory check-query cache, a visited-path cycle guard, and Check plus object-listing APIs over disposable in-process servers.",
+    "assumptions": [
+      "The analyst may read and edit a local source snapshot and build it with a local Go toolchain.",
+      "The cache can be enabled or disabled independently on two disposable local servers.",
+      "Tuple data is attacker-influenced but the authorization model is fixed by the service owner.",
+      "Only loopback traffic and local fixtures are used; no public deployment is contacted.",
+      "Patch mode: the deliverable is a minimal source repair plus local regression evidence and a host-side official-evaluation handoff."
+    ]
+  },
+  "incumbent": {
+    "id": "r2-v1",
+    "text": "Build an end-to-end cyclic fixture with one cyclic branch and one acyclic branch sharing a tuple key, and issue checks in an order that leaves a cycle-marked subanswer cached before the same tuple is queried as a root. Prerequisites: an acyclic allow path long enough for the recursive child to finish while the ancestor is still resolving. Bounded test: two identical local servers, cache on versus off, same model/tuples, fixed query order; log each allowed value. Expected result: the cached server returns false where the cache-disabled server returns true; falsifier: both orders agree. Cleanup: delete the fixture store."
+  },
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "r2-v1",
+      "text": "Skip cache insertion when the resolved response carries a cycle marker, leaving ordinary responses cacheable. Prerequisites: cycle state is available on the response and recomputation is acceptable for cycle cases. Bounded test: apply the guard to the working copy, rerun the two-server fixture, rerun the counting-delegate probe for cycle and acyclic responses, and run the resolver and storage package suites. Expected result: fixture parity, two delegate calls for the cycle case, one for the acyclic case, and passing suites after the single expectation update; falsifier: parity fails or an acyclic hit is lost. Cleanup: revert the guard and the test expectation."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "r2-v1",
+      "text": "Gate cache lookup on visited-path membership in addition to insertion, returning a cycle denial before reading the cache. Prerequisites: the wrapper can identify the same tuple key as the inner guard. Bounded test: the same two-server fixture plus a seeded-entry test where the tuple is already visited. Expected result: stale replay disappears and non-cycle recursion still hits; falsifier: performance or hit-rate regression in legitimate recursion. Cleanup: remove the lookup gate."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "r2-v1",
+      "text": "Append a canonical visited-path digest to the cache key. Prerequisites: deterministic ordering and bounded key size. Bounded test: compare keys for identical tuple/context with different visited sets, then run the cyclic fixture and count distinct keys. Expected result: distinct keys and no wrong-path hit; falsifier: format breakage or excessive cardinality. Cleanup: restore the original key builder."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "r2-v1",
+      "text": "Extend repair validation to object-listing with cyclic data, because listing consumes the same check resolver and may surface a different symptom. Prerequisites: a listing query and a cyclic candidate graph. Bounded test: warm the cache through one cyclic path, then compare cache-enabled and cache-disabled object lists. Expected result: identical lists after repair; falsifier: a false positive or missing object that differs only with caching. Cleanup: remove the listing fixture."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.68,
+      "rationale": "Incumbent control fixture; selecting it again would repeat the prior step rather than apply the repair."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.73,
+      "rationale": "Selected: minimal repair, direct before/after fixture, cycle-versus-acyclic delegate controls, and explicit package regression."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.73,
+      "rationale": "Deferred by a narrow margin: stronger lookup guarantee but broader behavioral risk; retained for the final completeness check."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.64,
+      "rationale": "Deferred: sound but invasive key change; cardinality cost not yet measured."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Deferred: necessary verification extension of the same repair, not a different mechanism."
+    }
+  ],
+  "selected_id": "r3-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "The guard was applied in the working copy. The two-server fixture now returned true on both servers, the cycle probe recorded two delegate calls, the acyclic control recorded one delegate call across three resolutions, and the resolver and storage suites passed. One existing test expected a cycle-marked answer to be cached; its delegate expectation was changed from one call to two to match the intentional no-cache-cycle behavior.",
+    "next_hint": "Verify the same repair on an object-listing path and against the repository's existing cache-enabled functional tests; if those pass, the remaining gap is only an exclusion-specific false-allow construction that was designed but not executed."
+  },
+  "lineage": {
+    "case_id": "case-9fc62583c0044d909212d96b60979f7c",
+    "iteration_id": "step-3",
+    "previous_iteration_id": "step-2",
+    "step_id": "step-3",
+    "parent_step_id": "step-2",
+    "branch_id": "main"
+  }
+}

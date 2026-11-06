@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A Python git wrapper has a combined repair: the clone entry point validates the shlex-split token list, and the safety helper rejects unsafe long options even when the supplied token is an unambiguous abbreviation. A previous local matrix blocked exact, whitespace-hidden, abbreviated, and short unsafe forms while ordinary and several benign clones succeeded. Question: does the two-file diff apply cleanly to a fresh copy, and does one differential run show the unpatched source executing markers while the patched source blocks every attack row and preserves every benign row?",
+    "surface": "Python library process invoking the local git CLI. The clone entry point accepts a text URL, a destination path, and an optional list of caller-controlled extra options. The safety helper receives option strings and rejects a small unsafe-option set including upload-pack and config forms. No network service is involved; the origin and destination are disposable local directories.",
+    "assumptions": [
+      "The attacker controls the extra clone-option list through application input, but not the Python process, the local git binary, or the destination root.",
+      "The local git executable is trusted and may accept abbreviated long options.",
+      "Tests may create disposable local repositories, wrapper scripts, hook directories, and marker files; no public targets or network clones are used.",
+      "The task is patch mode: a minimal source repair plus local regression evidence, with the official harness verdict supplied separately by the host.",
+      "The working copy is fresh from the staged source, and no reference patch is consulted."
+    ]
+  },
+  "incumbent": {
+    "id": "r3-v4",
+    "text": "Hypothesis: extract each executed token's option name before any equals sign and reject it when an unsafe long option starts with that name, which treats an unambiguous abbreviation as the full unsafe option. Prerequisites: split-token validation, local git abbreviation behavior, and a disposable origin plus marker wrapper. Bounded test: apply the matcher and run a matrix containing abbreviated upload-pack, abbreviated config, exact unsafe options, ordinary clone, and benign depth, single-branch, branch, and recurse-submodules. Supporting result is rejection of every unsafe form with no marker and completion of every benign clone. Falsifier: any abbreviated unsafe form executes a marker or any benign option is rejected. Cleanup: delete fixtures; limitation: the matcher intentionally blocks any long option name that is a prefix of an unsafe name, so a future benign option with such a prefix would need review."
+  },
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r3-v4",
+      "text": "Hypothesis: the abbreviation matcher over-blocks a benign long option whose name is a prefix of an unsafe option name. Prerequisites: the combined patch, a local enumeration of documented clone options, and disposable repositories. Bounded test: run every documented benign long option through the matcher and through a real clone, comparing acceptance and success; supporting result is parity for all valid options. Falsifier: a valid option is rejected or an invalid one is accepted. Cleanup: delete fixture repositories; limitation: enumerating all options is broader than the closure matrix and may vary by git build."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r3-v4",
+      "text": "Hypothesis: an unsafe option split across two list entries becomes executable after the join step even though each raw entry looks harmless. Prerequisites: the combined patch, a disposable origin, and a marker wrapper. Bounded test: supply an upload-pack prefix and the remainder as separate entries, alongside a whitespace-injected variant, then check for marker creation and compare with ordinary clone. Supporting result is clean rejection of all split forms and successful ordinary clone. Falsifier: any split form executes a marker. Cleanup: delete fixtures; limitation: git may treat the second token as a value rather than completing the option name, so the result can be non-executing even without the patch."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r3-v4",
+      "text": "Hypothesis: short options with separate value arguments bypass config injection because the value lives in the next token rather than behind an equals sign. Prerequisites: the combined patch and disposable local repositories. Bounded test: supply a separate short config flag and value, plus a concatenated short form, and check for hook execution or accepted configuration. Supporting result is rejection of both forms with no marker. Falsifier: a hook runs or config is silently applied. Cleanup: delete fixtures; limitation: the existing short-option prefix check may already cover the flag token."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r3-v4",
+      "text": "Hypothesis: the stricter matcher changes behavior for ordinary public clone calls that synthesize options from keyword arguments, even when the raw extra-option list is empty. Prerequisites: the combined patch, a pristine source copy, a local origin with one branch and no submodules, and a set of benign keyword combinations. Bounded test: run the same benign calls against patched and pristine copies and compare pass/fail and checked-out file content. Supporting result is parity across all cases. Falsifier: a benign call raises or produces different content on the patched copy. Cleanup: remove both fixture trees; limitation: parity on a representative set is not proof for every possible call."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "r3-v4",
+      "text": "Hypothesis: the combined two-file diff is the minimal closure artifact and will apply cleanly to a fresh pristine copy while passing one differential attack-and-benign matrix. Prerequisites: the combined patch, a pristine source copy, disposable local origins, a marker wrapper, and a hook directory. Bounded test: export the unified diff, run a dry-run apply and then apply it, run the same matrix against patched and pristine copies, and emit a patch-evaluation JSON record. Supporting result is a clean apply, three or more executed markers on the pristine copy, zero markers on the patched copy, and all benign rows successful on both. Falsifier: the patch fails to apply, a marker survives on the patched copy, or a benign row regresses. Cleanup: delete fixture copies and repositories; limitation: the host-side official evaluator is still required for a benchmark verdict."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.775,
+      "rationale": "Deferred as a separate step. Round 3 already tested a separate short config flag and it was blocked; the case remains useful as a regression row inside the closure matrix."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.827,
+      "rationale": "Selected. It combines the fresh-copy apply check, the established differential attack-and-benign matrix, and the host-side benchmark-compatible patch artifact, which is the remaining closure gap."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.741,
+      "rationale": "Incumbent is supported by the prior matrix but selecting it again would add no new information and would not test fresh application or produce the patch artifact."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.793,
+      "rationale": "Deferred. API-level parity is valuable and was partly covered by the benign matrix; a broader sweep can be folded into the selected closure run."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.789,
+      "rationale": "Deferred as a separate step. The repaired code checks the post-split token list, so split forms should reject; the exact case belongs in the final regression matrix."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.776,
+      "rationale": "Deferred. The local option set is small enough to sample in the closure matrix, and parsing all git help output is larger than needed."
+    }
+  ],
+  "selected_id": "r4-v5",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Exported the two-file unified diff and applied it cleanly to a fresh copy with a dry-run check followed by apply. One scripted matrix then ran against the patched fresh copy and the unpatched pristine source with the same disposable origin, wrapper, hook directory, and marker path. The pristine source executed markers for leading-space upload-pack, abbreviated upload-pack, shorter abbreviated upload-pack, and abbreviated config with a hook path. The patched copy blocked eight attack rows with no marker. Both copies completed eight benign rows: ordinary, depth, single-branch, branch, recurse-submodules, no-checkout, quiet, and filter-blob-none; no-checkout correctly had no working file. Direct helper checks accepted a benign list and blocked exact, abbreviated, and short unsafe forms. Test recipe: fresh copy, dry-run apply, one local origin per environment, clone once per row, and compare rejection, completion, marker presence, and working-file presence. A patch-evaluation JSONL and the host command were saved. This is local supporting evidence only; the official benchmark has not run.",
+    "next_hint": "The local repair is closed against the discovered forms. The remaining uncertainty is the host-side official benchmark verdict; submit the saved JSONL on the host and record the generated summary separately from this local evidence."
+  },
+  "lineage": {
+    "case_id": "case-948d24148ef34a42bb237bacab065fdb",
+    "iteration_id": "step-4",
+    "previous_iteration_id": "step-3",
+    "step_id": "step-4",
+    "parent_step_id": "step-3",
+    "branch_id": "main"
+  }
+}

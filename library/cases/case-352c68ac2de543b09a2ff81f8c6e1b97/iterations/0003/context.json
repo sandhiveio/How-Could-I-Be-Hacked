@@ -1,0 +1,10 @@
+{
+  "case_id": "case-352c68ac2de543b09a2ff81f8c6e1b97",
+  "iteration_id": "step-3",
+  "previous_iteration_id": "step-2",
+  "incumbent": {
+    "id": "c2-1",
+    "text": "Hypothesis: deleting the sole global autoescape-disabling write in the adapter load path restores escaping without collateral breakage. Prerequisites: source audit confirms no other writer; a disposable copy and local toolchain are available. Bounded test: remove the write, then render a caller marker through a plain template, an include, a template embedded in a layout and an independent library set; also render the marker through the safe filter. Expected: caller occurrences escaped, layout structure intact, safe filter literal, full module suite green. Falsifier: any residual raw caller output, double-escaped layout HTML, or failing existing test. Cleanup: remove probe templates and retain the source diff. This is the minimal repair candidate."
+  },
+  "hint": "Removing the global autoescape-disabling write restored escaping for ordinary caller bindings but double-escaped the layout body, because the adapter executes the child template into a string and then injects that string as a layout binding. Existing layout and filesystem tests failed with entity-escaped child HTML. A safe-value wrapper exists in the template library and can mark a value as already-trusted HTML. Determine the smallest change that marks only the adapter-generated child fragment safe, not caller data, and verify plain variables, includes, layouts, independent sets, safe filter, autoescape-off block, a second adapter, and the full module suite."
+}

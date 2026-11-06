@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A Python library wraps the local git executable. Its clone entry point accepts a caller-controlled list of extra options, joins the list with spaces, and shlex-splits the joined text before spawning git. Before spawning, a safety helper checks the original list strings with prefix comparisons against unsafe options such as upload-pack and config. The caller can use the public clone API, and the local git binary accepts abbreviated long options. Question: does a leading-space option pass the raw-string check but reach git as a normal unsafe option?",
+    "surface": "Python library process invoking the local git CLI. The clone entry point accepts a text URL, a destination path, and an optional list of caller-controlled extra options. The safety helper receives option strings and rejects a small unsafe-option set including upload-pack and config forms. No network service is involved; the origin and destination are disposable local directories.",
+    "assumptions": [
+      "The attacker controls the extra clone-option list through application input, but not the Python process, the local git binary, or the destination root.",
+      "The local git executable is trusted and may accept abbreviated long options.",
+      "Tests may create disposable local repositories, wrapper scripts, hook directories, and marker files; no public targets or network clones are used.",
+      "The task is patch mode: a minimal source repair plus local regression evidence, with the official harness verdict supplied separately by the host.",
+      "The working copy is fresh from the staged source, and no reference patch is consulted."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Normalization-mismatch plan: inspect the clone entry point and the option-safety helper, then test whether a leading-space unsafe option is invisible to the raw-string check but becomes a normal option after shlex splitting. Use a disposable local origin and a harmless upload-pack wrapper that writes a marker. Repair by validating the exact token list passed to git, and rerun the reproducer plus ordinary clone controls before exporting a minimal patch."
+  },
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a single extra-option entry containing an embedded space, such as an upload-pack option followed by a wrapper path, passes the raw-string check because the validator never sees the option as a standalone list element, while shlex splitting yields two arguments. Prerequisites: caller controls the option list, local git is trusted, and a disposable origin plus marker wrapper exist. Bounded test: call the public clone API with one combined list entry and check whether the wrapper writes a marker; a supporting result is marker creation and a completed clone. Falsifier: the safety helper rejects the entry, git rejects the split arguments, or no marker appears. Cleanup: delete the disposable origin, destination, wrapper, and marker; the main limitation is that the prefix check may still match the beginning of the combined string."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the local git accepts an unambiguous long-option abbreviation for upload-pack, while the raw-string safety check only matches the full unsafe spelling, so the abbreviation reaches git and executes the wrapper. Prerequisites: the local git supports long-option abbreviation, the caller controls the option list, and a marker-writing wrapper is available. Bounded test: create a disposable local origin and call the public clone API with an abbreviated upload-pack option; a supporting result is a completed clone plus marker. Falsifier: git rejects the abbreviation as ambiguous or unknown, or no marker is written. Cleanup: remove the local origin, destination, wrapper, and marker; limitation: support may vary across git builds."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a config option supplied through the extra-option list changes an executable setting such as a hook path, even though config options are nominally in the unsafe set. Prerequisites: caller controls the option list, a disposable local origin exists, and a hook directory can write a marker. Bounded test: pass a config assignment that points a hook path at the marker hook, then clone; a supporting result is marker creation during checkout. Falsifier: the safety helper blocks the exact config spelling, git ignores the setting, or no hook runs. Cleanup: delete the origin, destination, hook directory, and marker; limitation: the exact config spelling is likely caught by the existing prefix check."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an option missing from the unsafe list, such as a template-directory option, lets an attacker choose a directory whose hooks run during clone. Prerequisites: caller controls the extra-option list, a disposable origin exists, and a template directory contains an executable post-checkout hook. Bounded test: clone with the template option and check for a marker; a supporting result is marker creation. Falsifier: the safety helper blocks the option, modern git does not run the copied hook, or no marker appears. Cleanup: delete the origin, destination, template directory, and marker; limitation: this tests a different allowlist gap rather than the raw-versus-normalized validation mismatch."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a repair that validates the post-split token list blocks whitespace-hidden unsafe options while preserving benign options such as depth. Prerequisites: the direct bypass has been reproduced, a fresh source copy exists, and a disposable origin plus marker wrapper are available. Bounded test: patch the clone entry point to check the already-split token list, then try a whitespace-hidden upload-pack and a benign depth option; supporting result is rejection of the unsafe form and a successful depth clone. Falsifier: the hidden form still executes a marker or the benign clone fails. Cleanup: delete the fixture repositories; limitation: this plan does not by itself address long-option abbreviations."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.689,
+      "rationale": "Deferred in favor of the direct whitespace test. The abbreviation mechanism is plausible and locally testable, but adds a second parser assumption and was not executed in this step."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.726,
+      "rationale": "Selected. Source inspection supports the raw-versus-normalized mismatch, and the marker wrapper gives a cheap causal discriminator with an ordinary-clone control."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.399,
+      "rationale": "Deferred, not refuted. Source inspection predicts the existing prefix check still matches the combined entry because the string begins with the unsafe option name."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.592,
+      "rationale": "Deferred. It tests a plausible allowlist gap for a template option, but not the observed validation normalization difference and was not executed."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.378,
+      "rationale": "Deferred, not refuted. The exact config spelling is already in the unsafe set and likely blocked by the existing prefix check; it was not executed."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.647,
+      "rationale": "Deferred until the bypass is confirmed. It is a useful repair-validation plan but presupposes an execution result that did not yet exist when selected."
+    }
+  ],
+  "selected_id": "plan-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Executed a local differential probe with a disposable origin and a wrapper that writes a marker. The exact upload-pack option was rejected by the safety helper. The same option with one leading space completed the clone and created the marker. An ordinary clone completed and created no marker. The result supports the raw-versus-normalized validation mismatch and shows reachability through the public clone API. Test recipe: initialize a local origin, commit one file, create an executable wrapper that writes a marker and then executes the real upload-pack helper, call the clone API with the three option forms, and compare rejection, completion, and marker presence. This is local evidence only; the official harness was not run.",
+    "next_hint": "The whitespace bypass is confirmed. The next question is whether validating the already-split token list blocks it while preserving ordinary clone options, and whether abbreviated long options remain a separate bypass."
+  },
+  "lineage": {
+    "case_id": "case-948d24148ef34a42bb237bacab065fdb",
+    "iteration_id": "step-1",
+    "previous_iteration_id": null,
+    "step_id": "step-1",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}

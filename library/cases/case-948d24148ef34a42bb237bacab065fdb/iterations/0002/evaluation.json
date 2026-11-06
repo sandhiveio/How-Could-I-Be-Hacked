@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.739,
+      "rationale": "Selected. It is the smallest causal repair for the directly observed mismatch and includes both an unsafe case and benign controls."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.683,
+      "rationale": "Superseded by r2-v1 for implementation. The incumbent's main discriminator is complete and keeping it adds no new executable step."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.502,
+      "rationale": "Deferred. Plain equality on a token containing an assignment would not equal the bare option name and could allow the unsafe form, so the proposal is less precise than normalized prefix checking."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.573,
+      "rationale": "Deferred to a later iteration because it depends on the repair existing first; it is the strongest residual-bypass hypothesis."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.438,
+      "rationale": "Deferred. The smaller repair can avoid re-joining entirely, so the double-normalization failure mode may not exist."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.702,
+      "rationale": "Deferred in favor of the smaller r2-v1 patch, which implements the same final-token invariant. The invariant should still appear in regression evidence."
+    }
+  ]
+}

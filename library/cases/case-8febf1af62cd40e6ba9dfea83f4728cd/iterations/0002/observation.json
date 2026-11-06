@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "A minimal real-newline header/body/footer span was applied to the disposable copy and compared with pristine source across 11 carriers. Generic, RSA, ENCRYPTED, and CRLF blocks with real newlines were preserved before the change and reduced to header/XXXX/footer after it; the older escaped-newline generic control stayed masked; public-certificate and benign six-digit text stayed byte-identical; token and password controls stayed masked. A JSON carrier using a literal-backslash-n RSA block still leaked because the new span required a real newline, and the six-digit passcode carrier still leaked. Evidence strength: direct pristine/patched causal comparison. Limits: direct module load, not the package import chain; no official verdict.",
+  "next_hint": "Generalize the private-key span to both newline styles and add key-name-anchored authentication-code masking, then test whether the two repairs interact or alter benign text."
+}

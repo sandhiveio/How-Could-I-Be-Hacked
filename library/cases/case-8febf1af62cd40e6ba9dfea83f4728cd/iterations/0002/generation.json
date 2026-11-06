@@ -1,0 +1,24 @@
+{
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a DOTALL header-to-footer span replaces only the private-key body and leaves benign lines intact. Applicability: the formatter can be loaded directly from the disposable source copy. Bounded test: pipe a PEM block plus a six-digit timestamp line through the formatter. Expected result: every base64 line disappears, the END header remains, and the timestamp is unchanged; falsifier: a base64 line survives or the timestamp is masked. Cleanup: delete the temporary log and fixture key."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: key-name anchoring for passcode, auth_code, mfa_code, and related names catches short numeric codes without touching ordinary six-digit numbers. Applicability: the same formatter harness and a disposable log are enough. Bounded test: emit code-key values and an unrelated latency value. Expected result: code values mask and the latency value stays byte-identical; falsifier: a code survives or the unrelated number is masked. Cleanup: delete the temporary log."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: short signed-URL signatures, authorization-scheme headers, and double-quoted cloud-key values are missed because each existing pattern requires a specific name, quote style, or value length. Applicability: SDK loggers share the formatter. Bounded test: emit each carrier with a short marker next to a long-signature or single-quoted control. Expected result: every carrier marker is masked and controls stay masked; falsifier: a carrier survives while its control masks. Cleanup: delete fixture URLs and logs."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: composing a broad private-key span before per-line password/token maskers can over-mask adjacent text or leave residual fragments when one secret is nested inside another carrier. Applicability: no code change is needed for the probe. Bounded test: place a password-like line inside or next to a PEM-shaped block and inspect exact residual bytes. Expected result: the whole block masks once and the END header remains; falsifier: a partial body survives or a non-secret neighbor is altered. Cleanup: delete the temporary fixture."
+    }
+  ]
+}

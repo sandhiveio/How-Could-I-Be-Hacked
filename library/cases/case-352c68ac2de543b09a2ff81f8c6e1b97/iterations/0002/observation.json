@@ -1,0 +1,5 @@
+{
+  "outcome": "refuted",
+  "summary": "Applied the single-write deletion. Plain variables, included variables and an independent library set now escaped caller markup, and the safe filter stayed literal. However the layout path failed: the adapter first executed the child template to a string, then bound that string into the layout, so the newly enabled autoescape escaped the engine-generated child HTML a second time. The rendered layout body contained &amp;lt;b ... instead of &lt;b ..., and the module's existing layout and filesystem tests failed. The deletion alone is therefore experimentally contradicted as a complete repair. Local result only; no official harness ran.",
+  "next_hint": "Escaping must be restored for caller data without escaping the adapter's own child-render fragment. The next question is whether marking only that fragment as a trusted safe value at the layout insertion restores raw layout structure while caller variables and includes remain escaped."
+}

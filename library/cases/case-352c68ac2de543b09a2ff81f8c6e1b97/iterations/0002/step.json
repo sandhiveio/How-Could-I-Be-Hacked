@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A baseline probe established that the adapter's load path disables the library's process-wide autoescape flag, so caller markup renders literally and even independently created library sets inherit the disabled state. The adapter also supports layouts by executing the child template into a string and injecting that string into the layout. An audit is expected to find a single global write. Apply the minimal removal of that write, then run a matrix covering a plain variable, an included variable, a layout, an independent set and the explicit safe filter; finish with the module's full test suite. Record any collateral breakage rather than assuming the one-line change is sufficient.",
+    "surface": "Single Go module: an adapter over a third-party template engine, a walk-based loader for local directories and virtual filesystems, a child-render string composed into an optional layout, and disposable template fixtures. Caller data arrives as map bindings; template source is fixed.",
+    "assumptions": [
+      "The observer can read and modify a disposable local source tree, build it with a local Go toolchain and run unit tests; no public service, network target or production data is used.",
+      "The attacker controls string values interpolated into templates, not template source, layout names or adapter configuration.",
+      "The third-party library exposes a process-wide autoescape flag and a safe-value wrapper; it has no per-template-set autoescape option.",
+      "The adapter's existing behavior for layouts, includes, safe filters and explicit autoescape-off blocks must be preserved.",
+      "Official benchmark verification is host-side; local tests and an exported diff are supporting evidence, not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Trace the load path to the process-wide autoescape write, reproduce raw caller markup through the adapter and an independent library set, remove the write, and verify escaping plus preserved layout and escape-hatch behavior."
+  },
+  "candidates": [
+    {
+      "id": "c2-1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: deleting the sole global autoescape-disabling write in the adapter load path restores escaping without collateral breakage. Prerequisites: source audit confirms no other writer; a disposable copy and local toolchain are available. Bounded test: remove the write, then render a caller marker through a plain template, an include, a template embedded in a layout and an independent library set; also render the marker through the safe filter. Expected: caller occurrences escaped, layout structure intact, safe filter literal, full module suite green. Falsifier: any residual raw caller output, double-escaped layout HTML, or failing existing test. Cleanup: remove probe templates and retain the source diff. This is the minimal repair candidate."
+    },
+    {
+      "id": "c2-2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: replacing the global false write with an explicit true write at load also repairs independent sets but introduces a race under concurrent loads. Prerequisites: the library flag is writable and adapters can be constructed concurrently. Bounded test: change the load path to set the flag true, spawn several goroutines that alternate adapter loads with independent-set renders of a marker, and run under a race detector if available. Expected: every render escapes the marker and no race is reported. Falsifier: any interleaving produces raw caller markup, or a race-detector report names the global flag. Cleanup: stop goroutines and delete the concurrency probe. If the race detector is unavailable, report the environment limitation."
+    },
+    {
+      "id": "c2-3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: escaping string values in the binding map before rendering removes the vulnerability while the global autoescape flag stays false. Prerequisites: the adapter controls binding construction and can recognize safe values. Bounded test: pre-escape a marker string, then render it as a plain variable, through a safe filter and inside an explicit autoescape-off block; also render an integer and nil. Expected: plain variable escaped once, safe and autoescape-off paths literal, non-strings unaffected. Falsifier: double-escaped safe output, raw plain output, or a type-dependent panic. Cleanup: revert binding edits and delete probe templates."
+    },
+    {
+      "id": "c2-4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: after removing the global write, repeated and sequential adapter loads still escape because no load path re-disables the flag. Prerequisites: the repair is applied and at least two engines can coexist. Bounded test: create adapter A, render a marker, create adapter B in the same process, render again, then create a fresh independent set and render once more. Expected: all three renders escape the marker and layout output remains structurally raw. Falsifier: any later render emits literal markup, showing a lingering one-time mutation. Cleanup: delete the probe templates and second engine fixture."
+    },
+    {
+      "id": "c2-5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: adding a test assertion alone can appear to fix the defect if the vulnerable source remains, so the repair must change source and the regression must fail on the unpatched tree. Prerequisites: the disposable copy has both vulnerable and repaired states. Bounded test: add a caller-markup escape assertion, run it against the unpatched tree and confirm it fails, apply the source repair, then run the assertion and the original suite. Expected: assertion fails before and passes after, with source diff present. Falsifier: the assertion passes while the adapter still emits raw markup, or the suite passes only because the test was skipped. Cleanup: retain the regression assertion only if it is part of the exported evidence."
+    },
+    {
+      "id": "c2-6",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the broad global-state route remains best because it combines the cross-consumer mutation check, a minimal repair, the safe-filter hatch and the existing suite. Prerequisites: baseline evidence already shows the global mutation. Bounded test: apply the single-write deletion, then run plain, include, layout, independent-set, safe-filter and full-suite checks. Expected: escaping restored everywhere and no collateral breakage. Falsifier: layout double escaping, a failing existing test, or residual raw caller data. Cleanup: remove probes. This incumbent is nearly identical to c2-1 but states the broader acceptance criteria."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "c2-1",
+      "eligible": true,
+      "score": 0.73,
+      "rationale": "Selected. It is the narrowest source repair directly implied by the baseline and its test matrix covers the observed mechanisms; the layout interaction is the main unknown."
+    },
+    {
+      "id": "c2-2",
+      "eligible": true,
+      "score": 0.61,
+      "rationale": "Deferred. Explicitly setting true would repair independent sets but retains a global write and adds a concurrency variable before the simpler deletion is tested."
+    },
+    {
+      "id": "c2-3",
+      "eligible": true,
+      "score": 0.47,
+      "rationale": "Deferred. Pre-escaping bindings is more invasive, must preserve safe values, and leaves the global mutation for other consumers of the library."
+    },
+    {
+      "id": "c2-4",
+      "eligible": true,
+      "score": 0.64,
+      "rationale": "Deferred. Sequential-load idempotence is a useful verification, but it assumes the repair works and does not decide the repair choice."
+    },
+    {
+      "id": "c2-5",
+      "eligible": true,
+      "score": 0.67,
+      "rationale": "Deferred. The test-only counterexample is already implied by the baseline, where a markup assertion would fail; it becomes a property of the selected repair."
+    },
+    {
+      "id": "c2-6",
+      "eligible": true,
+      "score": 0.71,
+      "rationale": "Deferred narrowly behind c2-1. The incumbent has the same source action and broader acceptance criteria; c2-1 states the bounded test and falsifier more concretely."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.71,
+      "rationale": "Incumbent broad global-state plan from the previous step. The baseline supported its mechanism; this step tested the narrower deletion candidate, so the incumbent remains a valid but unadvanced route."
+    }
+  ],
+  "selected_id": "c2-1",
+  "observation": {
+    "outcome": "refuted",
+    "summary": "Applied the single-write deletion. Plain variables, included variables and an independent library set now escaped caller markup, and the safe filter stayed literal. However the layout path failed: the adapter first executed the child template to a string, then bound that string into the layout, so the newly enabled autoescape escaped the engine-generated child HTML a second time. The rendered layout body contained &amp;lt;b ... instead of &lt;b ..., and the module's existing layout and filesystem tests failed. The deletion alone is therefore experimentally contradicted as a complete repair. Local result only; no official harness ran.",
+    "next_hint": "Escaping must be restored for caller data without escaping the adapter's own child-render fragment. The next question is whether marking only that fragment as a trusted safe value at the layout insertion restores raw layout structure while caller variables and includes remain escaped."
+  },
+  "lineage": {
+    "case_id": "case-352c68ac2de543b09a2ff81f8c6e1b97",
+    "iteration_id": "step-2",
+    "previous_iteration_id": "step-1",
+    "step_id": "step-2",
+    "parent_step_id": "step-1",
+    "branch_id": "main"
+  }
+}

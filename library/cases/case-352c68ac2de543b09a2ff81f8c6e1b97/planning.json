@@ -1,0 +1,8 @@
+{
+  "plans": [
+    "Trace the load path to the process-wide autoescape write, reproduce raw caller markup through the adapter and an independent library set, remove the write, and verify escaping plus preserved layout and escape-hatch behavior.",
+    "Leave the global flag alone and force escaping inside templates by wrapping parsed template bytes in an autoescape-on block or equivalent per-template construct, then test includes, inherited templates and layouts.",
+    "Escape caller bindings before they reach the template engine, or compose child output into layouts structurally, then test interactions with safe values, filters, nil values, includes and layout embedding."
+  ],
+  "selected_id": "plan-1"
+}

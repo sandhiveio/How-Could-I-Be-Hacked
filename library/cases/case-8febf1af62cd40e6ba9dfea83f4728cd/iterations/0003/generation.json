@@ -1,0 +1,24 @@
+{
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: one DOTALL header-to-footer matcher can unify real-newline and literal-backslash-n private-key variants. Applicability: the formatter is loaded from the disposable source copy. Bounded test: emit JSON containing escaped-newline RSA and ENCRYPTED blocks, raw multiline blocks, and public-certificate text. Expected result: all private-key bodies become XXXX and the certificate is unchanged; falsifier: a body fragment survives or the certificate is masked. Cleanup: delete the fixture JSON and logs."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: key-name anchoring for passcode, auth_code, mfa_code, verification_code, otp, and totp closes short numeric codes without masking unrelated numbers. Applicability: the central formatter is attached to connector and SDK loggers. Bounded test: emit code-key values in key=value and JSON forms plus a standalone six-digit latency/zip line. Expected result: code-key values mask and the standalone numbers stay unchanged; falsifier: a code survives or an unrelated number masks. Cleanup: delete the temporary log."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a broad private-key span can interfere with token or password maskers when one credential is nested inside another carrier. Applicability: the maskers are composed in a fixed order. Bounded test: construct a string with a token before and inside an unmasked private-key block, then inspect exact residual bytes. Expected result: both secrets mask and no partial body remains; falsifier: the token leaks or a body fragment survives. Cleanup: archive the combined probe output and delete the fixture."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: mixed LF and CRLF line endings inside one private-key block break a span that assumes a single separator style. Applicability: the formatter receives logs from mixed platforms. Bounded test: emit one block whose header uses CRLF and whose body/footer use LF, plus a uniform-LF control. Expected result: both blocks lose the base64 marker and retain END headers; falsifier: the mixed block leaves a body fragment. Cleanup: delete the temporary log."
+    }
+  ]
+}

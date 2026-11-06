@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.689,
+      "rationale": "Deferred in favor of the direct whitespace test. The abbreviation mechanism is plausible and locally testable, but adds a second parser assumption and was not executed in this step."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.726,
+      "rationale": "Selected. Source inspection supports the raw-versus-normalized mismatch, and the marker wrapper gives a cheap causal discriminator with an ordinary-clone control."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.399,
+      "rationale": "Deferred, not refuted. Source inspection predicts the existing prefix check still matches the combined entry because the string begins with the unsafe option name."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.592,
+      "rationale": "Deferred. It tests a plausible allowlist gap for a template option, but not the observed validation normalization difference and was not executed."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.378,
+      "rationale": "Deferred, not refuted. The exact config spelling is already in the unsafe set and likely blocked by the existing prefix check; it was not executed."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.647,
+      "rationale": "Deferred until the bypass is confirmed. It is a useful repair-validation plan but presupposes an execution result that did not yet exist when selected."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "plans": [
+    "Add a streaming authentication interceptor built from the same authenticator used by the unary interceptor, wire it into server startup, and make the streaming handler use the server stream context. Validate with a preshared-credential service that missing and invalid credentials are rejected on both RPCs, valid credentials succeed, and the handler retains the stream context.",
+    "Enforce authentication inside the streaming listing handler by reading metadata from the server stream context and invoking the configured authenticator there, leaving interceptor wiring unchanged. Validate the same credential matrix and check that unary behavior and health exemptions are unchanged.",
+    "Introduce one authentication guard shared by the existing unary interceptor and a new streaming interceptor so every public RPC maps identity and errors through the same path. Validate consistent status codes across missing, invalid, and valid credentials and preserve no-auth mode.",
+    "Make only the smallest service-layer change that rejects unauthenticated streaming calls, leaving the handler's fresh background context in place, then test whether the lost stream context independently breaks cancellation or credential-claim propagation."
+  ],
+  "selected_id": "plan-1"
+}

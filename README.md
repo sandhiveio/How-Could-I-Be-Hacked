@@ -4,7 +4,7 @@ Explore how your code could be attacked using real security investigation trajec
 Find applicable hypotheses, run targeted checks, and turn verified findings into regression
 tests — all locally, without API access.
 
-**13 cases · 41 steps · 238 searchable hypothesis entries**
+**18 cases · 59 steps · 348 searchable hypothesis entries**
 
 **Works offline. No API keys required.**
 
@@ -39,8 +39,11 @@ Then [ask your agent to review your repository](#use-with-an-agent).
 - **Data anonymization CLI.** Checks cover consistent pseudonyms across linked
   tables and time-dependent identities under a memory limit.
 
-Planned coverage includes command and option injection, authorization and session
-handling, archive symlinks, CSRF, secret redaction, signature verification, and
+- **Authorization, rendering, and tooling.** Checks cover streaming RPC authentication,
+  path-dependent authorization caching, HTML template autoescaping, secret redaction
+  in logs, and Git clone option validation.
+
+Planned coverage includes archive symlinks, CSRF, session handling, signature verification, and
 cryptography challenges. The queue also includes release provenance, sanitizer
 compatibility, and behavioral replay.
 

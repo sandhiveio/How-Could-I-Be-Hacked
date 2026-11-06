@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "Removing the global autoescape-disabling write restored escaping for ordinary caller bindings but double-escaped the layout body, because the adapter executes the child template into a string and then injects that string as a layout binding. Existing layout and filesystem tests failed with entity-escaped child HTML. A safe-value wrapper exists in the template library and can mark a value as already-trusted HTML. Determine the smallest change that marks only the adapter-generated child fragment safe, not caller data, and verify plain variables, includes, layouts, independent sets, safe filter, autoescape-off block, a second adapter, and the full module suite.",
+    "surface": "Single Go module: an adapter over a third-party template engine, a walk-based loader for local directories and virtual filesystems, a child-render string composed into an optional layout, and disposable template fixtures. Caller data arrives as map bindings; template source is fixed.",
+    "assumptions": [
+      "The observer can read and modify a disposable local source tree, build it with a local Go toolchain and run unit tests; no public service, network target or production data is used.",
+      "The attacker controls string values interpolated into templates, not template source, layout names or adapter configuration.",
+      "The third-party library exposes a process-wide autoescape flag and a safe-value wrapper; it has no per-template-set autoescape option.",
+      "The adapter's existing behavior for layouts, includes, safe filters and explicit autoescape-off blocks must be preserved.",
+      "Official benchmark verification is host-side; local tests and an exported diff are supporting evidence, not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "c2-1",
+    "text": "Hypothesis: deleting the sole global autoescape-disabling write in the adapter load path restores escaping without collateral breakage. Prerequisites: source audit confirms no other writer; a disposable copy and local toolchain are available. Bounded test: remove the write, then render a caller marker through a plain template, an include, a template embedded in a layout and an independent library set; also render the marker through the safe filter. Expected: caller occurrences escaped, layout structure intact, safe filter literal, full module suite green. Falsifier: any residual raw caller output, double-escaped layout HTML, or failing existing test. Cleanup: remove probe templates and retain the source diff. This is the minimal repair candidate."
+  },
+  "candidates": [
+    {
+      "id": "c3-1",
+      "parent_id": "c2-1",
+      "text": "Hypothesis: wrapping only the child-render string in the library's safe-value wrapper before inserting it into the layout placeholder restores raw layout structure while caller bindings stay escaped. Prerequisites: the library exports a safe-value type or wrapper, and the layout path has a single insertion point. Bounded test: keep the global write removed, wrap the child string at that insertion, then render caller markup through a plain template, an include, a layout and an independent set; check safe filter, autoescape-off block and a second adapter. Expected: caller occurrences escaped, layout tags literal, escape hatches literal, full module suite green. Falsifier: any double-escaped layout entity, raw caller variable, or failing existing test. Cleanup: remove probe templates and retain the two-edit diff."
+    },
+    {
+      "id": "c3-2",
+      "parent_id": "c2-1",
+      "text": "Hypothesis: rendering the child directly into the layout's block stream, instead of executing it to a string and injecting that string, eliminates double escaping without trusting a string. Prerequisites: the library supports block composition or a writer-based layout path for arbitrary caller templates. Bounded test: replace string injection with block or writer composition, then run existing layout and filesystem tests plus a caller-markup layout probe. Expected: child HTML appears literally in the layout and caller variables are escaped once. Falsifier: layout tags remain escaped, caller data becomes raw, or existing layout semantics change. Cleanup: revert the composition experiment if arbitrary layouts cannot be supported."
+    },
+    {
+      "id": "c3-3",
+      "parent_id": "c2-1",
+      "text": "Hypothesis: wrapping the layout binding in a safe value while leaving every other binding plain preserves per-variable trust boundaries even when an include reads the same context map. Prerequisites: the layout execution path can wrap one key without mutating caller maps. Bounded test: wrap only the layout placeholder key, render a template that includes a partial reading caller data and also uses a nested layout, and compare escaping of include data versus layout fragment. Expected: include data escaped, layout structure literal. Falsifier: included caller markup raw, layout still double-escaped, or caller map mutated. Cleanup: remove the nested fixture and probe."
+    },
+    {
+      "id": "c3-4",
+      "parent_id": "c2-1",
+      "text": "Hypothesis: introducing a per-adapter autoescape option, instead of relying on the library's package-global flag, prevents cross-adapter leakage while allowing the adapter's own fragment to be marked safe. Prerequisites: the library accepts per-set or per-execution escape configuration, or the adapter implements its own escaping. Bounded test: add an adapter field gating autoescape, build two adapters with different settings, render caller markers and layouts from each, and create independent sets around them. Expected: each adapter honors its setting without changing the other. Falsifier: cross-contamination, a required global write, or existing constructor tests fail. Cleanup: remove the experimental field if the library cannot support it."
+    },
+    {
+      "id": "c3-5",
+      "parent_id": "c2-1",
+      "text": "Hypothesis: after the targeted safe-value repair, repeated loads, multiple adapters and concurrent renders cannot re-disable escaping or bypass caller-data escaping. Prerequisites: the repair is applied; concurrency tooling is available or a sequential interleaving is used. Bounded test: create two adapters sequentially, interleave independent-set renders with adapter renders, render caller markup and a layout, and repeat the matrix twice; run under a race detector if available. Expected: every caller marker escaped, layouts structurally literal, no race report. Falsifier: a later render emits raw caller markup or the race detector flags the global flag. Cleanup: stop workers and remove probes. This is a closure check."
+    },
+    {
+      "id": "c3-6",
+      "parent_id": "c2-1",
+      "text": "Hypothesis: the single-write deletion remains the best repair despite the layout regression, and the layout failure is an acceptable compatibility break. Prerequisites: the existing layout tests can be updated. Bounded test: keep the deletion, update layout expectations to escaped child HTML, and run the suite plus a caller-markup layout probe. Expected: suite green and caller data escaped. Falsifier: any consumer relying on literal layout HTML breaks, which would show the repair changes documented layout semantics. Cleanup: restore original layout tests. This incumbent tests whether the observed regression is a test artifact or a real contract break."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "c3-1",
+      "eligible": true,
+      "score": 0.75,
+      "rationale": "Selected. It is the smallest change that addresses the observed double escape, marks only engine-generated HTML, and leaves caller bindings and escape hatches untouched."
+    },
+    {
+      "id": "c3-2",
+      "eligible": true,
+      "score": 0.59,
+      "rationale": "Deferred. Structural composition is architecturally cleaner but requires arbitrary caller layouts to become block-based, a much larger compatibility change than the observed defect requires."
+    },
+    {
+      "id": "c3-3",
+      "eligible": true,
+      "score": 0.69,
+      "rationale": "Deferred narrowly. It is nearly the same insertion-site repair as c3-1 with a broader include/nested check; c3-1 states the minimal change and falsifier more crisply."
+    },
+    {
+      "id": "c3-4",
+      "eligible": true,
+      "score": 0.6,
+      "rationale": "Deferred. The library has no per-set autoescape option, so an adapter-level option would require custom escaping and is larger than necessary."
+    },
+    {
+      "id": "c3-5",
+      "eligible": true,
+      "score": 0.7,
+      "rationale": "Deferred. Closure and concurrency checking is valuable after the repair but does not choose the repair and depends on race-detector availability."
+    },
+    {
+      "id": "c3-6",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Not selected. Keeping the deletion and updating layout tests would change documented layout behavior; the existing tests expect literal composed HTML, so the regression is a real contract break, not a test artifact."
+    },
+    {
+      "id": "c2-1",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Incumbent from the previous step. Deletion was experimentally contradicted by the layout double-escape, so it does not advance unchanged."
+    }
+  ],
+  "selected_id": "c3-1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Applied the targeted layout repair on top of the global-write removal: the child-render string is wrapped as a trusted safe value only when inserted into the layout placeholder. The disposable matrix then showed caller markup escaped in plain templates, includes, layout bodies, an independent library set created after load, and a second adapter; the safe filter and explicit autoescape-off block stayed literal. The complete module test suite passed, including the previously failing layout and filesystem tests. The local source change is two edits: remove the global autoescape write and mark the engine-generated layout fragment safe. Local result only; no official harness ran.",
+    "next_hint": "The two-edit repair passed the working tree. The next question is whether the exact exported diff applies to a pristine copy, reproduces the escaping matrix there, and remains correct across all loader constructors."
+  },
+  "lineage": {
+    "case_id": "case-352c68ac2de543b09a2ff81f8c6e1b97",
+    "iteration_id": "step-3",
+    "previous_iteration_id": "step-2",
+    "step_id": "step-3",
+    "parent_step_id": "step-2",
+    "branch_id": "main"
+  }
+}

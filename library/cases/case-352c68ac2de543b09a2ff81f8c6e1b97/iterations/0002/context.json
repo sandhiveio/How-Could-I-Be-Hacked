@@ -1,0 +1,10 @@
+{
+  "case_id": "case-352c68ac2de543b09a2ff81f8c6e1b97",
+  "iteration_id": "step-2",
+  "previous_iteration_id": "step-1",
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Trace the load path to the process-wide autoescape write, reproduce raw caller markup through the adapter and an independent library set, remove the write, and verify escaping plus preserved layout and escape-hatch behavior."
+  },
+  "hint": "A baseline probe established that the adapter's load path disables the library's process-wide autoescape flag, so caller markup renders literally and even independently created library sets inherit the disabled state. The adapter also supports layouts by executing the child template into a string and injecting that string into the layout. An audit is expected to find a single global write. Apply the minimal removal of that write, then run a matrix covering a plain variable, an included variable, a layout, an independent set and the explicit safe filter; finish with the module's full test suite. Record any collateral breakage rather than assuming the one-line change is sufficient."
+}

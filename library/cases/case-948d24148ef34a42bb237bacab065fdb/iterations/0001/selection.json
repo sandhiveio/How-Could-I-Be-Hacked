@@ -1,0 +1,4 @@
+{
+  "selected_id": "plan-1",
+  "selected_text": "Normalization-mismatch plan: inspect the clone entry point and the option-safety helper, then test whether a leading-space unsafe option is invisible to the raw-string check but becomes a normal option after shlex splitting. Use a disposable local origin and a harmless upload-pack wrapper that writes a marker. Repair by validating the exact token list passed to git, and rerun the reproducer plus ordinary clone controls before exporting a minimal patch."
+}

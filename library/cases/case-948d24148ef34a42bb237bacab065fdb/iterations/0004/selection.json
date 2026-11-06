@@ -1,0 +1,4 @@
+{
+  "selected_id": "r4-v5",
+  "selected_text": "Hypothesis: the combined two-file diff is the minimal closure artifact and will apply cleanly to a fresh pristine copy while passing one differential attack-and-benign matrix. Prerequisites: the combined patch, a pristine source copy, disposable local origins, a marker wrapper, and a hook directory. Bounded test: export the unified diff, run a dry-run apply and then apply it, run the same matrix against patched and pristine copies, and emit a patch-evaluation JSON record. Supporting result is a clean apply, three or more executed markers on the pristine copy, zero markers on the patched copy, and all benign rows successful on both. Falsifier: the patch fails to apply, a marker survives on the patched copy, or a benign row regresses. Cleanup: delete fixture copies and repositories; limitation: the host-side official evaluator is still required for a benchmark verdict."
+}

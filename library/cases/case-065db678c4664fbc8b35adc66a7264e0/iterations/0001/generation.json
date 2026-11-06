@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the unary authentication interceptor is the only installed boundary, and the streaming handler's fresh background context is the sole streaming defect; only context replacement needs repair. Prerequisites: local service with a reusable preshared credential, one seeded object tuple, and a server stream whose context carries a cancellable value. Bounded test: call the streaming listing RPC with no credential and a context value, and record whether the handler observes the value and returns the object. Expected supporting result: the handler sees the injected value and the streaming path can be fixed by context adoption alone. Falsifier: the streaming call still succeeds without a credential after only the context change. Cleanup: stop the service and delete the seeded store."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: server startup registers only a unary interceptor chain, so per-stream interceptors are absent and the streaming listing RPC bypasses the authenticator. Prerequisites: preshared-credential service, one seeded tuple, and the ability to call both RPCs without metadata. Bounded test: compare a missing-credential unary listing call with a missing-credential streaming call, recording status and returned identifiers. Expected supporting result: unary is rejected while streaming returns the seeded identifier. Falsifier: both calls are rejected or both are accepted. Cleanup: stop the service and delete the seeded store."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: revocation semantics differ because a stream opened with a valid credential keeps its authorization decision for the stream lifetime, while unary calls re-authenticate per request. Prerequisites: a mutable authenticator that can rotate accepted credentials without restart, a seeded tuple, and a long-lived stream. Bounded test: open a credentialed stream, rotate the credential to reject it, then continue reading objects on the same stream and issue a fresh unary call. Expected supporting result: the old stream keeps disclosing after rotation while a fresh call fails. Falsifier: the old stream fails immediately after rotation. Cleanup: restore the accepted credentials and delete the store."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: authorization denial leaks object existence because unary and streaming errors differ for existing versus missing objects. Prerequisites: two seeded stores, one with a known tuple and one empty, plus missing credentials. Bounded test: compare status and message shapes for existing and missing object combinations on both RPCs. Expected supporting result: the streaming denial exposes an existence-dependent message. Falsifier: all unauthenticated responses are indistinguishable. Cleanup: delete both stores."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a complete repair requires both a streaming interceptor and adoption of the server stream context; either change alone leaves a separately observable defect. Prerequisites: local service harness, a fake server stream carrying a context value, and a datastore stub that records the context. Bounded test: apply only interception, then only context adoption, then both, and check authorization plus context-value propagation. Expected supporting result: both changes are needed for the full matrix. Falsifier: one change passes every check. Cleanup: restore the disposable copy."
+    }
+  ]
+}

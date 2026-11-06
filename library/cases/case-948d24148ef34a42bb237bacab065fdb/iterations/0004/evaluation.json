@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.775,
+      "rationale": "Deferred as a separate step. Round 3 already tested a separate short config flag and it was blocked; the case remains useful as a regression row inside the closure matrix."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.827,
+      "rationale": "Selected. It combines the fresh-copy apply check, the established differential attack-and-benign matrix, and the host-side benchmark-compatible patch artifact, which is the remaining closure gap."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.741,
+      "rationale": "Incumbent is supported by the prior matrix but selecting it again would add no new information and would not test fresh application or produce the patch artifact."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.793,
+      "rationale": "Deferred. API-level parity is valuable and was partly covered by the benign matrix; a broader sweep can be folded into the selected closure run."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.789,
+      "rationale": "Deferred as a separate step. The repaired code checks the post-split token list, so split forms should reject; the exact case belongs in the final regression matrix."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.776,
+      "rationale": "Deferred. The local option set is small enough to sample in the closure matrix, and parsing all git help output is larger than needed."
+    }
+  ]
+}

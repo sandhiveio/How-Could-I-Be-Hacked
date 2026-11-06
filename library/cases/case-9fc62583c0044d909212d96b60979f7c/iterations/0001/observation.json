@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "A counting delegate returned an allowed:false response with a cycle marker. Two identical cache-resolver calls produced two identical responses but only one delegate invocation, proving that the cycle-marked answer was inserted and replayed. The acyclic control in the same probe was not yet run; the result establishes the insertion behavior, not an end-to-end authorization change.",
+  "next_hint": "Construct an end-to-end cyclic fixture where a cycle-marked subanswer is cached during one traversal and the same tuple is later queried as a root, then compare a cache-enabled server with a cache-disabled server."
+}

@@ -1,0 +1,8 @@
+{
+  "plans": [
+    "Normalization-mismatch plan: inspect the clone entry point and the option-safety helper, then test whether a leading-space unsafe option is invisible to the raw-string check but becomes a normal option after shlex splitting. Use a disposable local origin and a harmless upload-pack wrapper that writes a marker. Repair by validating the exact token list passed to git, and rerun the reproducer plus ordinary clone controls before exporting a minimal patch.",
+    "Long-option-abbreviation plan: determine whether the local git accepts unambiguous prefixes such as an abbreviated upload-pack or config option, while the safety helper compares only full unsafe spellings. Test each abbreviation through the public clone API against a disposable local origin and marker wrapper. Repair by rejecting unsafe long-option prefixes or by using a strict safe-option allowlist, then verify benign options still clone.",
+    "Parser-roundtrip plan: treat the join-then-shlex-split transformation as the suspect and probe whether quoting, multiple list entries, or option/value separation produce an executed token different from the checked text. Record both validator input and the resulting git argv in local fixtures. Repair by parsing once and validating the final argv, then add the discovered combination to a regression matrix."
+  ],
+  "selected_id": "plan-1"
+}

@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.72,
+      "rationale": "Incumbent repair has direct before/after evidence; remaining question is coverage breadth."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.73,
+      "rationale": "Selected: best available completeness challenge through the shared resolver's listing path, with a clear parity falsifier. The exclusion-specific subcase remained unexecuted."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.68,
+      "rationale": "Strong regression check and executed as supporting evidence; not a new mechanism."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.63,
+      "rationale": "Deferred: the proposed same-key setup is questionable because contextual tuples are key material."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.57,
+      "rationale": "Deferred: race detector unavailable because the container has no C compiler; an environment blocker, not a refutation."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.51,
+      "rationale": "Deferred: performance tradeoff is secondary to correctness and no benchmark harness was prepared."
+    }
+  ]
+}

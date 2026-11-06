@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r3-v1",
+      "text": "Challenge repair completeness with an object-listing query and an exclusion-style cyclic filter. Prerequisites: a cyclic candidate graph and a listing request. Bounded test: warm the cache through the cyclic path, then compare cache-enabled and cache-disabled listing results; add an exclusion relation if the model supports it. Expected result: identical lists after repair; falsifier: cache-only false positive or omission. Cleanup: remove the listing fixture."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r3-v1",
+      "text": "Run the repository's existing cache-enabled functional tests without changing their assertions. Prerequisites: a working local functional harness and cache-enabled server. Bounded test: execute the cache-enabled check test and inspect every subtest. Expected result: all pass; falsifier: a logic-related failure or timeout. Cleanup: none beyond server shutdown."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r3-v1",
+      "text": "Seed a cache entry through an acyclic path, then force a cycle on the same key via contextual tuples and observe whether the stale entry is served. Prerequisites: the contextual-tuple change does not alter the cache key; if it does, the setup cannot test the same key. Expected result: stale allowed value served; falsifier: the key changes and a fresh resolution occurs. Cleanup: remove the seed helper."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r3-v1",
+      "text": "Run five concurrent identical cyclic checks under the Go race detector to validate concurrency safety of the guard. Prerequisites: a race-detector-capable toolchain. Bounded test: concurrent checks followed by mixed-result inspection. Expected result: no data race and consistent results; falsifier: race report or mixed decisions. Cleanup: none."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "r3-v1",
+      "text": "Benchmark skip-insert against always-invalidate-on-cycle under acyclic and cyclic load. Prerequisites: a local benchmark harness and stable timing. Bounded test: compare CPU and hit counts for both repairs. Expected result: skip-insert has lower overhead; falsifier: similar cost or worse memory behavior. Cleanup: revert instrumentation."
+    }
+  ]
+}

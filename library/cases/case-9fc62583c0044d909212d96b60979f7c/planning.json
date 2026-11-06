@@ -1,0 +1,9 @@
+{
+  "plans": [
+    "Skip cache insertion when the resolved subproblem response carries a cycle marker, then compare cache-enabled and cache-disabled results on a cyclic traversal and verify that ordinary acyclic subproblems still hit.",
+    "Check the visited-path set before cache lookup, returning a cycle denial before any cached entry can be replayed, and verify the acyclic hit rate is unchanged.",
+    "Make the cache key depend on the canonical visited-path set or a cycle-context fingerprint, accepting higher key cardinality to eliminate all path-dependent reuse.",
+    "Bypass both lookup and insertion for any request with non-empty visited state, a conservative correctness-first repair that reduces subproblem cache coverage."
+  ],
+  "selected_id": "plan-1"
+}

@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.68,
+      "rationale": "Incumbent control fixture; selecting it again would repeat the prior step rather than apply the repair."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.73,
+      "rationale": "Selected: minimal repair, direct before/after fixture, cycle-versus-acyclic delegate controls, and explicit package regression."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.73,
+      "rationale": "Deferred by a narrow margin: stronger lookup guarantee but broader behavioral risk; retained for the final completeness check."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.64,
+      "rationale": "Deferred: sound but invasive key change; cardinality cost not yet measured."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Deferred: necessary verification extension of the same repair, not a different mechanism."
+    }
+  ]
+}

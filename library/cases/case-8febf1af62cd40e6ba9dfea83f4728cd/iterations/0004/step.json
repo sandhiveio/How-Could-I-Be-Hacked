@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A Python connector's central formatter now has a generalized private-key span plus key-name authentication-code, authorization-scheme, and double-quoted cloud-key maskers. A 23-carrier pristine/patched matrix passed with benign controls, but the change has not been exported as a standalone diff, applied to a fresh copy, or checked against the repository's existing secret-detector test functions. Question: does the patch replay cleanly and preserve existing behavior and benign PEM-adjacent text?",
+    "surface": "Python connector package with a central logging.Formatter applied to application and SDK handlers; disposable local logging fixtures; no live database or network required.",
+    "assumptions": [
+      "The analyst can read the connector source and run a disposable local Python fixture with a writable temporary log.",
+      "The attacker controls credential strings and field values that reach debug logs, but not the formatter code or its composition order.",
+      "The formatter is attached to file or stream handlers in the real product; direct formatter invocation is an acceptable bounded proxy for a first probe.",
+      "No official host-side benchmark evaluator is available inside the local container."
+    ]
+  },
+  "incumbent": {
+    "id": "r1-v1",
+    "text": "Hypothesis: a real multiline private-key block survives because the PEM regex expects literal backslash-n separators and only a generic header. Applicability: the central formatter is attached to file logging, and the analyst may call it directly on a disposable string. Bounded test: emit generic, RSA, and ENCRYPTED blocks with real newlines and a base64 marker, plus a literal-backslash-n control. Expected result: base64 markers disappear and END headers remain; falsifier: any marker survives. Cleanup: delete the temporary log and fixture key material."
+  },
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: the working-tree diff applies cleanly to a fresh pristine copy and reproduces every carrier outcome. Applicability: a disposable copy and a saved unified diff are available. Bounded test: run apply-check, apply the patch, compare the modified file with the working copy, and rerun the carrier matrix. Expected result: apply succeeds, files are byte-identical, and every masked/benign check matches; falsifier: a hunk rejects or any check flips. Cleanup: remove the replay copy and temporary logs."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: the patch does not regress existing secret-detector test functions. Applicability: the test modules can be loaded through a minimal package shim when optional connector dependencies are absent. Bounded test: execute every test function in the two secret-detector test files against pristine and patched copies. Expected result: all previously passing functions still pass; falsifier: any function fails after the patch or collection differs. Cleanup: delete both test work directories."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a broad private-key span over-masks PEM-adjacent benign text such as public keys, SSH-known-host base64 lines, or prose mentioning an authentication-code field. Applicability: the formatter is run on disposable mixed-content logs. Bounded test: emit public-certificate and public-key blocks, a known-host base64 line, and prose containing passcode/otp words next to real code-key carriers. Expected result: only real secret carriers change; falsifier: a public block or benign base64 line is altered. Cleanup: delete the fixture log."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: formatter behavior differs when attached through the product's file-logging configuration rather than called directly. Applicability: an isolated process can configure a temporary file handler without opening a live connection. Bounded test: emit a private-key block and an authentication-code line through the connector logger namespace, then compare the file bytes with direct formatter output. Expected result: both paths mask identically; falsifier: the attached-handler output leaks a marker. Cleanup: remove handler files and reset logger state."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: serializer differences produce escaped-newline private-key carriers that a real-newline-only span misses. Applicability: the formatter receives JSON-serialized request data. Bounded test: emit the same private-key body through two serializers with different newline escaping and two randomized marker lengths. Expected result: both serialized forms lose the marker; falsifier: one serializer's body survives. Cleanup: delete serialized fixtures and logs."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.8505,
+      "rationale": "Selected: the strongest evidence base and the repair already exist; this round uses the incumbent to drive replay and regression rather than opening a new mechanism."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.6645,
+      "rationale": "Highest-value closure check; deferred only because it is a verification action for the incumbent rather than a separate hypothesis."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.468,
+      "rationale": "Important compatibility signal, but lower feasibility because the local package import chain lacks optional dependencies."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.631,
+      "rationale": "Strong over-masking discriminator and easy to run alongside replay."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.531,
+      "rationale": "Useful wiring-level check, but heavier than the direct-formatter path used by the bounded probe."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.34,
+      "rationale": "Mechanism already covered by the escaped-newline carrier in the third iteration; retained as a lower-value randomized alternative."
+    }
+  ],
+  "selected_id": "r1-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "The working-tree change was exported as a standalone unified diff. A fresh disposable copy passed apply-check and apply; the applied formatter file was byte-identical to the working copy. A replay probe produced identical output on both trees and passed 27/27 checks: all private-key shapes after replay, six authentication-code carriers, an authorization-scheme JWT, a double-quoted cloud-key secret, benign six-digit/zip text, public-certificate text, public-key text, and a known-host base64 line, plus every test function in the two repository secret-detector test files (ten log tests and four out-of-band tests). Evidence strength: patch replay plus repository-test replay with benign controls. Limits: tests ran through a minimal package shim because optional connector dependencies are absent; handler wiring was not separately exercised; the official host-side evaluator was not run, so the benchmark verdict remains unverified.",
+    "next_hint": "Run the official host-side evaluator on the exported patch JSONL. If it is unavailable, retain the local replay and regression evidence as unverified and report the environment blocker separately."
+  },
+  "lineage": {
+    "case_id": "case-8febf1af62cd40e6ba9dfea83f4728cd",
+    "iteration_id": "iteration-0004",
+    "previous_iteration_id": "iteration-0003",
+    "step_id": "iteration-0004",
+    "parent_step_id": "iteration-0003",
+    "branch_id": "main"
+  }
+}

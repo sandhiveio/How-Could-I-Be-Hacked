@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "A direct formatter probe over 16 carriers showed real-newline generic, RSA, and ENCRYPTED private-key blocks passing through byte-for-byte, while the literal-backslash-n generic control was masked. The same run found six-digit passcode/PASSCODE/auth_code/mfa_code values, a short signed-URL signature, and an authorization-scheme header surviving; long signatures and token/password controls were masked, and benign text was unchanged. Evidence strength: direct local causal result with controls. Limits: formatter-level only; no live connector session and no official benchmark verdict.",
+  "next_hint": "The multiline private-key gap is real. Determine whether a header-to-footer span can cover real and escaped newline styles while preserving public-certificate and benign text, and separately decide whether short authentication codes need key-name anchoring."
+}

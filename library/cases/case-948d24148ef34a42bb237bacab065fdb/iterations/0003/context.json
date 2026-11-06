@@ -1,0 +1,10 @@
+{
+  "case_id": "case-948d24148ef34a42bb237bacab065fdb",
+  "iteration_id": "step-3",
+  "previous_iteration_id": "step-2",
+  "incumbent": {
+    "id": "r2-v1",
+    "text": "Hypothesis: passing the already shlex-split token list to the safety helper closes the leading-space bypass because validation and execution then share the same tokens. Prerequisites: a fresh source copy, disposable local origin, marker wrapper, and a benign depth option. Bounded test: patch the clone entry point to check the split list, then attempt exact and leading-space upload-pack plus an ordinary clone and a depth-limited clone; supporting result is rejection of both unsafe forms, marker absence, and success of both benign clones. Falsifier: either unsafe form executes a marker, or a benign clone fails. Cleanup: delete the fixture repositories and marker; limitation: it does not yet address abbreviated long options."
+  },
+  "hint": "A Python git wrapper now validates the shlex-split token list before cloning. That blocks exact and leading-space unsafe options, but a previous local matrix showed that an abbreviated upload-pack option still executes a marker wrapper and an abbreviated config option is accepted. The local git expands unambiguous long-option prefixes. Question: what minimal matcher treats an abbreviated unsafe long option as its full unsafe name while preserving benign options such as depth, single-branch, branch, and recurse-submodules?"
+}

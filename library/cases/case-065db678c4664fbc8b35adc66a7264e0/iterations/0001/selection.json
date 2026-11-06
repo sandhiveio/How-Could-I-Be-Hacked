@@ -1,0 +1,4 @@
+{
+  "selected_id": "r1-v2",
+  "selected_text": "Hypothesis: server startup registers only a unary interceptor chain, so per-stream interceptors are absent and the streaming listing RPC bypasses the authenticator. Prerequisites: preshared-credential service, one seeded tuple, and the ability to call both RPCs without metadata. Bounded test: compare a missing-credential unary listing call with a missing-credential streaming call, recording status and returned identifiers. Expected supporting result: unary is rejected while streaming returns the seeded identifier. Falsifier: both calls are rejected or both are accepted. Cleanup: stop the service and delete the seeded store."
+}

@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.72,
+      "rationale": "Initial overall plan retained as the incumbent; it proposes the direct insertion guard that the trajectory later tests."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.71,
+      "rationale": "Selected: smallest testable repair tied directly to the suspected cache insertion behavior, with a counting-delegate falsifier."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.64,
+      "rationale": "Deferred: plausible and compatible with the incumbent, but the observed uncertainty is insertion, so lookup gating is tested later."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.63,
+      "rationale": "Deferred: sound but more invasive; key cardinality and canonicalization need measurement first."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.47,
+      "rationale": "Deferred: short TTL only narrows the stale window and introduces timing flakiness."
+    }
+  ]
+}

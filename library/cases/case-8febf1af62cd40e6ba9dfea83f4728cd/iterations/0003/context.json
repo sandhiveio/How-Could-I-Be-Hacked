@@ -1,0 +1,10 @@
+{
+  "case_id": "case-8febf1af62cd40e6ba9dfea83f4728cd",
+  "iteration_id": "iteration-0003",
+  "previous_iteration_id": "iteration-0002",
+  "incumbent": {
+    "id": "r1-v1",
+    "text": "Hypothesis: a real multiline private-key block survives because the PEM regex expects literal backslash-n separators and only a generic header. Applicability: the central formatter is attached to file logging, and the analyst may call it directly on a disposable string. Bounded test: emit generic, RSA, and ENCRYPTED blocks with real newlines and a base64 marker, plus a literal-backslash-n control. Expected result: base64 markers disappear and END headers remain; falsifier: any marker survives. Cleanup: delete the temporary log and fixture key material."
+  },
+  "hint": "A Python connector's central formatter had a narrow private-key regex. A first repair spanning real newlines closed generic, RSA, ENCRYPTED, and CRLF blocks and preserved public-certificate and benign text, but a JSON carrier with literal-backslash-n RSA text and six authentication-code carriers still leaked. The working copy is disposable and can be patched freely. Question: which generalized private-key matcher plus which key-name code pattern closes both residual families without masking public certificates, benign six-digit numbers, or already-masked token/password values?"
+}

@@ -1,0 +1,10 @@
+{
+  "case_id": "case-352c68ac2de543b09a2ff81f8c6e1b97",
+  "iteration_id": "step-4",
+  "previous_iteration_id": "step-3",
+  "incumbent": {
+    "id": "c3-1",
+    "text": "Hypothesis: wrapping only the child-render string in the library's safe-value wrapper before inserting it into the layout placeholder restores raw layout structure while caller bindings stay escaped. Prerequisites: the library exports a safe-value type or wrapper, and the layout path has a single insertion point. Bounded test: keep the global write removed, wrap the child string at that insertion, then render caller markup through a plain template, an include, a layout and an independent set; check safe filter, autoescape-off block and a second adapter. Expected: caller occurrences escaped, layout tags literal, escape hatches literal, full module suite green. Falsifier: any double-escaped layout entity, raw caller variable, or failing existing test. Cleanup: remove probe templates and retain the two-edit diff."
+  },
+  "hint": "A two-edit repair passed the working-tree regression matrix: remove the process-wide autoescape-disabling write and wrap only the child-render string as a trusted safe value at the layout insertion. The remaining risk is artifact fidelity rather than mechanism. Export the change as a unified diff, apply it to a pristine copy of the staged source with a check-then-apply sequence, and rerun the escaping matrix there. Also exercise every loader constructor (local directory, virtual filesystem and path-forwarding filesystem) and record whether a race-detector run is available in the local toolchain."
+}

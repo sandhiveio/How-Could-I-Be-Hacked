@@ -1,0 +1,24 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Skip cache insertion when the delegate's response reports a detected cycle, leaving ordinary responses cacheable. Prerequisites: cycle state is exposed in response metadata and a missing entry is safe to recompute. Bounded test: call the cache resolver twice with one delegate that returns an allowed:false, cycle-marked response and count delegate invocations; then repeat with an allowed:true response. Expected result: the cycle response is not cached (two calls) while the acyclic response is cached (one call); falsifier: either case violates the expected count or changes the returned decision. Cleanup: remove the guard."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Gate cache lookup on visited-path membership so a tuple already on the current traversal path returns a cycle denial before any cached value is read. Prerequisites: the wrapper has the same tuple-key normalization as the inner guard. Bounded test: seed a cache entry through one path, then evaluate the same tuple while it is already visited and assert the delegate is not consulted. Expected result: no stale replay; falsifier: a legitimate non-cycle recursive request loses its hit or returns a different decision. Cleanup: remove the lookup gate."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Include a canonical digest of the visited-path set in the cache key so each traversal context gets a distinct entry. Prerequisites: deterministic tuple ordering and a bounded fingerprint. Bounded test: build two requests with identical tuple/store/model/context but different visited sets, compare keys, then repeat a cyclic workload and count distinct keys. Expected result: keys differ and the wrong-path hit disappears; falsifier: unbounded key growth or unchanged keys. Cleanup: revert the key construction."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Shorten the cache TTL so path-dependent entries expire before reuse. Prerequisites: a configurable clock or short interval and toleration of a stale window. Bounded test: populate a cycle-marked entry, advance time past the TTL, and re-evaluate the tuple. Expected result: the entry is gone; falsifier: a wrong decision is still served within the TTL. Limitation: probabilistic mitigation, not a correctness guard. Cleanup: restore the original TTL."
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A Python connector's central log formatter uses ordered regex maskers for token names, password/pwd, cloud key names, signed-URL sig/signature, JSON token values, private-key blocks, and a JSON private-key-data field. Authentication setup logs a request-data mapping with the password field removed. The staged tree also contains private-key fixtures with RSA and ENCRYPTED headers, but the existing tests do not cover a multiline PEM block or a short numeric authentication code. Question: which credential encodings survive the formatter?",
+    "surface": "Python connector package with a central logging.Formatter applied to application and SDK handlers; disposable local logging fixtures; no live database or network required.",
+    "assumptions": [
+      "The analyst can read the connector source and run a disposable local Python fixture with a writable temporary log.",
+      "The attacker controls credential strings and field values that reach debug logs, but not the formatter code or its composition order.",
+      "The formatter is attached to file or stream handlers in the real product; direct formatter invocation is an acceptable bounded proxy for a first probe.",
+      "No official host-side benchmark evaluator is available inside the local container."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Credential-format coverage matrix: enumerate structured ways secrets appear in connector logs (key=value, JSON, URL query, multiline PEM, numeric authentication code, authorization-scheme headers), run each through the central formatter, and repair only demonstrated gaps at the formatter boundary with benign parity checks."
+  },
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a real multiline private-key block survives because the PEM regex expects literal backslash-n separators and only a generic header. Applicability: the central formatter is attached to file logging, and the analyst may call it directly on a disposable string. Bounded test: emit generic, RSA, and ENCRYPTED blocks with real newlines and a base64 marker, plus a literal-backslash-n control. Expected result: base64 markers disappear and END headers remain; falsifier: any marker survives. Cleanup: delete the temporary log and fixture key material."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: short numeric authentication codes pass through because no masker targets passcode, auth_code, mfa_code, or otp keys, and the connection-token value floor is longer than six digits. Applicability: an authentication path logs a request-data mapping after omitting only a password field. Bounded test: emit passcode=482913 and quoted PASSCODE/auth_code/mfa_code variants alongside an unrelated six-digit latency value. Expected result: code values become masked and the latency value is unchanged; falsifier: a code survives or the unrelated number is altered. Cleanup: delete the temporary log."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a short signed-URL signature and an authorization-scheme credential survive because the signed-URL matcher requires a longer value and no matcher recognizes the authorization-scheme keyword. Applicability: third-party SDK loggers share the formatter and may print request headers or URLs. Bounded test: emit a short sig= value, a long sig= control, and an authorization header carrying a marker token. Expected result: short and long signatures and the header credential are masked; falsifier: any marker survives while its control is masked. Cleanup: delete fixture URLs and logs."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: mixed-case or nested JSON secret keys evade exact-name regexes. Applicability: structured dictionaries are logged as repr or JSON strings. Bounded test: emit private-key-data, auth-token, and cloud-key keys with mixed case and nesting. Expected result: all variants mask identically to lowercase baselines; falsifier: a mixed-case key leaks. Note: several existing patterns already compile case-insensitively, so the hypothesis may only hold for key names absent from the list. Cleanup: delete fixture dictionaries and logs."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a repair that closes format gaps can still over-mask benign fields or leave a gap partially visible. Applicability: a candidate patch is applied only to the disposable local copy. Bounded test: run existing unit-test vectors plus benign six-digit numbers, public-certificate text, and already-masked token/password values through pristine and patched formatters. Expected result: all demonstrated secrets mask and benign text stays byte-identical; falsifier: benign-only input changes beyond the intended secret fields or a demonstrated secret still leaks. Cleanup: remove both temporary trees."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Useful umbrella because a single matrix can classify every carrier family; less discriminating for the first action than the strongest specific hypothesis."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.6765,
+      "rationale": "Selected: direct causal match to the source regex and staged PEM headers, cheap to execute, and decisive with a literal-backslash-n control."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.659,
+      "rationale": "Deferred in favor of the PEM probe; the authentication path and six-digit floor make it a strong second target."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.535,
+      "rationale": "Plausible but partly pre-empted by existing signed-URL and token patterns; retained as a lower-priority carrier check."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.4625,
+      "rationale": "Weaker because several patterns are already case-insensitive; only absent key names can leak."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.5535,
+      "rationale": "Necessary closure check, but premature before any repair exists."
+    }
+  ],
+  "selected_id": "r1-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "A direct formatter probe over 16 carriers showed real-newline generic, RSA, and ENCRYPTED private-key blocks passing through byte-for-byte, while the literal-backslash-n generic control was masked. The same run found six-digit passcode/PASSCODE/auth_code/mfa_code values, a short signed-URL signature, and an authorization-scheme header surviving; long signatures and token/password controls were masked, and benign text was unchanged. Evidence strength: direct local causal result with controls. Limits: formatter-level only; no live connector session and no official benchmark verdict.",
+    "next_hint": "The multiline private-key gap is real. Determine whether a header-to-footer span can cover real and escaped newline styles while preserving public-certificate and benign text, and separately decide whether short authentication codes need key-name anchoring."
+  },
+  "lineage": {
+    "case_id": "case-8febf1af62cd40e6ba9dfea83f4728cd",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null,
+    "step_id": "iteration-0001",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}

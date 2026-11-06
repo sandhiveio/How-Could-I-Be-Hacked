@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Executed a disposable unit probe in the staged adapter module. An independent library set escaped a harmless markup marker before adapter load (output contained &lt;b ...&gt;). After the adapter loaded its templates, the same independent set and the adapter's own render both emitted the literal marker (<b ...>); the explicit safe filter also stayed literal. This isolates the load-time process-global autoescape mutation and confirms that ordinary caller bindings are raw. The probe passed its internal assertions; no source was changed. Local result only; no official harness ran.",
+  "next_hint": "The baseline shows that adapter load changes process-wide library state. The next question is whether deleting the single global autoescape write restores escaping for the adapter, includes and independent sets while preserving layout rendering and the existing module suite."
+}

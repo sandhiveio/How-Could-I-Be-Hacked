@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A Python git wrapper joins caller-controlled extra clone options, shlex-splits them for execution, and validates the original raw list. A previous local test showed that an exact unsafe upload-pack option is rejected, but the same option with a leading space executes a marker wrapper, while an ordinary clone does not. The next step is to repair the mismatch: validate the exact token list that git will receive, then rerun the attack form and benign controls. Question: does single-pass normalization close the bypass without breaking ordinary or common benign options?",
+    "surface": "Python library process invoking the local git CLI. The clone entry point accepts a text URL, a destination path, and an optional list of caller-controlled extra options. The safety helper receives option strings and rejects a small unsafe-option set including upload-pack and config forms. No network service is involved; the origin and destination are disposable local directories.",
+    "assumptions": [
+      "The attacker controls the extra clone-option list through application input, but not the Python process, the local git binary, or the destination root.",
+      "The local git executable is trusted and may accept abbreviated long options.",
+      "Tests may create disposable local repositories, wrapper scripts, hook directories, and marker files; no public targets or network clones are used.",
+      "The task is patch mode: a minimal source repair plus local regression evidence, with the official harness verdict supplied separately by the host.",
+      "The working copy is fresh from the staged source, and no reference patch is consulted."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Normalization-mismatch plan: inspect the clone entry point and the option-safety helper, then test whether a leading-space unsafe option is invisible to the raw-string check but becomes a normal option after shlex splitting. Use a disposable local origin and a harmless upload-pack wrapper that writes a marker. Repair by validating the exact token list passed to git, and rerun the reproducer plus ordinary clone controls before exporting a minimal patch."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: passing the already shlex-split token list to the safety helper closes the leading-space bypass because validation and execution then share the same tokens. Prerequisites: a fresh source copy, disposable local origin, marker wrapper, and a benign depth option. Bounded test: patch the clone entry point to check the split list, then attempt exact and leading-space upload-pack plus an ordinary clone and a depth-limited clone; supporting result is rejection of both unsafe forms, marker absence, and success of both benign clones. Falsifier: either unsafe form executes a marker, or a benign clone fails. Cleanup: delete the fixture repositories and marker; limitation: it does not yet address abbreviated long options."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: after validating split tokens, an abbreviated long option such as an upload-pack prefix still bypasses the full-name prefix check because git expands abbreviations. Prerequisites: the normalized-token patch is applied, local git supports abbreviation, and a marker wrapper exists. Bounded test: clone with an abbreviated upload-pack option and compare marker presence to an exact unsafe control; supporting result is a completed clone with a marker. Falsifier: the repaired helper rejects the abbreviation or git refuses it. Cleanup: delete repositories and marker; limitation: abbreviation support can differ by git version."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: replacing prefix matching with exact token equality for known unsafe options preserves benign prefixed flags while blocking the exploit. Prerequisites: split-token validation, a disposable origin, and both unsafe and benign option forms. Bounded test: change the helper to exact matching, then try an upload-pack assignment and a benign depth option; supporting result is unsafe rejection and benign success. Falsifier: the unsafe assignment is accepted because it is not exactly equal to the bare option name, or the benign option fails. Cleanup: delete fixture repositories; limitation: exact equality may miss assignment forms and therefore is not clearly safer."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: double normalization, splitting tokens and then re-joining them before execution, corrupts options containing quoted values or spaces. Prerequisites: split-token validation and a local branch or path containing a space. Bounded test: clone a fixture with such a branch using a re-joining patch; supporting result is a successful clone with the correct checked-out content. Falsifier: a valid quoted option fails while the same option works without re-joining. Cleanup: delete the fixture repositories; limitation: the smaller repair can pass the split list directly and avoid this failure mode entirely."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the repair must validate the final argument list passed to the subprocess, not an intermediate string, so no later transformation can diverge from what was checked. Prerequisites: instrumentation that records the clone subprocess arguments and the safety-helper input. Bounded test: log both lists for a clone with mixed benign and unsafe forms and compare them; supporting result is byte-identical validated and executed lists plus unsafe rejection. Falsifier: the logged lists differ, or an unsafe form reaches the subprocess after passing the check. Cleanup: remove logging fixtures; limitation: this is an invariant check and needs a concrete unsafe reproducer to exercise it."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.739,
+      "rationale": "Selected. It is the smallest causal repair for the directly observed mismatch and includes both an unsafe case and benign controls."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.683,
+      "rationale": "Superseded by r2-v1 for implementation. The incumbent's main discriminator is complete and keeping it adds no new executable step."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.502,
+      "rationale": "Deferred. Plain equality on a token containing an assignment would not equal the bare option name and could allow the unsafe form, so the proposal is less precise than normalized prefix checking."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.573,
+      "rationale": "Deferred to a later iteration because it depends on the repair existing first; it is the strongest residual-bypass hypothesis."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.438,
+      "rationale": "Deferred. The smaller repair can avoid re-joining entirely, so the double-normalization failure mode may not exist."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.702,
+      "rationale": "Deferred in favor of the smaller r2-v1 patch, which implements the same final-token invariant. The invariant should still appear in regression evidence."
+    }
+  ],
+  "selected_id": "r2-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Applied the selected local repair so the safety helper receives the same shlex-split token list that git will execute. Exact and leading-space unsafe upload-pack options were both rejected with no marker; ordinary clone and a benign depth-limited clone both completed. The same matrix also showed a residual bypass: an abbreviated upload-pack option still completed the clone and executed the marker, and an abbreviated config option was accepted through the public API. Test recipe: fresh local origin, marker wrapper, then one clone per option form with assertions on rejection, completion, and working-file presence. This is local evidence only; the official harness was not run.",
+    "next_hint": "Normalizing the executed tokens closed the whitespace form but exposed long-option abbreviation as a separate bypass. The next question is which minimal matcher blocks abbreviated unsafe options without rejecting benign long options such as depth, single-branch, or branch."
+  },
+  "lineage": {
+    "case_id": "case-948d24148ef34a42bb237bacab065fdb",
+    "iteration_id": "step-2",
+    "previous_iteration_id": "step-1",
+    "step_id": "step-2",
+    "parent_step_id": "step-1",
+    "branch_id": "main"
+  }
+}

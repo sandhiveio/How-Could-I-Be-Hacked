@@ -1,0 +1,49 @@
+{
+  "candidates": [
+    {
+      "id": "c1-1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the adapter load path calls the library's process-wide autoescape setter with false, so every later render in the process emits caller strings verbatim. Prerequisites: one test binary imports the adapter and library; the caller controls a string binding but not template source. Bounded test: render a harmless markup marker through an independent library set before adapter load, load the adapter, then render the same marker through a second independent set and through an adapter template containing only the marker variable. Expected supporting result: the pre-load set escapes the marker while the post-load set and adapter render emit raw markup. Falsifier: the independent set remains escaped after load, or the adapter emits escaped marker. Cleanup: delete the disposable probe template and test file; no source change yet."
+    },
+    {
+      "id": "c1-2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: escaping can be forced at template-parse time by wrapping each parsed template body in an explicit autoescape-on block, leaving the library's global default untouched. Prerequisites: the library supports an autoescape tag and the adapter controls the bytes passed to the parser. Bounded test: wrap one fixture template containing a caller variable, render the marker, and repeat with an included partial, an inherited block and a layout. Expected: all caller occurrences are escaped and the wrapper does not appear in output. Falsifier: any parse path loses the wrapper, a partial or layout still emits raw caller data, or wrapper syntax changes literal output. Cleanup: remove wrapped fixtures and restore original template bytes."
+    },
+    {
+      "id": "c1-3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the adapter can neutralize the defect by HTML-escaping string values in its binding map before rendering, regardless of the library's global autoescape state. Prerequisites: binding values are reachable in the adapter render path and safe-value semantics are known. Bounded test: pre-escape a marker binding, render it as a plain variable, through a built-in safe filter and inside an explicit autoescape-off block; compare with an integer and a nil binding. Expected: plain variable escaped exactly once; integer and nil unchanged; explicit safe and autoescape-off paths remain verbatim rather than double-escaped. Falsifier: double-escaped safe output, broken non-string rendering, or raw plain output. Cleanup: revert adapter binding changes and remove probe templates."
+    },
+    {
+      "id": "c1-4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the adapter can save the library's process-wide autoescape value before load or render and restore it afterward, preventing cross-consumer interference while keeping its own chosen behavior. Prerequisites: the flag is readable or its default known, and rendering is not concurrent in the test. Bounded test: set the library default to escaped, load the adapter, render caller markup, then create an independent set and render again; repeat with the initial default reversed. Expected: adapter output follows its intended policy and the independent set keeps the caller's prior policy. Falsifier: independent-set behavior changes after adapter load, or save/restore ordering yields inconsistent adapter output. Cleanup: restore the library default and remove probes; note that concurrent renders may race."
+    },
+    {
+      "id": "c1-5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a second library set created after adapter construction renders caller strings unescaped because the adapter's load mutated the package global. Prerequisites: the test can create an independent set and inspect its rendered string. Bounded test: create and render a marker through a set before load, discard it, load the adapter, create a fresh set, and render the same marker. Expected: pre-load output contains entities such as &lt; while the post-load output contains the literal tag. Falsifier: both outputs are escaped or both are raw for the same marker. Cleanup: remove the test set and template fixtures. This is a narrow cross-consumer check, not a repair."
+    },
+    {
+      "id": "c1-6",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: escaping depends on evaluation order because an autoescape-off block leaks beyond its template into sibling renders that share library state. Prerequisites: two templates rendered from one adapter instance, with the first toggling autoescape. Bounded test: render a template containing an explicit autoescape-off block, then render a second template containing only a caller variable; repeat in reverse order. Expected after any repair: each render's escaping is independent of the prior render, with only the explicit block raw. Falsifier: the second render's caller marker is raw or escaped depending on render order. Cleanup: remove the two disposable templates and the order probe."
+    },
+    {
+      "id": "c1-7",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a repair that escapes only top-level variable nodes leaves other interpolation sinks raw, such as filter arguments, included-variable slots and nested attribute contexts. Prerequisites: the library exposes filters, includes and dotted lookups. Bounded test: place the same harmless marker into a plain variable, a filter argument, an included template variable and a nested map lookup; render all four in one template and compare raw versus entity output. Expected: every sink escapes the marker after repair. Falsifier: any sink emits the literal tag while another escapes it. Cleanup: delete the matrix template and probe. This is a coverage check, not a repair choice."
+    },
+    {
+      "id": "c1-8",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: removing the global autoescape write will silently break intentional raw-output paths, especially the safe filter, explicit autoescape-off blocks and plain-text literals. Prerequisites: capture golden outputs before the repair. Bounded test: record outputs for a safe-filter marker, an autoescape-off block and a literal containing ampersands; apply the candidate repair and diff the outputs. Expected: only ordinary caller variables become escaped; safe and autoescape-off outputs remain byte-identical and literal text is not double-escaped. Falsifier: a raw-output hatch loses rawness, or literal text gains entities. Cleanup: discard golden snapshots and probe files after comparison."
+    },
+    {
+      "id": "c1-9",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: deleting the global write is insufficient if another initialization path or a concurrent adapter load re-disables autoescape later in process lifetime. Prerequisites: source can be searched for all writers and the toolchain supports a race detector, or sequential interleaving can approximate it. Bounded test: audit all writes to the flag, then create several adapters sequentially and concurrently, render caller markers after each load and check for any raw output. Expected: no remaining writer and stable escaped output. Falsifier: a second writer exists or an interleaving produces raw caller markup. Cleanup: remove concurrency probe and stop workers; if the race detector is unavailable, record that limitation rather than treating it as refutation."
+    }
+  ]
+}

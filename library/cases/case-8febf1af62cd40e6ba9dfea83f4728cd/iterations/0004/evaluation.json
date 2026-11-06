@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.8505,
+      "rationale": "Selected: the strongest evidence base and the repair already exist; this round uses the incumbent to drive replay and regression rather than opening a new mechanism."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.6645,
+      "rationale": "Highest-value closure check; deferred only because it is a verification action for the incumbent rather than a separate hypothesis."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.468,
+      "rationale": "Important compatibility signal, but lower feasibility because the local package import chain lacks optional dependencies."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.631,
+      "rationale": "Strong over-masking discriminator and easy to run alongside replay."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.531,
+      "rationale": "Useful wiring-level check, but heavier than the direct-formatter path used by the bounded probe."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.34,
+      "rationale": "Mechanism already covered by the escaped-newline carrier in the third iteration; retained as a lower-value randomized alternative."
+    }
+  ]
+}

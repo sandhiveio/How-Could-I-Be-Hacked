@@ -1,0 +1,4 @@
+{
+  "selected_id": "c2-1",
+  "selected_text": "Hypothesis: deleting the sole global autoescape-disabling write in the adapter load path restores escaping without collateral breakage. Prerequisites: source audit confirms no other writer; a disposable copy and local toolchain are available. Bounded test: remove the write, then render a caller marker through a plain template, an include, a template embedded in a layout and an independent library set; also render the marker through the safe filter. Expected: caller occurrences escaped, layout structure intact, safe filter literal, full module suite green. Falsifier: any residual raw caller output, double-escaped layout HTML, or failing existing test. Cleanup: remove probe templates and retain the source diff. This is the minimal repair candidate."
+}

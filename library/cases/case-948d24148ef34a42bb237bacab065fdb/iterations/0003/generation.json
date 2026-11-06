@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: expand each supplied long-option token to its unique full name using a precomputed option dictionary, then compare the expanded name with the unsafe set. Prerequisites: split-token validation, a local git build whose option set can be enumerated, and a disposable origin plus marker wrapper. Bounded test: apply the expansion patch, attempt an abbreviated upload-pack and a benign depth clone, and expect unsafe rejection with benign success. Falsifier: the abbreviation executes a marker, a benign option is rejected, or the dictionary cannot resolve the abbreviation. Cleanup: delete fixture repositories and any generated dictionary; limitation: maintaining a complete option dictionary is larger than the safety set needs."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: a git parse-options utility can canonicalize the extra tokens before validation so only full option names reach the safety helper. Prerequisites: split-token validation, a git subcommand that exposes canonical parsing, and a disposable origin plus marker wrapper. Bounded test: run an abbreviated upload-pack through the canonicalizer, inspect the tokens presented to validation, and clone a benign fixture; supporting result is a canonical unsafe name and successful benign clone. Falsifier: the utility is unavailable, leaves the abbreviation unchanged, or changes benign options. Cleanup: delete fixtures and wrapper; limitation: a separate parser process adds a new failure mode."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: replacing the unsafe-option blacklist with a complete allowlist of documented safe clone options prevents any abbreviated unsafe form from slipping through. Prerequisites: split-token validation, a static safe-option definition, and a disposable origin plus marker wrapper. Bounded test: apply the allowlist, attempt an abbreviated upload-pack and a documented benign option; supporting result is unsafe rejection and benign success. Falsifier: an unsafe abbreviation is accepted or a common benign option is rejected, causing a compatibility regression. Cleanup: delete fixtures; limitation: the allowlist must track every supported clone flag and argument shape."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: extract each executed token's option name before any equals sign and reject it when an unsafe long option starts with that name, which treats an unambiguous abbreviation as the full unsafe option. Prerequisites: split-token validation, local git abbreviation behavior, and a disposable origin plus marker wrapper. Bounded test: apply the matcher and run a matrix containing abbreviated upload-pack, abbreviated config, exact unsafe options, ordinary clone, and benign depth, single-branch, branch, and recurse-submodules. Supporting result is rejection of every unsafe form with no marker and completion of every benign clone. Falsifier: any abbreviated unsafe form executes a marker or any benign option is rejected. Cleanup: delete fixtures; limitation: the matcher intentionally blocks any long option name that is a prefix of an unsafe name, so a future benign option with such a prefix would need review."
+    },
+    {
+      "id": "r3-v5",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: strict regular-expression allowlisting for every documented clone parameter eliminates arbitrary option entry points, including abbreviated unsafe forms. Prerequisites: split-token validation, a regex definition per supported option, and disposable local repositories. Bounded test: apply the regex gate, then try a standard benign clone and a crafted abbreviated unsafe option; supporting result is benign acceptance and unsafe rejection. Falsifier: a regex is too permissive and the unsafe form executes, or too strict and a standard option fails. Cleanup: delete fixtures; limitation: regexes are brittle for compound arguments and require broad compatibility testing."
+    }
+  ]
+}

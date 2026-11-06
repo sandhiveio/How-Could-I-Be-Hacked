@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Applied the selected local repair so the safety helper receives the same shlex-split token list that git will execute. Exact and leading-space unsafe upload-pack options were both rejected with no marker; ordinary clone and a benign depth-limited clone both completed. The same matrix also showed a residual bypass: an abbreviated upload-pack option still completed the clone and executed the marker, and an abbreviated config option was accepted through the public API. Test recipe: fresh local origin, marker wrapper, then one clone per option form with assertions on rejection, completion, and working-file presence. This is local evidence only; the official harness was not run.",
+  "next_hint": "Normalizing the executed tokens closed the whitespace form but exposed long-option abbreviation as a separate bypass. The next question is which minimal matcher blocks abbreviated unsafe options without rejecting benign long options such as depth, single-branch, or branch."
+}

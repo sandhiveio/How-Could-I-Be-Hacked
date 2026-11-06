@@ -1,0 +1,10 @@
+{
+  "case_id": "case-352c68ac2de543b09a2ff81f8c6e1b97",
+  "iteration_id": "step-1",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Trace the load path to the process-wide autoescape write, reproduce raw caller markup through the adapter and an independent library set, remove the write, and verify escaping plus preserved layout and escape-hatch behavior."
+  },
+  "hint": "A server-side template adapter uses a third-party engine whose autoescape control is a package-level flag. The adapter has a load path and a render path; caller data arrives as map bindings. The existing test suite uses only plain-text values. Before changing source, establish whether loading the adapter mutates process-wide library state and whether ordinary caller markup is emitted verbatim. Use one test process that imports both the adapter and the library, render a harmless marker through an independent library set before adapter load, then load the adapter and render the same marker through a fresh independent set and through an adapter template. Compare escaped versus raw output and record which path changes."
+}

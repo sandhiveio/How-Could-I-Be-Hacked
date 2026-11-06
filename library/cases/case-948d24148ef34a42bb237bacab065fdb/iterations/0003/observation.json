@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Implemented the selected option-name matcher: each executed token is reduced to the text before the first equals sign, and an unsafe long option is rejected when its own full name starts with that token name. The local matrix then rejected exact upload-pack, leading-space upload-pack, abbreviated upload-pack prefixes, exact config, abbreviated config, and separate short config options, with no marker. Ordinary clone and benign depth, single-branch, branch, and recurse-submodules clones all completed with the expected working file. Test recipe: one local origin, one marker wrapper, one clone per option form, and assertions on rejection, completion, and marker presence. This is local evidence only; the official harness was not run.",
+  "next_hint": "Both the normalization and abbreviation forms are blocked in the fixture matrix. The remaining work is a fresh-copy apply check, a differential unpatched-versus-patched regression, and a minimal patch artifact for the host-side official evaluator."
+}

@@ -1,0 +1,5 @@
+{
+  "outcome": "inconclusive",
+  "summary": "A simplified cyclic admin/viewer fixture returned viewer objects [doc:2] from both cache-enabled and cache-disabled servers after the guard, with no listing divergence. The existing cache-enabled check test passed all four subtests. The exclusion-specific false-allow construction proposed by the selected candidate was not executed, so the listing parity supports but does not fully prove completeness for every exclusion/cycle combination.",
+  "next_hint": "If revisiting this case, build the exclusion-specific fixture: cache an ordinary denial through a non-cycle path, then make the same tuple an ancestor in a root exclusion query and compare cache-enabled versus cache-disabled decisions."
+}

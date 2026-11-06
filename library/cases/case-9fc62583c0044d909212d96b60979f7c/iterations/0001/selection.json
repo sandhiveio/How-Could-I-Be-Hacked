@@ -1,0 +1,4 @@
+{
+  "selected_id": "r1-v1",
+  "selected_text": "Skip cache insertion when the delegate's response reports a detected cycle, leaving ordinary responses cacheable. Prerequisites: cycle state is exposed in response metadata and a missing entry is safe to recompute. Bounded test: call the cache resolver twice with one delegate that returns an allowed:false, cycle-marked response and count delegate invocations; then repeat with an allowed:true response. Expected result: the cycle response is not cached (two calls) while the acyclic response is cached (one call); falsifier: either case violates the expected count or changes the returned decision. Cleanup: remove the guard."
+}

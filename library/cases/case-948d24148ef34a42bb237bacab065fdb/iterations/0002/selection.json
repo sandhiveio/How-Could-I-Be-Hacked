@@ -1,0 +1,4 @@
+{
+  "selected_id": "r2-v1",
+  "selected_text": "Hypothesis: passing the already shlex-split token list to the safety helper closes the leading-space bypass because validation and execution then share the same tokens. Prerequisites: a fresh source copy, disposable local origin, marker wrapper, and a benign depth option. Bounded test: patch the clone entry point to check the split list, then attempt exact and leading-space upload-pack plus an ordinary clone and a depth-limited clone; supporting result is rejection of both unsafe forms, marker absence, and success of both benign clones. Falsifier: either unsafe form executes a marker, or a benign clone fails. Cleanup: delete the fixture repositories and marker; limitation: it does not yet address abbreviated long options."
+}

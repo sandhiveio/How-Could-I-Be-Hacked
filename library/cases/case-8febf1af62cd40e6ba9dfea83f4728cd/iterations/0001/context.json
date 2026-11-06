@@ -1,0 +1,10 @@
+{
+  "case_id": "case-8febf1af62cd40e6ba9dfea83f4728cd",
+  "iteration_id": "iteration-0001",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Credential-format coverage matrix: enumerate structured ways secrets appear in connector logs (key=value, JSON, URL query, multiline PEM, numeric authentication code, authorization-scheme headers), run each through the central formatter, and repair only demonstrated gaps at the formatter boundary with benign parity checks."
+  },
+  "hint": "A Python connector's central log formatter uses ordered regex maskers for token names, password/pwd, cloud key names, signed-URL sig/signature, JSON token values, private-key blocks, and a JSON private-key-data field. Authentication setup logs a request-data mapping with the password field removed. The staged tree also contains private-key fixtures with RSA and ENCRYPTED headers, but the existing tests do not cover a multiline PEM block or a short numeric authentication code. Question: which credential encodings survive the formatter?"
+}

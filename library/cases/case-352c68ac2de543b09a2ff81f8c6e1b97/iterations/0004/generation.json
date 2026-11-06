@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "c4-1",
+      "parent_id": "c3-1",
+      "text": "Hypothesis: the exported two-edit diff applies cleanly to a pristine source copy and reproduces the repaired behavior there. Prerequisites: a unified diff generated from the worked copy and a fresh copy of the staged source. Bounded test: run a check-only apply, apply the diff, add the disposable escaping probe, and run the probe plus the full module suite. Expected: check and apply succeed; caller markup escaped in plain, include, layout and independent-set paths; safe and autoescape-off hatches literal; suite green. Falsifier: whitespace or context mismatch, double-escaped layout, raw caller data, or a failing module test. Cleanup: delete the replay copy after saving logs; keep the diff and evidence private."
+    },
+    {
+      "id": "c4-2",
+      "parent_id": "c3-1",
+      "text": "Hypothesis: the repair is independent of loader constructor, so the local-directory engine, virtual-filesystem engine and path-forwarding filesystem engine all escape caller data while preserving layout handling. Prerequisites: each constructor can load a small disposable template and layout. Bounded test: in one process, build all three engines, render the same caller marker and a layout through each, and compare escaped output. Expected: identical escaping and no double-escaped layout entities across constructors. Falsifier: any constructor emits literal caller markup or entity-escaped layout structure. Cleanup: remove constructor fixtures and probe files."
+    },
+    {
+      "id": "c4-3",
+      "parent_id": "c3-1",
+      "text": "Hypothesis: concurrent renders after repeated loads remain correct and race-free because the repair removes the load-time global write. Prerequisites: multiple adapters and independent sets can run in one process; a race detector or equivalent instrumentation is available. Bounded test: spawn several goroutines that load separate adapters and render caller markers and layouts while independent sets render the same marker; run under the race detector. Expected: no data race and every marker escaped. Falsifier: a race report on the autoescape state or raw caller markup from any interleaving. Cleanup: stop workers and remove probes; if the detector is unavailable, record the environment blocker."
+    },
+    {
+      "id": "c4-4",
+      "parent_id": "c3-1",
+      "text": "Hypothesis: applying the exported diff to pristine source preserves escape-hatch contracts exactly as observed in the worked tree. Prerequisites: golden outputs for safe-filter and autoescape-off markers captured before replay. Bounded test: on the replayed copy, render a plain caller marker, a safe-filter marker and an autoescape-off block in one template; compare the hatch outputs with the goldens. Expected: plain marker escaped, both hatches literal, goldens unchanged. Falsifier: a hatch loses rawness, gains entities, or plain marker stays raw. Cleanup: discard replay copy and preserve golden comparison log."
+    },
+    {
+      "id": "c4-5",
+      "parent_id": "c3-1",
+      "text": "Hypothesis: no residual path, such as nested layouts or repeated loads, can re-enable trust leakage after the safe-value repair. Prerequisites: nested composition can be built from disposable templates. Bounded test: compose two layout levels, place caller markup in the innermost child, render through both levels, then load a second adapter and repeat. Expected: innermost caller marker escaped once, both layout structures literal, second adapter identical. Falsifier: caller markup becomes literal at either level or layout structure is entity-escaped. Cleanup: remove nested fixtures and probe."
+    }
+  ]
+}

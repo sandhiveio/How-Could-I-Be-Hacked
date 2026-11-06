@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Executed a local differential probe with a disposable origin and a wrapper that writes a marker. The exact upload-pack option was rejected by the safety helper. The same option with one leading space completed the clone and created the marker. An ordinary clone completed and created no marker. The result supports the raw-versus-normalized validation mismatch and shows reachability through the public clone API. Test recipe: initialize a local origin, commit one file, create an executable wrapper that writes a marker and then executes the real upload-pack helper, call the clone API with the three option forms, and compare rejection, completion, and marker presence. This is local evidence only; the official harness was not run.",
+  "next_hint": "The whitespace bypass is confirmed. The next question is whether validating the already-split token list blocks it while preserving ordinary clone options, and whether abbreviated long options remain a separate bypass."
+}

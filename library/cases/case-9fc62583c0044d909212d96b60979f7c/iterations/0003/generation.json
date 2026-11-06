@@ -1,0 +1,24 @@
+{
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "r2-v1",
+      "text": "Skip cache insertion when the resolved response carries a cycle marker, leaving ordinary responses cacheable. Prerequisites: cycle state is available on the response and recomputation is acceptable for cycle cases. Bounded test: apply the guard to the working copy, rerun the two-server fixture, rerun the counting-delegate probe for cycle and acyclic responses, and run the resolver and storage package suites. Expected result: fixture parity, two delegate calls for the cycle case, one for the acyclic case, and passing suites after the single expectation update; falsifier: parity fails or an acyclic hit is lost. Cleanup: revert the guard and the test expectation."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "r2-v1",
+      "text": "Gate cache lookup on visited-path membership in addition to insertion, returning a cycle denial before reading the cache. Prerequisites: the wrapper can identify the same tuple key as the inner guard. Bounded test: the same two-server fixture plus a seeded-entry test where the tuple is already visited. Expected result: stale replay disappears and non-cycle recursion still hits; falsifier: performance or hit-rate regression in legitimate recursion. Cleanup: remove the lookup gate."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "r2-v1",
+      "text": "Append a canonical visited-path digest to the cache key. Prerequisites: deterministic ordering and bounded key size. Bounded test: compare keys for identical tuple/context with different visited sets, then run the cyclic fixture and count distinct keys. Expected result: distinct keys and no wrong-path hit; falsifier: format breakage or excessive cardinality. Cleanup: restore the original key builder."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "r2-v1",
+      "text": "Extend repair validation to object-listing with cyclic data, because listing consumes the same check resolver and may surface a different symptom. Prerequisites: a listing query and a cyclic candidate graph. Bounded test: warm the cache through one cyclic path, then compare cache-enabled and cache-disabled object lists. Expected result: identical lists after repair; falsifier: a false positive or missing object that differs only with caching. Cleanup: remove the listing fixture."
+    }
+  ]
+}

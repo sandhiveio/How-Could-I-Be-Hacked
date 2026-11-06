@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.6,
+      "rationale": "Incumbent has unit evidence but no end-to-end discriminator; retained as the repair candidate."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.71,
+      "rationale": "Selected: converts the unit observation into a deterministic two-server permission divergence with a clean falsifier."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.65,
+      "rationale": "Deferred: strong challenge to insert-only repair, but it presumes a path-dependent ordinary entry that the selected fixture should first expose."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.63,
+      "rationale": "Deferred as a regression action; necessary after a repair exists."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.55,
+      "rationale": "Deferred: real tradeoff measurement, lower priority than establishing the failure."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.56,
+      "rationale": "Deferred: closure recipe, not a new causal test."
+    }
+  ]
+}

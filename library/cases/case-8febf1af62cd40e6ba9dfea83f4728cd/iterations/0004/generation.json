@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: the working-tree diff applies cleanly to a fresh pristine copy and reproduces every carrier outcome. Applicability: a disposable copy and a saved unified diff are available. Bounded test: run apply-check, apply the patch, compare the modified file with the working copy, and rerun the carrier matrix. Expected result: apply succeeds, files are byte-identical, and every masked/benign check matches; falsifier: a hunk rejects or any check flips. Cleanup: remove the replay copy and temporary logs."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: the patch does not regress existing secret-detector test functions. Applicability: the test modules can be loaded through a minimal package shim when optional connector dependencies are absent. Bounded test: execute every test function in the two secret-detector test files against pristine and patched copies. Expected result: all previously passing functions still pass; falsifier: any function fails after the patch or collection differs. Cleanup: delete both test work directories."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a broad private-key span over-masks PEM-adjacent benign text such as public keys, SSH-known-host base64 lines, or prose mentioning an authentication-code field. Applicability: the formatter is run on disposable mixed-content logs. Bounded test: emit public-certificate and public-key blocks, a known-host base64 line, and prose containing passcode/otp words next to real code-key carriers. Expected result: only real secret carriers change; falsifier: a public block or benign base64 line is altered. Cleanup: delete the fixture log."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: formatter behavior differs when attached through the product's file-logging configuration rather than called directly. Applicability: an isolated process can configure a temporary file handler without opening a live connection. Bounded test: emit a private-key block and an authentication-code line through the connector logger namespace, then compare the file bytes with direct formatter output. Expected result: both paths mask identically; falsifier: the attached-handler output leaks a marker. Cleanup: remove handler files and reset logger state."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: serializer differences produce escaped-newline private-key carriers that a real-newline-only span misses. Applicability: the formatter receives JSON-serialized request data. Bounded test: emit the same private-key body through two serializers with different newline escaping and two randomized marker lengths. Expected result: both serialized forms lose the marker; falsifier: one serializer's body survives. Cleanup: delete serialized fixtures and logs."
+    }
+  ]
+}

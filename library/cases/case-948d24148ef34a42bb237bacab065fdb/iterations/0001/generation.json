@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a single extra-option entry containing an embedded space, such as an upload-pack option followed by a wrapper path, passes the raw-string check because the validator never sees the option as a standalone list element, while shlex splitting yields two arguments. Prerequisites: caller controls the option list, local git is trusted, and a disposable origin plus marker wrapper exist. Bounded test: call the public clone API with one combined list entry and check whether the wrapper writes a marker; a supporting result is marker creation and a completed clone. Falsifier: the safety helper rejects the entry, git rejects the split arguments, or no marker appears. Cleanup: delete the disposable origin, destination, wrapper, and marker; the main limitation is that the prefix check may still match the beginning of the combined string."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the local git accepts an unambiguous long-option abbreviation for upload-pack, while the raw-string safety check only matches the full unsafe spelling, so the abbreviation reaches git and executes the wrapper. Prerequisites: the local git supports long-option abbreviation, the caller controls the option list, and a marker-writing wrapper is available. Bounded test: create a disposable local origin and call the public clone API with an abbreviated upload-pack option; a supporting result is a completed clone plus marker. Falsifier: git rejects the abbreviation as ambiguous or unknown, or no marker is written. Cleanup: remove the local origin, destination, wrapper, and marker; limitation: support may vary across git builds."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a config option supplied through the extra-option list changes an executable setting such as a hook path, even though config options are nominally in the unsafe set. Prerequisites: caller controls the option list, a disposable local origin exists, and a hook directory can write a marker. Bounded test: pass a config assignment that points a hook path at the marker hook, then clone; a supporting result is marker creation during checkout. Falsifier: the safety helper blocks the exact config spelling, git ignores the setting, or no hook runs. Cleanup: delete the origin, destination, hook directory, and marker; limitation: the exact config spelling is likely caught by the existing prefix check."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: an option missing from the unsafe list, such as a template-directory option, lets an attacker choose a directory whose hooks run during clone. Prerequisites: caller controls the extra-option list, a disposable origin exists, and a template directory contains an executable post-checkout hook. Bounded test: clone with the template option and check for a marker; a supporting result is marker creation. Falsifier: the safety helper blocks the option, modern git does not run the copied hook, or no marker appears. Cleanup: delete the origin, destination, template directory, and marker; limitation: this tests a different allowlist gap rather than the raw-versus-normalized validation mismatch."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a repair that validates the post-split token list blocks whitespace-hidden unsafe options while preserving benign options such as depth. Prerequisites: the direct bypass has been reproduced, a fresh source copy exists, and a disposable origin plus marker wrapper are available. Bounded test: patch the clone entry point to check the already-split token list, then try a whitespace-hidden upload-pack and a benign depth option; supporting result is rejection of the unsafe form and a successful depth clone. Falsifier: the hidden form still executes a marker or the benign clone fails. Cleanup: delete the fixture repositories; limitation: this plan does not by itself address long-option abbreviations."
+    }
+  ]
+}

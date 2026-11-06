@@ -1,0 +1,4 @@
+{
+  "selected_id": "c4-1",
+  "selected_text": "Hypothesis: the exported two-edit diff applies cleanly to a pristine source copy and reproduces the repaired behavior there. Prerequisites: a unified diff generated from the worked copy and a fresh copy of the staged source. Bounded test: run a check-only apply, apply the diff, add the disposable escaping probe, and run the probe plus the full module suite. Expected: check and apply succeed; caller markup escaped in plain, include, layout and independent-set paths; safe and autoescape-off hatches literal; suite green. Falsifier: whitespace or context mismatch, double-escaped layout, raw caller data, or a failing module test. Cleanup: delete the replay copy after saving logs; keep the diff and evidence private."
+}

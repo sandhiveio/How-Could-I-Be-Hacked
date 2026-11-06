@@ -1,0 +1,4 @@
+{
+  "selected_id": "r2-v2",
+  "selected_text": "Hypothesis: switching the streaming handler from a fresh background context to the server stream context changes lifecycle propagation but not authentication rejection, so both an interceptor and context adoption are required for a complete repair. Prerequisites: patched interceptor logic, a fake server stream carrying a context value, and a datastore stub that can observe the context. Bounded test: run a missing/invalid/valid credential matrix on unary and streaming calls, then call the handler with a fake stream whose context contains a marker and check that the datastore path sees the marker. Expected supporting result: interception rejects bad credentials and the handler observes the stream context. Falsifier: either check fails, or the context change is unnecessary for every observable path. Cleanup: restore the disposable copy."
+}

@@ -1,0 +1,46 @@
+{
+  "evaluations": [
+    {
+      "id": "c3-1",
+      "eligible": true,
+      "score": 0.75,
+      "rationale": "Selected. It is the smallest change that addresses the observed double escape, marks only engine-generated HTML, and leaves caller bindings and escape hatches untouched."
+    },
+    {
+      "id": "c3-2",
+      "eligible": true,
+      "score": 0.59,
+      "rationale": "Deferred. Structural composition is architecturally cleaner but requires arbitrary caller layouts to become block-based, a much larger compatibility change than the observed defect requires."
+    },
+    {
+      "id": "c3-3",
+      "eligible": true,
+      "score": 0.69,
+      "rationale": "Deferred narrowly. It is nearly the same insertion-site repair as c3-1 with a broader include/nested check; c3-1 states the minimal change and falsifier more crisply."
+    },
+    {
+      "id": "c3-4",
+      "eligible": true,
+      "score": 0.6,
+      "rationale": "Deferred. The library has no per-set autoescape option, so an adapter-level option would require custom escaping and is larger than necessary."
+    },
+    {
+      "id": "c3-5",
+      "eligible": true,
+      "score": 0.7,
+      "rationale": "Deferred. Closure and concurrency checking is valuable after the repair but does not choose the repair and depends on race-detector availability."
+    },
+    {
+      "id": "c3-6",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Not selected. Keeping the deletion and updating layout tests would change documented layout behavior; the existing tests expect literal composed HTML, so the regression is a real contract break, not a test artifact."
+    },
+    {
+      "id": "c2-1",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Incumbent from the previous step. Deletion was experimentally contradicted by the layout double-escape, so it does not advance unchanged."
+    }
+  ]
+}

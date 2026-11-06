@@ -1,0 +1,4 @@
+{
+  "selected_id": "c3-1",
+  "selected_text": "Hypothesis: wrapping only the child-render string in the library's safe-value wrapper before inserting it into the layout placeholder restores raw layout structure while caller bindings stay escaped. Prerequisites: the library exports a safe-value type or wrapper, and the layout path has a single insertion point. Bounded test: keep the global write removed, wrap the child string at that insertion, then render caller markup through a plain template, an include, a layout and an independent set; check safe filter, autoescape-off block and a second adapter. Expected: caller occurrences escaped, layout tags literal, escape hatches literal, full module suite green. Falsifier: any double-escaped layout entity, raw caller variable, or failing existing test. Cleanup: remove probe templates and retain the two-edit diff."
+}

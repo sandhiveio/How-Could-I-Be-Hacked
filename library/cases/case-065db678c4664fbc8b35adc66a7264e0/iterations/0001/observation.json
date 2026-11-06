@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Executed a fresh preshared-credential service, seeded one object tuple through authenticated calls, and compared missing-credential unary and streaming listing calls. The unary call failed with a missing-credential status, while the streaming call returned the seeded object identifier with no error; a credentialed streaming call also returned it. This supports the explanation that only a unary interceptor is installed and the streaming endpoint bypasses authentication. It also shows that the dropped stream context is not required to explain the disclosure. Local only; no official harness was run.",
+  "next_hint": "Apply the smallest repair that installs the same authenticator as a streaming interceptor and adopts the server stream context, then run a missing/invalid/valid credential matrix and a stream-context propagation probe."
+}

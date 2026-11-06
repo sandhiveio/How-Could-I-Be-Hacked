@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v1",
+      "text": "Build an end-to-end cyclic fixture with one cyclic branch and one acyclic branch sharing a tuple key, and issue checks in an order that leaves a cycle-marked subanswer cached before the same tuple is queried as a root. Prerequisites: an acyclic allow path long enough for the recursive child to finish while the ancestor is still resolving. Bounded test: two identical local servers, cache on versus off, same model/tuples, fixed query order; log each allowed value. Expected result: the cached server returns false where the cache-disabled server returns true; falsifier: both orders agree. Cleanup: delete the fixture store."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v1",
+      "text": "Gate lookup, not only insertion, on visited-path membership, because a previously cached acyclic answer might be shadowed by a later cycle-context replay of the same key. Prerequisites: one cache instance reused across calls with different visited sets. Bounded test: seed a key through an acyclic path, then call the same tuple while it is already visited and assert a cycle denial reaches the caller. Expected result: cycle marker propagates; falsifier: insert-only and lookup-gated variants produce identical results. Cleanup: remove the gate."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v1",
+      "text": "Check whether existing tests intentionally rely on caching cycle-marked answers, so a narrow guard changes expected behavior outside the new fixture. Prerequisites: a baseline test log and the guarded test run. Bounded test: compare internal resolver and storage package results before and after the guard and inspect every delta. Expected result: no unexplained behavioral delta; falsifier: a pre-existing test fails for a semantic reason. Cleanup: retain the delta log as regression evidence."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v1",
+      "text": "Measure the cache-cardinality cost of a traversal-sensitive key by counting distinct keys per request on cyclic versus acyclic graphs and checking repeat stability. Prerequisites: lightweight counters and a dense relation graph. Expected result: key cardinality stays proportional to nodes and hits remain usable; falsifier: fragmented keys cause an eviction storm. Cleanup: remove instrumentation."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "r1-v1",
+      "text": "Closure recipe: repeat the counting-delegate probe and the two-server Check fixture several times, require identical decisions for cyclic graphs, and require at least one acyclic cache hit to show the repair did not disable caching. Prerequisites: deterministic fixture and hit counters in test code only. Expected result: stable parity plus preserved acyclic hit; falsifier: any repeat or hit-count regression. Cleanup: keep observers in private test files, not production code."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A Python connector's central formatter had a narrow private-key regex. A first repair spanning real newlines closed generic, RSA, ENCRYPTED, and CRLF blocks and preserved public-certificate and benign text, but a JSON carrier with literal-backslash-n RSA text and six authentication-code carriers still leaked. The working copy is disposable and can be patched freely. Question: which generalized private-key matcher plus which key-name code pattern closes both residual families without masking public certificates, benign six-digit numbers, or already-masked token/password values?",
+    "surface": "Python connector package with a central logging.Formatter applied to application and SDK handlers; disposable local logging fixtures; no live database or network required.",
+    "assumptions": [
+      "The analyst can read the connector source and run a disposable local Python fixture with a writable temporary log.",
+      "The attacker controls credential strings and field values that reach debug logs, but not the formatter code or its composition order.",
+      "The formatter is attached to file or stream handlers in the real product; direct formatter invocation is an acceptable bounded proxy for a first probe.",
+      "No official host-side benchmark evaluator is available inside the local container."
+    ]
+  },
+  "incumbent": {
+    "id": "r1-v1",
+    "text": "Hypothesis: a real multiline private-key block survives because the PEM regex expects literal backslash-n separators and only a generic header. Applicability: the central formatter is attached to file logging, and the analyst may call it directly on a disposable string. Bounded test: emit generic, RSA, and ENCRYPTED blocks with real newlines and a base64 marker, plus a literal-backslash-n control. Expected result: base64 markers disappear and END headers remain; falsifier: any marker survives. Cleanup: delete the temporary log and fixture key material."
+  },
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: one DOTALL header-to-footer matcher can unify real-newline and literal-backslash-n private-key variants. Applicability: the formatter is loaded from the disposable source copy. Bounded test: emit JSON containing escaped-newline RSA and ENCRYPTED blocks, raw multiline blocks, and public-certificate text. Expected result: all private-key bodies become XXXX and the certificate is unchanged; falsifier: a body fragment survives or the certificate is masked. Cleanup: delete the fixture JSON and logs."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: key-name anchoring for passcode, auth_code, mfa_code, verification_code, otp, and totp closes short numeric codes without masking unrelated numbers. Applicability: the central formatter is attached to connector and SDK loggers. Bounded test: emit code-key values in key=value and JSON forms plus a standalone six-digit latency/zip line. Expected result: code-key values mask and the standalone numbers stay unchanged; falsifier: a code survives or an unrelated number masks. Cleanup: delete the temporary log."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a broad private-key span can interfere with token or password maskers when one credential is nested inside another carrier. Applicability: the maskers are composed in a fixed order. Bounded test: construct a string with a token before and inside an unmasked private-key block, then inspect exact residual bytes. Expected result: both secrets mask and no partial body remains; falsifier: the token leaks or a body fragment survives. Cleanup: archive the combined probe output and delete the fixture."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: mixed LF and CRLF line endings inside one private-key block break a span that assumes a single separator style. Applicability: the formatter receives logs from mixed platforms. Bounded test: emit one block whose header uses CRLF and whose body/footer use LF, plus a uniform-LF control. Expected result: both blocks lose the base64 marker and retain END headers; falsifier: the mixed block leaves a body fragment. Cleanup: delete the temporary log."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.7728,
+      "rationale": "Selected: two direct observations plus a scoped repair make the incumbent the best base for the generalized patch; newly generated lower-level candidates are incorporated into the same repair."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.7066,
+      "rationale": "Direct next implementation, with only the real-newline half already demonstrated; deferred because the incumbent carries stronger evidence."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.6966,
+      "rationale": "Strong complement for the observed six-code leak; incorporated into the incumbent repair rather than selected as a separate step."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.6079,
+      "rationale": "Useful interaction control after broadening the span; secondary to closing the two known leak families."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.4136,
+      "rationale": "Coherent mixed-ending edge case, but uniform CRLF already passed, so incremental information is small."
+    }
+  ],
+  "selected_id": "r1-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "The disposable formatter was generalized to a DOTALL header/body/footer span that preserves escaped-newline style, then extended with key-name authentication-code, authorization-scheme, and double-quoted cloud-key maskers. A pristine-versus-patched matrix of 23 checks passed: seven private-key shapes (generic/RSA/ENCRYPTED, real/escaped/mixed endings, two blocks) lost the base64 marker and kept END headers; six authentication-code carriers masked; authorization-scheme and double-quoted cloud-key carriers masked; benign six-digit/zip text, a prose sentence containing an otp word, and public-certificate text stayed byte-unchanged; token, password, and long-signature controls stayed identical. Evidence strength: direct local differential matrix with benign controls. Limits: formatter-level; package dependency suite not yet run; no official verdict.",
+    "next_hint": "Export the diff, replay it on a fresh pristine copy, and check repository secret-detector tests plus PEM-adjacent benign text before treating the local repair as complete."
+  },
+  "lineage": {
+    "case_id": "case-8febf1af62cd40e6ba9dfea83f4728cd",
+    "iteration_id": "iteration-0003",
+    "previous_iteration_id": "iteration-0002",
+    "step_id": "iteration-0003",
+    "parent_step_id": "iteration-0002",
+    "branch_id": "main"
+  }
+}

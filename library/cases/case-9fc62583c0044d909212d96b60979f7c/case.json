@@ -1,0 +1,13 @@
+{
+  "id": "case-9fc62583c0044d909212d96b60979f7c",
+  "kind": "curated_case",
+  "hint": "A relationship-based authorization engine answers single-object permission checks by recursively resolving relation rewrites. A query cache stores subproblem answers by tuple identity plus store, model, contextual tuples and request context. Cycle detection is separate: a per-traversal visited-path set marks a tuple as a cycle when it is re-entered and returns a denial carrying a cycle marker. The question is whether a path-dependent cycle-marked subanswer can be replayed for a later request whose traversal path differs, and which minimal repair preserves ordinary cache hits.",
+  "surface": "Go authorization service with a recursive check resolver, an optional in-memory check-query cache, a visited-path cycle guard, and Check plus object-listing APIs over disposable in-process servers.",
+  "assumptions": [
+    "The analyst may read and edit a local source snapshot and build it with a local Go toolchain.",
+    "The cache can be enabled or disabled independently on two disposable local servers.",
+    "Tuple data is attacker-influenced but the authorization model is fixed by the service owner.",
+    "Only loopback traffic and local fixtures are used; no public deployment is contacted.",
+    "Patch mode: the deliverable is a minimal source repair plus local regression evidence and a host-side official-evaluation handoff."
+  ]
+}

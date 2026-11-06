@@ -1,0 +1,12 @@
+{
+  "id": "case-065db678c4664fbc8b35adc66a7264e0",
+  "kind": "curated_case",
+  "hint": "A Go authorization service exposes two object-listing RPCs: an ordinary unary call and a server-streaming call. Authentication uses a reusable authenticator and is installed as a unary network interceptor. The streaming handler constructs a fresh background context instead of using the server stream's context. An attacker with network access but no credential can call the streaming RPC and receive object identifiers for a seeded relationship, while the same attacker's unary call is rejected. Determine the smallest repair that makes both endpoints enforce the same authentication boundary and preserves request lifecycle context.",
+  "surface": "Go network service with an in-memory datastore, a reusable preshared-credential authenticator, unary and streaming object-listing handlers, and a disposable local service fixture.",
+  "assumptions": [
+    "The observer can read and modify a disposable local source tree and run the Go toolchain; no public service, production datastore, or live target is used.",
+    "The attacker can reach both listing RPCs over the local network and can omit, corrupt, or supply credential metadata; the attacker cannot change server configuration or read the datastore directly.",
+    "A valid credential is available for the positive control, and a health RPC has an explicit unary authentication override.",
+    "Official benchmark verification is performed outside the producing container; local builds and test logs are evidence for the repair, not an official pass."
+  ]
+}

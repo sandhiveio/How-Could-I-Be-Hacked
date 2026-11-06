@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Exported the two-edit source change as a unified diff and replayed it onto a pristine copy with a check-only apply followed by a real apply. The replay copy passed the full module suite and the disposable escaping probe: caller markup was escaped in plain, include, layout and independent-set paths; safe and autoescape-off hatches stayed literal; a second adapter stayed escaped. A constructor matrix also passed for local-directory with layout, virtual-filesystem and path-forwarding filesystem engines. A race-detector run could not start because the local toolchain lacks cgo/gcc, so concurrency remains an environment-limited check. The exported diff is the handoff artifact; official host evaluation was not run.",
+  "next_hint": "Local replay is green and the exported diff is ready. The remaining step is the official host-side patch benchmark evaluation; its result determines the source-case verdict, not the local tests."
+}

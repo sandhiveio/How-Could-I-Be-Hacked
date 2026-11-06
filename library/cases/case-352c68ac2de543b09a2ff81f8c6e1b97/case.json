@@ -1,0 +1,13 @@
+{
+  "id": "case-352c68ac2de543b09a2ff81f8c6e1b97",
+  "kind": "curated_case",
+  "hint": "A server-side HTML template adapter wraps a third-party template library whose autoescape control is a process-wide flag rather than a per-set option. The adapter disables autoescape while loading templates and supports layouts by executing the child template to a string and then binding that string into the layout under a special placeholder. Caller-controlled values are interpolated as ordinary template variables. Determine the minimal repair that escapes caller data while keeping engine-generated layout HTML intact, and verify plain variables, includes, layouts, independent library sets, explicit raw-output escape hatches and all loader constructors.",
+  "surface": "Single Go module: an adapter over a third-party template engine, a walk-based loader for local directories and virtual filesystems, a child-render string composed into an optional layout, and disposable template fixtures. Caller data arrives as map bindings; template source is fixed.",
+  "assumptions": [
+    "The observer can read and modify a disposable local source tree, build it with a local Go toolchain and run unit tests; no public service, network target or production data is used.",
+    "The attacker controls string values interpolated into templates, not template source, layout names or adapter configuration.",
+    "The third-party library exposes a process-wide autoescape flag and a safe-value wrapper; it has no per-template-set autoescape option.",
+    "The adapter's existing behavior for layouts, includes, safe filters and explicit autoescape-off blocks must be preserved.",
+    "Official benchmark verification is host-side; local tests and an exported diff are supporting evidence, not an official pass."
+  ]
+}

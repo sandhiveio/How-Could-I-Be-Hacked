@@ -1,0 +1,4 @@
+{
+  "selected_id": "r4-v1",
+  "selected_text": "Challenge repair completeness with an object-listing query and an exclusion-style cyclic filter. Prerequisites: a cyclic candidate graph and a listing request. Bounded test: warm the cache through the cyclic path, then compare cache-enabled and cache-disabled listing results; add an exclusion relation if the model supports it. Expected result: identical lists after repair; falsifier: cache-only false positive or omission. Cleanup: remove the listing fixture."
+}

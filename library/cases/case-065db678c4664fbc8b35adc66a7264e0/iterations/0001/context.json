@@ -1,0 +1,10 @@
+{
+  "case_id": "case-065db678c4664fbc8b35adc66a7264e0",
+  "iteration_id": "iteration-0001",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Add a streaming authentication interceptor built from the same authenticator used by the unary interceptor, wire it into server startup, and make the streaming handler use the server stream context. Validate with a preshared-credential service that missing and invalid credentials are rejected on both RPCs, valid credentials succeed, and the handler retains the stream context."
+  },
+  "hint": "A local preshared-credential service is started and one object tuple is seeded through authenticated calls. The ordinary unary listing RPC rejects a request with no credential, but the streaming listing RPC returns the seeded object identifier without one. Which defect explains the asymmetry: no streaming authentication interceptor, replacement of the stream context with a fresh background context, or both?"
+}

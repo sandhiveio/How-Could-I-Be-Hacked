@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.7728,
+      "rationale": "Selected: two direct observations plus a scoped repair make the incumbent the best base for the generalized patch; newly generated lower-level candidates are incorporated into the same repair."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.7066,
+      "rationale": "Direct next implementation, with only the real-newline half already demonstrated; deferred because the incumbent carries stronger evidence."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.6966,
+      "rationale": "Strong complement for the observed six-code leak; incorporated into the incumbent repair rather than selected as a separate step."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.6079,
+      "rationale": "Useful interaction control after broadening the span; secondary to closing the two known leak families."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.4136,
+      "rationale": "Coherent mixed-ending edge case, but uniform CRLF already passed, so incremental information is small."
+    }
+  ]
+}

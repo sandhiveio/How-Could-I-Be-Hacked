@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "The baseline asymmetry is known: without a credential the unary listing RPC is rejected while the streaming listing RPC returns a seeded object. A repair is now needed. Which minimal wiring change installs the existing authenticator for streams, does the streaming handler also need the server stream context rather than a fresh background context, and what local matrix distinguishes a complete repair from an auth-only change?",
+    "surface": "Go network service with an in-memory datastore, a reusable preshared-credential authenticator, unary and streaming object-listing handlers, and a disposable local service fixture.",
+    "assumptions": [
+      "The observer can read and modify a disposable local source tree and run the Go toolchain; no public service, production datastore, or live target is used.",
+      "The attacker can reach both listing RPCs over the local network and can omit, corrupt, or supply credential metadata; the attacker cannot change server configuration or read the datastore directly.",
+      "A valid credential is available for the positive control, and a health RPC has an explicit unary authentication override.",
+      "Official benchmark verification is performed outside the producing container; local builds and test logs are evidence for the repair, not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "r1-v2",
+    "text": "Hypothesis: server startup registers only a unary interceptor chain, so per-stream interceptors are absent and the streaming listing RPC bypasses the authenticator. Prerequisites: preshared-credential service, one seeded tuple, and the ability to call both RPCs without metadata. Bounded test: compare a missing-credential unary listing call with a missing-credential streaming call, recording status and returned identifiers. Expected supporting result: unary is rejected while streaming returns the seeded identifier. Falsifier: both calls are rejected or both are accepted. Cleanup: stop the service and delete the seeded store."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: stream interception alone rejects missing credentials, but the handler still ignores the stream deadline, so a credentialed stream can keep iterating after client cancellation. Prerequisites: patched interception, a seeded many-object store, and a cancelable client context. Bounded test: start a credentialed stream, cancel after the first item, and compare how many items arrive with unary behavior. Expected supporting result: many items arrive after cancellation. Falsifier: the server stops promptly and the context change is unnecessary for lifecycle control. Cleanup: stop the service and delete the store."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: switching the streaming handler from a fresh background context to the server stream context changes lifecycle propagation but not authentication rejection, so both an interceptor and context adoption are required for a complete repair. Prerequisites: patched interceptor logic, a fake server stream carrying a context value, and a datastore stub that can observe the context. Bounded test: run a missing/invalid/valid credential matrix on unary and streaming calls, then call the handler with a fake stream whose context contains a marker and check that the datastore path sees the marker. Expected supporting result: interception rejects bad credentials and the handler observes the stream context. Falsifier: either check fails, or the context change is unnecessary for every observable path. Cleanup: restore the disposable copy."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: chaining stream interceptors globally also covers health or reflection streams and breaks unauthenticated liveness probes. Prerequisites: patched service, health client, and no credential. Bounded test: start the service with preshared authentication, call the health RPC without metadata, then attempt a reflection stream. Expected supporting result: health or reflection fails without a credential. Falsifier: health remains serving and only public data RPCs require credentials. Cleanup: stop the service."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: concurrent stream initialization exposes a race in the new interceptor path, causing occasional unauthenticated disclosures under load. Prerequisites: patched service, seeded store, and many concurrent streams with mixed credentials. Bounded test: launch many concurrent streaming calls, half missing credentials, and count successful disclosures. Expected supporting result: at least one missing-credential stream returns an object. Falsifier: every missing-credential stream is consistently rejected. Cleanup: stop the service and delete the store."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: empty-string, absent, and malformed credential metadata take different extractor branches, so a partial interceptor may reject one form but accept another. Prerequisites: patched service, raw metadata control, and a seeded tuple. Bounded test: call streaming with an absent header, an empty header value, a malformed scheme, and a valid credential, then compare statuses. Expected supporting result: any malformed form is accepted. Falsifier: every non-valid form is rejected. Cleanup: stop the service and delete the store."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.675,
+      "rationale": "Selected. The most complete repair-validation action: it covers the authorization matrix and independently checks that the handler adopts the stream context. It incorporates the baseline evidence while still testing the unexecuted repair."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Incumbent retained. Its baseline bypass is directly observed, but it has low remaining information gain because the next step should move from diagnosis to repair."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.645,
+      "rationale": "Deferred. Useful cancellation discriminator, but its premise that deadline handling is the main remaining defect is secondary; a complete repair should be applied first."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.6,
+      "rationale": "Deferred. Health and reflection regression is important, but the health service has no streaming data RPC and its unary override is already exercised by service startup."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.537,
+      "rationale": "Deferred. A concurrency stress test could reveal races, but it is more expensive and less discriminating than the credential and context matrix."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": false,
+      "score": 0.33,
+      "rationale": "Ineligible as generated. The core malformed-metadata idea is testable, but the original generation ended in incoherent filler, so it was not used without formalizing a stable hypothesis. It remains a valid alternative for another target."
+    }
+  ],
+  "selected_id": "r2-v2",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Applied the minimal repair in the disposable copy: server configuration carries a streaming interceptor chain, startup installs it, the service supplies the same preshared authenticator for streams, and the streaming handler uses the server stream context. The credential matrix passed: missing and invalid credentials were rejected on both unary and streaming calls, while valid credentials returned the seeded object. A separate fake-stream probe injected a marker into the stream context and a datastore stub observed it, confirming context adoption. The package build passed. The first probe run failed only on a capitalization assertion; the failure note and corrected passing log are saved. Local evidence only; official evaluation was not run.",
+    "next_hint": "Run the host-side official evaluation for the exported patch, then optionally exercise the OIDC authenticator and a no-auth service with the same unary/streaming credential matrix."
+  },
+  "lineage": {
+    "case_id": "case-065db678c4664fbc8b35adc66a7264e0",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001",
+    "step_id": "iteration-0002",
+    "parent_step_id": "iteration-0001",
+    "branch_id": "main"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.643,
+      "rationale": "Deferred. A safe allowlist is a valid defense but larger and more compatibility-sensitive than a targeted matcher."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.708,
+      "rationale": "Deferred. Expanding from a git option dictionary is coherent but heavier than needed for a four-entry unsafe set."
+    },
+    {
+      "id": "r3-v5",
+      "eligible": true,
+      "score": 0.641,
+      "rationale": "Deferred. Regex allowlisting risks breaking compound option values and needs a larger compatibility matrix."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.645,
+      "rationale": "Incumbent is supported for the whitespace form but experimentally incomplete: the prior matrix showed the abbreviation still executes a marker."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.585,
+      "rationale": "Deferred. The proposed canonicalizing utility is not part of normal clone usage, so it adds a subprocess and an uncertain dependency."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.728,
+      "rationale": "Selected. It is local and minimal, directly targets the observed abbreviation, and can be tested against both the attack matrix and a representative benign matrix."
+    }
+  ]
+}

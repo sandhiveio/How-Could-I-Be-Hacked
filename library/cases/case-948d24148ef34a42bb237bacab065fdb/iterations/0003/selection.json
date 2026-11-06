@@ -1,0 +1,4 @@
+{
+  "selected_id": "r3-v4",
+  "selected_text": "Hypothesis: extract each executed token's option name before any equals sign and reject it when an unsafe long option starts with that name, which treats an unambiguous abbreviation as the full unsafe option. Prerequisites: split-token validation, local git abbreviation behavior, and a disposable origin plus marker wrapper. Bounded test: apply the matcher and run a matrix containing abbreviated upload-pack, abbreviated config, exact unsafe options, ordinary clone, and benign depth, single-branch, branch, and recurse-submodules. Supporting result is rejection of every unsafe form with no marker and completion of every benign clone. Falsifier: any abbreviated unsafe form executes a marker or any benign option is rejected. Cleanup: delete fixtures; limitation: the matcher intentionally blocks any long option name that is a prefix of an unsafe name, so a future benign option with such a prefix would need review."
+}

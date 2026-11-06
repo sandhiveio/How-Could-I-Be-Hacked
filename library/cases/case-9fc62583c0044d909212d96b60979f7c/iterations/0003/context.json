@@ -1,0 +1,10 @@
+{
+  "case_id": "case-9fc62583c0044d909212d96b60979f7c",
+  "iteration_id": "step-3",
+  "previous_iteration_id": "step-2",
+  "incumbent": {
+    "id": "r2-v1",
+    "text": "Build an end-to-end cyclic fixture with one cyclic branch and one acyclic branch sharing a tuple key, and issue checks in an order that leaves a cycle-marked subanswer cached before the same tuple is queried as a root. Prerequisites: an acyclic allow path long enough for the recursive child to finish while the ancestor is still resolving. Bounded test: two identical local servers, cache on versus off, same model/tuples, fixed query order; log each allowed value. Expected result: the cached server returns false where the cache-disabled server returns true; falsifier: both orders agree. Cleanup: delete the fixture store."
+  },
+  "hint": "The same tuple produced false on the cache-enabled server and true on the cache-disabled server, and debug logs confirmed a cached cycle-marked viewer subanswer. The next step is implementation: apply the smallest guard that prevents cycle-marked insertion, then use the identical fixture as the before/after control. An acyclic response must still be cached, and the one existing test that asserts a cycle answer is cached must be reconciled with the intentional new behavior."
+}

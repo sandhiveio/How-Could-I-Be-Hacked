@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: passing the already shlex-split token list to the safety helper closes the leading-space bypass because validation and execution then share the same tokens. Prerequisites: a fresh source copy, disposable local origin, marker wrapper, and a benign depth option. Bounded test: patch the clone entry point to check the split list, then attempt exact and leading-space upload-pack plus an ordinary clone and a depth-limited clone; supporting result is rejection of both unsafe forms, marker absence, and success of both benign clones. Falsifier: either unsafe form executes a marker, or a benign clone fails. Cleanup: delete the fixture repositories and marker; limitation: it does not yet address abbreviated long options."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: after validating split tokens, an abbreviated long option such as an upload-pack prefix still bypasses the full-name prefix check because git expands abbreviations. Prerequisites: the normalized-token patch is applied, local git supports abbreviation, and a marker wrapper exists. Bounded test: clone with an abbreviated upload-pack option and compare marker presence to an exact unsafe control; supporting result is a completed clone with a marker. Falsifier: the repaired helper rejects the abbreviation or git refuses it. Cleanup: delete repositories and marker; limitation: abbreviation support can differ by git version."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: replacing prefix matching with exact token equality for known unsafe options preserves benign prefixed flags while blocking the exploit. Prerequisites: split-token validation, a disposable origin, and both unsafe and benign option forms. Bounded test: change the helper to exact matching, then try an upload-pack assignment and a benign depth option; supporting result is unsafe rejection and benign success. Falsifier: the unsafe assignment is accepted because it is not exactly equal to the bare option name, or the benign option fails. Cleanup: delete fixture repositories; limitation: exact equality may miss assignment forms and therefore is not clearly safer."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: double normalization, splitting tokens and then re-joining them before execution, corrupts options containing quoted values or spaces. Prerequisites: split-token validation and a local branch or path containing a space. Bounded test: clone a fixture with such a branch using a re-joining patch; supporting result is a successful clone with the correct checked-out content. Falsifier: a valid quoted option fails while the same option works without re-joining. Cleanup: delete the fixture repositories; limitation: the smaller repair can pass the split list directly and avoid this failure mode entirely."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the repair must validate the final argument list passed to the subprocess, not an intermediate string, so no later transformation can diverge from what was checked. Prerequisites: instrumentation that records the clone subprocess arguments and the safety-helper input. Bounded test: log both lists for a clone with mixed benign and unsafe forms and compare them; supporting result is byte-identical validated and executed lists plus unsafe rejection. Falsifier: the logged lists differ, or an unsafe form reaches the subprocess after passing the check. Cleanup: remove logging fixtures; limitation: this is an invariant check and needs a concrete unsafe reproducer to exercise it."
+    }
+  ]
+}

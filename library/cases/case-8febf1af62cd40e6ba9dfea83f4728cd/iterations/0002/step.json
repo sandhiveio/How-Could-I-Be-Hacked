@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A Python connector's central formatter masks tokens, passwords, cloud keys, signed-URL signatures, JSON token values, and private-key-data fields. A first probe showed real-newline generic, RSA, and ENCRYPTED private-key blocks leaking, while a literal-backslash-n generic block was masked; six-digit passcode/auth_code/mfa_code values and authorization-scheme headers also leaked. A real-newline header/body/footer span is now the leading repair candidate. Question: which implementation closes the private-key gap with the least benign over-masking, and which companion pattern is needed for short codes?",
+    "surface": "Python connector package with a central logging.Formatter applied to application and SDK handlers; disposable local logging fixtures; no live database or network required.",
+    "assumptions": [
+      "The analyst can read the connector source and run a disposable local Python fixture with a writable temporary log.",
+      "The attacker controls credential strings and field values that reach debug logs, but not the formatter code or its composition order.",
+      "The formatter is attached to file or stream handlers in the real product; direct formatter invocation is an acceptable bounded proxy for a first probe.",
+      "No official host-side benchmark evaluator is available inside the local container."
+    ]
+  },
+  "incumbent": {
+    "id": "r1-v1",
+    "text": "Hypothesis: a real multiline private-key block survives because the PEM regex expects literal backslash-n separators and only a generic header. Applicability: the central formatter is attached to file logging, and the analyst may call it directly on a disposable string. Bounded test: emit generic, RSA, and ENCRYPTED blocks with real newlines and a base64 marker, plus a literal-backslash-n control. Expected result: base64 markers disappear and END headers remain; falsifier: any marker survives. Cleanup: delete the temporary log and fixture key material."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a DOTALL header-to-footer span replaces only the private-key body and leaves benign lines intact. Applicability: the formatter can be loaded directly from the disposable source copy. Bounded test: pipe a PEM block plus a six-digit timestamp line through the formatter. Expected result: every base64 line disappears, the END header remains, and the timestamp is unchanged; falsifier: a base64 line survives or the timestamp is masked. Cleanup: delete the temporary log and fixture key."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: key-name anchoring for passcode, auth_code, mfa_code, and related names catches short numeric codes without touching ordinary six-digit numbers. Applicability: the same formatter harness and a disposable log are enough. Bounded test: emit code-key values and an unrelated latency value. Expected result: code values mask and the latency value stays byte-identical; falsifier: a code survives or the unrelated number is masked. Cleanup: delete the temporary log."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: short signed-URL signatures, authorization-scheme headers, and double-quoted cloud-key values are missed because each existing pattern requires a specific name, quote style, or value length. Applicability: SDK loggers share the formatter. Bounded test: emit each carrier with a short marker next to a long-signature or single-quoted control. Expected result: every carrier marker is masked and controls stay masked; falsifier: a carrier survives while its control masks. Cleanup: delete fixture URLs and logs."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: composing a broad private-key span before per-line password/token maskers can over-mask adjacent text or leave residual fragments when one secret is nested inside another carrier. Applicability: no code change is needed for the probe. Bounded test: place a password-like line inside or next to a PEM-shaped block and inspect exact residual bytes. Expected result: the whole block masks once and the END header remains; falsifier: a partial body survives or a non-secret neighbor is altered. Cleanup: delete the temporary fixture."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.7545,
+      "rationale": "Selected: now has a direct observed leak and a scoped repair, so it leads under evidence-weighted selection."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.666,
+      "rationale": "Concrete implementation of the selected repair with a benign timestamp control; deferred because the incumbent already carries the decisive leak evidence."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.6565,
+      "rationale": "Strong complementary key-name pattern for the observed short-code leak; deferred to keep the round focused on the primary PEM mechanism."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.493,
+      "rationale": "Broader carrier cleanup; lower priority than the two dominant gaps."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.52,
+      "rationale": "Useful ordering and nesting control; its original generated text was partly garbled, but the core masker-ordering hypothesis is reusable and testable."
+    }
+  ],
+  "selected_id": "r1-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "A minimal real-newline header/body/footer span was applied to the disposable copy and compared with pristine source across 11 carriers. Generic, RSA, ENCRYPTED, and CRLF blocks with real newlines were preserved before the change and reduced to header/XXXX/footer after it; the older escaped-newline generic control stayed masked; public-certificate and benign six-digit text stayed byte-identical; token and password controls stayed masked. A JSON carrier using a literal-backslash-n RSA block still leaked because the new span required a real newline, and the six-digit passcode carrier still leaked. Evidence strength: direct pristine/patched causal comparison. Limits: direct module load, not the package import chain; no official verdict.",
+    "next_hint": "Generalize the private-key span to both newline styles and add key-name-anchored authentication-code masking, then test whether the two repairs interact or alter benign text."
+  },
+  "lineage": {
+    "case_id": "case-8febf1af62cd40e6ba9dfea83f4728cd",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001",
+    "step_id": "iteration-0002",
+    "parent_step_id": "iteration-0001",
+    "branch_id": "main"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.7545,
+      "rationale": "Selected: now has a direct observed leak and a scoped repair, so it leads under evidence-weighted selection."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.666,
+      "rationale": "Concrete implementation of the selected repair with a benign timestamp control; deferred because the incumbent already carries the decisive leak evidence."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.6565,
+      "rationale": "Strong complementary key-name pattern for the observed short-code leak; deferred to keep the round focused on the primary PEM mechanism."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.493,
+      "rationale": "Broader carrier cleanup; lower priority than the two dominant gaps."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.52,
+      "rationale": "Useful ordering and nesting control; its original generated text was partly garbled, but the core masker-ordering hypothesis is reusable and testable."
+    }
+  ]
+}

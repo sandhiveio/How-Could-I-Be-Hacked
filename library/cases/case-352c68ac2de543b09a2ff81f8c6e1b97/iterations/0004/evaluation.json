@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "c4-1",
+      "eligible": true,
+      "score": 0.78,
+      "rationale": "Selected. Artifact replay is the decisive remaining verification for a host-side patch benchmark; the worked tree alone does not prove the exported diff is complete or context-correct."
+    },
+    {
+      "id": "c4-2",
+      "eligible": true,
+      "score": 0.71,
+      "rationale": "Deferred. Constructor coverage is valuable and was folded into the replay round; it is less decisive than applying the exact exported artifact."
+    },
+    {
+      "id": "c4-3",
+      "eligible": true,
+      "score": 0.67,
+      "rationale": "Deferred. The repair removes the global write, so the historical concurrency risk is reduced; race detection is also environment-dependent."
+    },
+    {
+      "id": "c4-4",
+      "eligible": true,
+      "score": 0.71,
+      "rationale": "Deferred. Escape-hatch parity was already demonstrated in the worked tree and is included in the replay matrix; standalone it is redundant."
+    },
+    {
+      "id": "c4-5",
+      "eligible": true,
+      "score": 0.7,
+      "rationale": "Deferred. Nested composition is a useful additional robustness case but does not verify the exported artifact as directly as replay."
+    },
+    {
+      "id": "c3-1",
+      "eligible": true,
+      "score": 0.77,
+      "rationale": "Incumbent from the previous step. The targeted safe-value repair passed the working-tree matrix and is the artifact replayed in this step."
+    }
+  ]
+}

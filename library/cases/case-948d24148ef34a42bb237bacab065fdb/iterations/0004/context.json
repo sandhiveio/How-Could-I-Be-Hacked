@@ -1,0 +1,10 @@
+{
+  "case_id": "case-948d24148ef34a42bb237bacab065fdb",
+  "iteration_id": "step-4",
+  "previous_iteration_id": "step-3",
+  "incumbent": {
+    "id": "r3-v4",
+    "text": "Hypothesis: extract each executed token's option name before any equals sign and reject it when an unsafe long option starts with that name, which treats an unambiguous abbreviation as the full unsafe option. Prerequisites: split-token validation, local git abbreviation behavior, and a disposable origin plus marker wrapper. Bounded test: apply the matcher and run a matrix containing abbreviated upload-pack, abbreviated config, exact unsafe options, ordinary clone, and benign depth, single-branch, branch, and recurse-submodules. Supporting result is rejection of every unsafe form with no marker and completion of every benign clone. Falsifier: any abbreviated unsafe form executes a marker or any benign option is rejected. Cleanup: delete fixtures; limitation: the matcher intentionally blocks any long option name that is a prefix of an unsafe name, so a future benign option with such a prefix would need review."
+  },
+  "hint": "A Python git wrapper has a combined repair: the clone entry point validates the shlex-split token list, and the safety helper rejects unsafe long options even when the supplied token is an unambiguous abbreviation. A previous local matrix blocked exact, whitespace-hidden, abbreviated, and short unsafe forms while ordinary and several benign clones succeeded. Question: does the two-file diff apply cleanly to a fresh copy, and does one differential run show the unpatched source executing markers while the patched source blocks every attack row and preserves every benign row?"
+}
