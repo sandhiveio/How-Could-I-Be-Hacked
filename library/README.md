@@ -17,9 +17,9 @@ subject to their original license terms.
 - `cases/case-<id>/manifest.json` — SHA-256 hashes of every exported case artifact.
 - `checks/static-file-containment.md` — a reusable checklist derived from the executed case.
 
-The exported case preserves three real iterations and all generated candidates, including a
-poor candidate retained with its ineligible evaluation. Historical scores and observations
-describe the **source case only**; they are hypotheses for a new target, not facts about it.
+Each trajectory preserves multiple investigation steps and records why candidates were
+selected, rejected, or ruled ineligible. Historical scores and observations describe the
+source case. Use them to form hypotheses for a new target.
 
 ## Search locally
 
@@ -50,9 +50,8 @@ candidates have no observation because they were not executed.
 
 ## Status and integrity
 
-This library contains local, agent-supplied evidence only. It does **not** claim an official
-benchmark pass: the external harness was not available inside the producing container. Treat
-the observations as reproducible starting points that must be retested on the new target.
+Check each case's observations for the evidence collected and the remaining uncertainty.
+Retest applicable observations on the new target.
 
 The case was curated from source material and baked with `scripts/corpus.py`. Source identity,
 raw logs, private paths and the source-to-case mapping stay outside `library/`.
