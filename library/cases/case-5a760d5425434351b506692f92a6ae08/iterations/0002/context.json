@@ -1,0 +1,10 @@
+{
+  "case_id": "case-5a760d5425434351b506692f92a6ae08",
+  "iteration_id": "step-2",
+  "previous_iteration_id": "step-1",
+  "incumbent": {
+    "id": "r1-v1",
+    "text": "Hypothesis: the shared redirect sanitizer matches exact credential names but has no rule for the proxy-credential family, while the fetch-style path has an additional deletion step. Prerequisites: local source, two loopback origins, and a caller able to set arbitrary request headers. Bounded test: send the proxy credential under four casings through a cross-origin 302 using the low-level API, repeat with the fetch-style API, and add a same-origin 302 control. Expected supporting result: every casing leaks through the low-level API, none leaks through the fetch-style API, and credentials survive same-origin. Falsifier: only one casing leaks, or same-origin loses credentials. Cleanup: close all loopback servers and restore the disposable tree."
+  },
+  "hint": "A local matrix established that a low-level HTTP request API leaks a caller-supplied proxy credential across a cross-origin redirect for four header casings and two storage forms, while the fetch-style API strips it and same-origin redirects preserve it. The shared redirect handler is the narrow repair site. The next question is how small the repair can be, and which benign controls prove it does not over-strip ordinary authorization, proxy challenges, duplicate non-credential headers, or same-origin credentials."
+}

@@ -1,0 +1,9 @@
+{
+  "plans": [
+    "Compare redirect header sanitation across the two request APIs. Drive cross-origin and same-origin redirects with distinct marker headers, identify the missing proxy-credential rule in the shared sanitizer, add that rule, and rerun ordinary and redirect regressions before exporting a minimal patch.",
+    "Enforce proxy-only header semantics at request construction so a proxy credential is never emitted to an origin even without a redirect. Test single-hop requests, casing variants, and header forms, then remove the credential at the construction boundary while preserving ordinary headers.",
+    "Exercise the proxy-agent component. Stand up a local forward proxy and destination, compare proxy-side and origin-side headers for direct requests, redirects, reused agents, and mixed-case option maps, then normalize the constructor or dispatch boundary.",
+    "Test URL-derived credentials and origin comparison. Use URLs with embedded userinfo, redirect across ports and host spellings, and compare delivered credential values against controls before repairing the derived-credential boundary."
+  ],
+  "selected_id": "plan-1"
+}

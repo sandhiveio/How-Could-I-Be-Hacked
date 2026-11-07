@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Executed a locally signed-template matrix with a disposable ECDSA key. An invalid later digest line with LF and no code verified true; a malformed first digest raised a decode error. The CR-tail variant, containing a second digest line plus a CR-separated code section, verified true and the YAML parser exposed source that printed the local user identity; running that source under a local shell printed the expected uid. LF-tail and CRLF-tail variants verified false while their code sections still parsed. This supports first-match digest selection and extra-digest tolerance, with the executable bypass carried by the bare-CR newline mismatch. The comparison was local only; no official evaluator verdict was produced.",
+  "next_hint": "A signed LF template verifies when a CR-terminated digest line and code section follow the real signature; LF and CRLF tails fail. The next question is which minimal repair removes exactly one terminal signature line, rejects later non-whitespace content, and preserves LF, CRLF, trailing-newline and trailing-space signatures."
+}

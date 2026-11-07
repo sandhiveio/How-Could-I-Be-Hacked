@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A local YAML scanner verifies a terminal ECDSA signature over template bytes. Verification previously removed every digest-prefixed line before hashing and selected the first digest, so a CR-terminated second digest line plus CR-separated code verified while the parser exposed the code. LF and CRLF tails failed. The current repair task is to define a terminal-signature boundary that leaves exactly one signature line outside the hashed bytes, rejects extra non-whitespace content after it, and still accepts valid LF, CRLF, trailing-newline and trailing-space signatures. Disposable local fixtures cover HTTP, code and DNS template shapes.",
+    "surface": "Go command-line scanner with YAML template loading, HTTP, code and DNS request sections, and a local ECDSA signer/verifier. Disposable local templates, a locally generated certificate and private key, and a local template-parser harness; no network target is used.",
+    "assumptions": [
+      "The attacker can edit a signed template file before the scanner loads it, but cannot forge an ECDSA signature or read the signer's private key.",
+      "The operator has enabled execution of code-template sections, so parsed code content is security-relevant.",
+      "The scanner loads local template files and the signer/verifier is reachable through a small local harness; no public service or deployed target is involved.",
+      "Signature lines follow the existing convention of one terminal digest-prefixed line appended after the template body.",
+      "Official benchmark verification is performed by an external host evaluator; local signing, parsing and regression checks are supporting evidence."
+    ]
+  },
+  "incumbent": {
+    "id": "r1-v2",
+    "text": "Hypothesis: verification uses the first digest match for the signature while removing later digest-prefixed lines from the hashed bytes, so an extra digest line can be tolerated or can change which digest is trusted. Prerequisites: a valid signed template, ability to insert digest-prefixed lines, and a local verifier. Bounded test: append a malformed second digest line with LF and no code; separately prepend a malformed digest line before the real signature; compare verification errors. Expected supporting result: the later malformed digest is tolerated, while a first-position malformed digest is selected and fails. Falsifier: both arrangements fail, or the later malformed line changes the hash and fails. Cleanup: remove the disposable fixtures. Limitation: this tests digest selection, not the CR-tail execution path."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: a strict tail-boundary parser that splits raw bytes at the final digest-prefixed line and rejects any earlier digest line or non-whitespace suffix closes the CR-tail path. Prerequisites: repaired verifier, disposable LF/CRLF/CR fixtures and a local key. Bounded test: sign each fixture, append executable CR and LF tails, and run the repaired verifier. Expected supporting result: CR and LF tails fail while all untouched signed fixtures verify. Falsifier: a CR tail with code still verifies or a trailing-space valid signature fails. Cleanup: delete generated fixtures and keys. Limitation: the rule must also define how multiple digest-looking body lines are handled."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: verification should hash every byte except exactly one terminal signature block, rather than stripping all digest-looking lines anywhere; this removes both the multiple-signature and CR-tail discrepancies. Prerequisites: repaired verifier, a local ECDSA signer, and a parser harness. Bounded test: implement a final-non-whitespace-line helper that recognizes LF, CRLF and bare CR; use it for terminal digest selection and for removing only that one line; then run the CR/LF/CRLF matrix, body-tamper checks and representative signed templates. Expected supporting result: CR, LF and CRLF executable tails fail; valid LF and CRLF signatures and trailing whitespace pass. Falsifier: an executable tail still verifies or a valid signature regresses. Cleanup: restore the pristine source copy after recording the patch. Limitation: embedded digest-looking body lines become part of the signed range."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: the primary defect is normalization asymmetry between signer and verifier, so a body rewritten from LF to CR after signing can still verify while the parser sees modified content. Prerequisites: a signed LF template and a verifier with normalization logic. Bounded test: sign an LF body, rewrite interior line endings to CR while preserving the signature, and compare verification before and after repair. Expected supporting result: the rewritten body fails only after normalization is made symmetric. Falsifier: the rewritten body fails in both versions, or a legitimate Windows-style save also breaks. Cleanup: restore fixture copies. Limitation: may be a secondary effect rather than the execution path."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: trailing-byte tolerance around the digest line (spaces, tabs, double newlines, mixed endings) creates ambiguity that lets a mutated tail verify; the repair should accept one documented canonical suffix and reject non-canonical tails. Prerequisites: valid signed fixtures and a local verifier. Bounded test: generate signatures followed by newline, CRLF, space, tab and double-newline tails and compare acceptance before and after repair. Expected supporting result: exactly the documented benign forms remain accepted. Falsifier: a non-canonical tail is accepted while an equally benign documented form is rejected. Cleanup: delete generated variants. Limitation: canonical-form selection is a policy choice."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: repair closure requires representative benign templates across independent sections to verify and one-byte mutations in each section to fail, in LF and CRLF forms. Prerequisites: repaired verifier and disposable HTTP, code and DNS templates. Bounded test: sign each template, mutate one byte outside the signature, and compare verifier results in a single matrix. Expected supporting result: all untouched templates verify and all mutations fail. Falsifier: a mutation is accepted or an untouched template is rejected. Cleanup: reset the disposable source tree. Limitation: validation activity rather than a distinct root-cause repair."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.73,
+      "rationale": "Selected. The existing matrix showed extra digest lines are tolerated and the CR tail is removed from the hashed range. Hashing every byte except one terminal signature block is a minimal rule that covers both observations and is directly testable on a fresh source copy."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.6825,
+      "rationale": "Deferred, not refuted. Strict last-line parsing is the right direction, but the proposal did not unify terminal-signature selection, multiple digest lines and CRLF handling into one rule."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.6825,
+      "rationale": "Incumbent. Its multiple-signature mechanism was confirmed, but it was a diagnostic hypothesis rather than the concrete terminal-signature repair."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.585,
+      "rationale": "Deferred. Representative-template regression closure was valuable and was incorporated into the selected repair test, but it is validation rather than a root-cause change."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.575,
+      "rationale": "Deferred, not refuted. The CRLF behavior observed in the matrix makes normalization asymmetry plausible, but it was less directly connected than the terminal boundary."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.5625,
+      "rationale": "Deferred. Trailing spaces and newlines already verified before repair, so this candidate is regression coverage rather than an explanation of the executable bypass."
+    }
+  ],
+  "selected_id": "r2-v2",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Implemented a terminal-signature boundary in a disposable copy: a helper locates the final non-whitespace line using LF, CRLF and bare CR; signature removal and digest lookup operate only on that line; verification reads the terminal digest. The patch applied cleanly to a fresh copy and produced byte-identical source. The repaired matrix rejected CR-tail, LF-tail and CRLF-tail executable variants while accepting valid LF, CRLF, trailing-newline and trailing-space signatures. A 20-check regression matrix over HTTP, code and DNS template shapes passed, including body tampering, embedded digest-looking comments and a stripped-bytes equality check. The real template parser on repaired source reported the CR-tail file as unverified while still parsing the appended code request; the pristine parser reported the same file as verified with the code request present. A cross-version check showed pristine-signed and repaired-signed ordinary templates verify under both implementations. The official host evaluator has not run.",
+    "next_hint": "The local repair closes the reproduced CR-tail and multiple-signature boundary for ordinary templates. Remaining limits are the missing official verdict, imported code-file signatures, zero-width-byte tails and exact parity with the pinned official image."
+  },
+  "lineage": {
+    "case_id": "case-4c1b4593177d4f3289377f152128add4",
+    "iteration_id": "step-2",
+    "previous_iteration_id": "step-1",
+    "step_id": "step-2",
+    "parent_step_id": "step-1",
+    "branch_id": "main"
+  }
+}

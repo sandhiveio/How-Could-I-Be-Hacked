@@ -1,0 +1,24 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the digest-line matcher treats only LF-terminated text as a line, so a second digest line and a following code section written with bare CR are swallowed as one match during hashing, while the YAML scanner still sees CR as a line break. Prerequisites: a validly signed template, a known terminal digest line, a parser that accepts bare CR, and code execution enabled. Bounded test: sign a benign template locally; append a second digest-prefixed line ending in CR and a CR-separated code section whose source prints a harmless marker; run verification and parse the result. Expected supporting result: verification is true and the parsed code section contains the marker command. Falsifier: verification is false, the code section is absent, or the same manipulation with LF also verifies. Cleanup: delete the disposable key and template. Limitation: the exact regex anchors and parser line-break rules must both be confirmed."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: verification uses the first digest match for the signature while removing later digest-prefixed lines from the hashed bytes, so an extra digest line can be tolerated or can change which digest is trusted. Prerequisites: a valid signed template, ability to insert digest-prefixed lines, and a local verifier. Bounded test: append a malformed second digest line with LF and no code; separately prepend a malformed digest line before the real signature; compare verification errors. Expected supporting result: the later malformed digest is tolerated, while a first-position malformed digest is selected and fails. Falsifier: both arrangements fail, or the later malformed line changes the hash and fails. Cleanup: remove the disposable fixtures. Limitation: this tests digest selection, not the CR-tail execution path."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: non-printing bytes such as zero-width spaces in the trailing whitespace after the signature change the parser's structural view without changing the hash range, creating a boundary mismatch. Prerequisites: a valid signed template and a parser that handles Unicode whitespace differently from the signature matcher. Bounded test: insert zero-width characters after the terminal signature and around the trailing newline, then verify and parse the template. Expected supporting result: verification stays true while parsing changes unexpectedly. Falsifier: verification fails or parsing is unchanged. Cleanup: delete the generated variants. Limitation: this is a different boundary from CR line endings and was not selected for execution."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: signing and verification normalize CRLF and bare CR differently, so a template signed with one newline style can be modified by rewriting line endings without invalidating the signature. Prerequisites: a valid CRLF-signed template and a local verifier. Bounded test: sign a CRLF template, then change only the final newline to bare CR or add trailing whitespace while leaving body bytes otherwise unchanged; compare verification. Expected supporting result: a specific newline transition verifies while the body has been rewritten. Falsifier: the transition fails verification or the parser sees identical content. Cleanup: remove the variants. Limitation: may reveal tolerance rather than an executable bypass."
+    }
+  ]
+}

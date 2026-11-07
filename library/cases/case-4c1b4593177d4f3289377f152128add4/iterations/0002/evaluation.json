@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.73,
+      "rationale": "Selected. The existing matrix showed extra digest lines are tolerated and the CR tail is removed from the hashed range. Hashing every byte except one terminal signature block is a minimal rule that covers both observations and is directly testable on a fresh source copy."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.6825,
+      "rationale": "Deferred, not refuted. Strict last-line parsing is the right direction, but the proposal did not unify terminal-signature selection, multiple digest lines and CRLF handling into one rule."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.6825,
+      "rationale": "Incumbent. Its multiple-signature mechanism was confirmed, but it was a diagnostic hypothesis rather than the concrete terminal-signature repair."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.585,
+      "rationale": "Deferred. Representative-template regression closure was valuable and was incorporated into the selected repair test, but it is validation rather than a root-cause change."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.575,
+      "rationale": "Deferred, not refuted. The CRLF behavior observed in the matrix makes normalization asymmetry plausible, but it was less directly connected than the terminal boundary."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.5625,
+      "rationale": "Deferred. Trailing spaces and newlines already verified before repair, so this candidate is regression coverage rather than an explanation of the executable bypass."
+    }
+  ]
+}

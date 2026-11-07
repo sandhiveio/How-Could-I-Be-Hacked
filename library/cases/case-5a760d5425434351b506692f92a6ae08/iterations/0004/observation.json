@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "The saved diff applied cleanly to a fresh hardlink copy of the full pristine tree; only the target file was broken out of sharing, and the patch reported one changed file with three insertions and three deletions. The canonical casing and array matrix, benign regression, and multi-hop robustness scripts all passed against that fresh patched tree with the source-root environment variable pointed at it. A separate pristine-file dry-run also succeeded and the patched-file hash matched the development copy. External official evaluation was not available, so the patch remains locally verified and officially unverified.",
+  "next_hint": "Hand the saved diff to the external benchmark evaluator with the verified dataset and preserve its summary and logs. If the evaluator reports a preservation failure, compare its exercised API paths with the fresh-tree regression matrix before changing the patch."
+}

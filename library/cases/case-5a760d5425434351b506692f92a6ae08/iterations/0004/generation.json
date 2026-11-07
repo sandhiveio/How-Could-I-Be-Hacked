@@ -1,0 +1,24 @@
+{
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: the exported patch is self-contained and limited to one file. Prerequisites: pristine source tree and the saved diff. Bounded test: run a patch dry-run against a fresh copy, apply it, and list the changed paths and line counts. Expected supporting result: the patch applies with no conflict and reports exactly one changed file. Falsifier: a conflict or any additional changed path. Cleanup: keep the applied fresh tree separate from the pristine source."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: behavior observed in the development copy reproduces when only the exported patch is applied to a fresh tree. Prerequisites: fresh copy, saved patch, and the existing loopback scripts parameterized by source root. Bounded test: apply the patch to a fresh copy, run the canonical cross-origin matrix, benign regression, and multi-hop robustness scripts against that copy, and compare the expected header sets. Expected supporting result: zero cross-origin leaks and all benign controls pass. Falsifier: any leak or benign regression appears only in the fresh tree. Cleanup: stop servers and keep the fresh tree and logs."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: hostname case differences between a redirect target and the original origin are treated as cross-origin, over-stripping credentials on a semantically same-origin hop. Prerequisites: patched fresh copy and loopback servers addressed by differently cased host spellings. Bounded test: redirect between mixed-case spellings of the same loopback host and compare credential survival with a different-host control. Expected supporting result: same-origin case variants preserve and a real host change strips. Falsifier: a case variant strips or a real change preserves. Cleanup: close servers."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: the one-file patch introduces a syntax or module-loading error in the fresh tree. Prerequisites: patched fresh copy and a loader that can require every source module without network access. Bounded test: load the changed module and its immediate dependents, then attempt a broader module sweep and record failures separately from optional-runtime failures. Expected supporting result: the changed module and its dependents load, and any broader failure is attributable to an absent optional facility. Falsifier: the changed module or a dependent fails to parse or load. Cleanup: discard the fresh tree after saving logs."
+    }
+  ]
+}

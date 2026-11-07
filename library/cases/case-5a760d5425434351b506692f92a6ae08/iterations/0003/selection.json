@@ -1,0 +1,4 @@
+{
+  "selected_id": "r3-v1",
+  "selected_text": "Hypothesis: sanitized headers are not written back to the request state, so a later hop of a multi-hop chain re-sends the original credential. Prerequisites: patched copy and three loopback origins. Bounded test: A redirects to B, B redirects to C; send both credential families and a marker at A and inspect C with the low-level API and the fetch-style API. Expected supporting result: C receives neither credential and receives the marker. Falsifier: either credential reappears at C. Cleanup: close all listeners and retain the chain log."
+}

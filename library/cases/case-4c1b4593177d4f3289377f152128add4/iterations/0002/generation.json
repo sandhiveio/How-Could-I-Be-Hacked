@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: a strict tail-boundary parser that splits raw bytes at the final digest-prefixed line and rejects any earlier digest line or non-whitespace suffix closes the CR-tail path. Prerequisites: repaired verifier, disposable LF/CRLF/CR fixtures and a local key. Bounded test: sign each fixture, append executable CR and LF tails, and run the repaired verifier. Expected supporting result: CR and LF tails fail while all untouched signed fixtures verify. Falsifier: a CR tail with code still verifies or a trailing-space valid signature fails. Cleanup: delete generated fixtures and keys. Limitation: the rule must also define how multiple digest-looking body lines are handled."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: verification should hash every byte except exactly one terminal signature block, rather than stripping all digest-looking lines anywhere; this removes both the multiple-signature and CR-tail discrepancies. Prerequisites: repaired verifier, a local ECDSA signer, and a parser harness. Bounded test: implement a final-non-whitespace-line helper that recognizes LF, CRLF and bare CR; use it for terminal digest selection and for removing only that one line; then run the CR/LF/CRLF matrix, body-tamper checks and representative signed templates. Expected supporting result: CR, LF and CRLF executable tails fail; valid LF and CRLF signatures and trailing whitespace pass. Falsifier: an executable tail still verifies or a valid signature regresses. Cleanup: restore the pristine source copy after recording the patch. Limitation: embedded digest-looking body lines become part of the signed range."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: the primary defect is normalization asymmetry between signer and verifier, so a body rewritten from LF to CR after signing can still verify while the parser sees modified content. Prerequisites: a signed LF template and a verifier with normalization logic. Bounded test: sign an LF body, rewrite interior line endings to CR while preserving the signature, and compare verification before and after repair. Expected supporting result: the rewritten body fails only after normalization is made symmetric. Falsifier: the rewritten body fails in both versions, or a legitimate Windows-style save also breaks. Cleanup: restore fixture copies. Limitation: may be a secondary effect rather than the execution path."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: trailing-byte tolerance around the digest line (spaces, tabs, double newlines, mixed endings) creates ambiguity that lets a mutated tail verify; the repair should accept one documented canonical suffix and reject non-canonical tails. Prerequisites: valid signed fixtures and a local verifier. Bounded test: generate signatures followed by newline, CRLF, space, tab and double-newline tails and compare acceptance before and after repair. Expected supporting result: exactly the documented benign forms remain accepted. Falsifier: a non-canonical tail is accepted while an equally benign documented form is rejected. Cleanup: delete generated variants. Limitation: canonical-form selection is a policy choice."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "r1-v2",
+      "text": "Hypothesis: repair closure requires representative benign templates across independent sections to verify and one-byte mutations in each section to fail, in LF and CRLF forms. Prerequisites: repaired verifier and disposable HTTP, code and DNS templates. Bounded test: sign each template, mutate one byte outside the signature, and compare verifier results in a single matrix. Expected supporting result: all untouched templates verify and all mutations fail. Falsifier: a mutation is accepted or an untouched template is rejected. Cleanup: reset the disposable source tree. Limitation: validation activity rather than a distinct root-cause repair."
+    }
+  ]
+}

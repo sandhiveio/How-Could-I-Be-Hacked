@@ -1,0 +1,10 @@
+{
+  "case_id": "case-5a760d5425434351b506692f92a6ae08",
+  "iteration_id": "step-3",
+  "previous_iteration_id": "step-2",
+  "incumbent": {
+    "id": "r2-v1",
+    "text": "Hypothesis: adding a case-insensitive proxy-credential name check to the shared cross-origin predicate removes all observed leaks without a second code path. Prerequisites: a disposable patched copy and the existing two-server fixture. Bounded test: patch the predicate, rerun the casing and array matrix for 302 and 307, then run a benign regression with a direct request, a relative same-origin redirect, a cross-origin redirect carrying mixed-case credentials plus a proxy challenge and duplicate marker header, and the fetch-style API. Expected supporting result: zero cross-origin credential deliveries, same-origin and direct requests preserved, challenge and marker headers preserved. Falsifier: any leak remains or any benign header is lost. Cleanup: keep the patch in the disposable copy and export only the diff."
+  },
+  "hint": "A minimal repair made the shared cross-origin redirect predicate recognize the proxy-credential name case-insensitively. One-hop cross-origin tests now leak nothing, same-origin and relative redirects preserve credentials, mixed casing is stripped, and unrelated challenge and marker headers survive. The next question is whether a longer redirect chain re-injects the credential on a later hop, and whether default-port or relative-Location origin spellings cause under- or over-stripping."
+}

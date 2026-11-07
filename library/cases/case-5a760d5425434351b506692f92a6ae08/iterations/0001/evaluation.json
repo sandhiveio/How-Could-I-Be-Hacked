@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.7,
+      "rationale": "The broad plan remains valid: it names parity, a local fixture, a repair, and a regression route. It is deferred in favor of the generated casing matrix because that candidate is the smallest test that discriminates the competing causes."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.86,
+      "rationale": "Selected. It directly discriminates a missing name rule from casing and fetch-path effects with one bounded matrix and includes the same-origin control. The baseline result already supports the expected pattern."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.63,
+      "rationale": "Deferred, not refuted. Array storage is a plausible bypass, but the baseline used object headers and had already produced a leak, so this candidate cannot be the primary explanation. It is folded into the selected matrix as a control."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.57,
+      "rationale": "Deferred, not refuted. Post-sanitization injection is a distinct mechanism, but internal instrumentation is more invasive than observing destination headers and is unnecessary while a missing name rule explains the same evidence."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.82,
+      "rationale": "Deferred, not refuted. The same-origin control is essential for repair validation but does not explain the cross-origin leak. It is included in the selected matrix so one action covers both."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.61,
+      "rationale": "Deferred, not refuted. Cross-API parity and 307 coverage are useful later regression work but require a candidate patch first, so this candidate belongs to a later round."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A minimal redirect-sanitizer repair passes one-hop, multi-hop, relative, default-port, 303, duplicate-header, and fetch-parity checks in the development copy. The remaining question is whether the saved patch is self-contained: does it apply to a fresh pristine tree, change only the intended file, and reproduce the same behavior there rather than depending on the edited working copy?",
+    "surface": "A dependency-free JavaScript HTTP client with a low-level request entry point, a fetch-style entry point, a shared redirect handler, a proxy-agent component, and disposable loopback HTTP servers.",
+    "assumptions": [
+      "The observer can read and modify a disposable local source tree, run a JavaScript runtime, and start ephemeral loopback servers; no public target, production service, or installed dependency is used.",
+      "The attacker controls caller-supplied request header names and values and the destination of a redirect, but not the client source or the local fixture.",
+      "A proxy credential is a request header intended only for a proxy, while an ordinary authorization credential is intended for the origin; both must be removed when the redirect target changes origin.",
+      "The client source ships without installed development dependencies, so purpose-built local scripts are used; official benchmark evaluation is external and local logs are not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "r3-v1",
+    "text": "Hypothesis: sanitized headers are not written back to the request state, so a later hop of a multi-hop chain re-sends the original credential. Prerequisites: patched copy and three loopback origins. Bounded test: A redirects to B, B redirects to C; send both credential families and a marker at A and inspect C with the low-level API and the fetch-style API. Expected supporting result: C receives neither credential and receives the marker. Falsifier: either credential reappears at C. Cleanup: close all listeners and retain the chain log."
+  },
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: the exported patch is self-contained and limited to one file. Prerequisites: pristine source tree and the saved diff. Bounded test: run a patch dry-run against a fresh copy, apply it, and list the changed paths and line counts. Expected supporting result: the patch applies with no conflict and reports exactly one changed file. Falsifier: a conflict or any additional changed path. Cleanup: keep the applied fresh tree separate from the pristine source."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: behavior observed in the development copy reproduces when only the exported patch is applied to a fresh tree. Prerequisites: fresh copy, saved patch, and the existing loopback scripts parameterized by source root. Bounded test: apply the patch to a fresh copy, run the canonical cross-origin matrix, benign regression, and multi-hop robustness scripts against that copy, and compare the expected header sets. Expected supporting result: zero cross-origin leaks and all benign controls pass. Falsifier: any leak or benign regression appears only in the fresh tree. Cleanup: stop servers and keep the fresh tree and logs."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: hostname case differences between a redirect target and the original origin are treated as cross-origin, over-stripping credentials on a semantically same-origin hop. Prerequisites: patched fresh copy and loopback servers addressed by differently cased host spellings. Bounded test: redirect between mixed-case spellings of the same loopback host and compare credential survival with a different-host control. Expected supporting result: same-origin case variants preserve and a real host change strips. Falsifier: a case variant strips or a real change preserves. Cleanup: close servers."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: the one-file patch introduces a syntax or module-loading error in the fresh tree. Prerequisites: patched fresh copy and a loader that can require every source module without network access. Bounded test: load the changed module and its immediate dependents, then attempt a broader module sweep and record failures separately from optional-runtime failures. Expected supporting result: the changed module and its dependents load, and any broader failure is attributable to an absent optional facility. Falsifier: the changed module or a dependent fails to parse or load. Cleanup: discard the fresh tree after saving logs."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.82,
+      "rationale": "The incumbent robustness result remains the strongest behavioral evidence, but it was produced in the development copy. It is rescored and deferred to the fresh-tree verification."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.86,
+      "rationale": "Deferred, not refuted. Patch application and one-file scope are necessary preconditions but do not prove behavior. They are folded into the selected fresh-tree run."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.9,
+      "rationale": "Selected. It is the only candidate that tests the exported artifact end-to-end on a pristine tree and directly falsifies dependence on the development copy or a stale patch."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.62,
+      "rationale": "Deferred, not refuted. Hostname case handling is a plausible origin edge but lies outside the changed name predicate and would not validate the saved patch. It remains a viable follow-up hypothesis for another target."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.55,
+      "rationale": "Deferred, not refuted. Module loading checks syntax and coupling, but the patch is confined to one already-loadable file and a full sweep may fail for absent optional facilities. It is lower information than behavioral verification."
+    }
+  ],
+  "selected_id": "r4-v2",
+  "observation": {
+    "outcome": "supported",
+    "summary": "The saved diff applied cleanly to a fresh hardlink copy of the full pristine tree; only the target file was broken out of sharing, and the patch reported one changed file with three insertions and three deletions. The canonical casing and array matrix, benign regression, and multi-hop robustness scripts all passed against that fresh patched tree with the source-root environment variable pointed at it. A separate pristine-file dry-run also succeeded and the patched-file hash matched the development copy. External official evaluation was not available, so the patch remains locally verified and officially unverified.",
+    "next_hint": "Hand the saved diff to the external benchmark evaluator with the verified dataset and preserve its summary and logs. If the evaluator reports a preservation failure, compare its exercised API paths with the fresh-tree regression matrix before changing the patch."
+  },
+  "lineage": {
+    "case_id": "case-5a760d5425434351b506692f92a6ae08",
+    "iteration_id": "step-4",
+    "previous_iteration_id": "step-3",
+    "step_id": "step-4",
+    "parent_step_id": "step-3",
+    "branch_id": "main"
+  }
+}

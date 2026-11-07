@@ -1,0 +1,10 @@
+{
+  "case_id": "case-5a760d5425434351b506692f92a6ae08",
+  "iteration_id": "step-1",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Compare redirect header sanitation across the two request APIs. Drive cross-origin and same-origin redirects with distinct marker headers, identify the missing proxy-credential rule in the shared sanitizer, add that rule, and rerun ordinary and redirect regressions before exporting a minimal patch."
+  },
+  "hint": "A dependency-free HTTP client has a low-level request API and a fetch-style API. Both follow redirects; the shared redirect handler decides which headers survive a cross-origin hop. A local two-server fixture shows that a caller-supplied proxy credential reaches a second origin after a redirect through the low-level API, while the fetch-style API removes it. In the same run, an ordinary authorization credential is removed by both APIs and a harmless marker survives. The next question is whether the cause is a missing credential-name rule, a casing bug, a header-storage form bug, or post-sanitization injection."
+}

@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A local matrix established that a low-level HTTP request API leaks a caller-supplied proxy credential across a cross-origin redirect for four header casings and two storage forms, while the fetch-style API strips it and same-origin redirects preserve it. The shared redirect handler is the narrow repair site. The next question is how small the repair can be, and which benign controls prove it does not over-strip ordinary authorization, proxy challenges, duplicate non-credential headers, or same-origin credentials.",
+    "surface": "A dependency-free JavaScript HTTP client with a low-level request entry point, a fetch-style entry point, a shared redirect handler, a proxy-agent component, and disposable loopback HTTP servers.",
+    "assumptions": [
+      "The observer can read and modify a disposable local source tree, run a JavaScript runtime, and start ephemeral loopback servers; no public target, production service, or installed dependency is used.",
+      "The attacker controls caller-supplied request header names and values and the destination of a redirect, but not the client source or the local fixture.",
+      "A proxy credential is a request header intended only for a proxy, while an ordinary authorization credential is intended for the origin; both must be removed when the redirect target changes origin.",
+      "The client source ships without installed development dependencies, so purpose-built local scripts are used; official benchmark evaluation is external and local logs are not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "r1-v1",
+    "text": "Hypothesis: the shared redirect sanitizer matches exact credential names but has no rule for the proxy-credential family, while the fetch-style path has an additional deletion step. Prerequisites: local source, two loopback origins, and a caller able to set arbitrary request headers. Bounded test: send the proxy credential under four casings through a cross-origin 302 using the low-level API, repeat with the fetch-style API, and add a same-origin 302 control. Expected supporting result: every casing leaks through the low-level API, none leaks through the fetch-style API, and credentials survive same-origin. Falsifier: only one casing leaks, or same-origin loses credentials. Cleanup: close all loopback servers and restore the disposable tree."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: adding a case-insensitive proxy-credential name check to the shared cross-origin predicate removes all observed leaks without a second code path. Prerequisites: a disposable patched copy and the existing two-server fixture. Bounded test: patch the predicate, rerun the casing and array matrix for 302 and 307, then run a benign regression with a direct request, a relative same-origin redirect, a cross-origin redirect carrying mixed-case credentials plus a proxy challenge and duplicate marker header, and the fetch-style API. Expected supporting result: zero cross-origin credential deliveries, same-origin and direct requests preserved, challenge and marker headers preserved. Falsifier: any leak remains or any benign header is lost. Cleanup: keep the patch in the disposable copy and export only the diff."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a name-based rule is too narrow because related authentication headers form a family and a length-sensitive edit may accidentally affect a challenge header. Prerequisites: patched copy and a fixture that can send authorization, proxy authorization, proxy challenge, and origin challenge headers together. Bounded test: send all four through a cross-origin 302 and record which survive. Expected supporting result: both credential headers are stripped, both challenge headers survive. Falsifier: a challenge header is stripped or a credential survives. Cleanup: close servers and compare the patched tree only with its disposable baseline."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a one-hop repair still allows re-injection on a later hop of a redirect chain because sanitized headers are not stored back into the request state. Prerequisites: three loopback origins and a patched copy. Bounded test: chain A to B to C with a proxy credential and marker at A, then inspect C with both request APIs. Expected supporting result: C receives no credential and the marker survives. Falsifier: the credential reappears at C. Cleanup: stop all three servers and keep the chain log."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: the repair under-strips when an origin has an implicit default port or over-strips when a relative Location or explicit default-port spelling is used. Prerequisites: permission to bind an ephemeral loopback port and the default HTTP port locally. Bounded test: from an origin on the default port, redirect relatively, to an explicit default-port URL, and to a different port; compare credential survival with a marker control. Expected supporting result: the two same-origin spellings preserve credentials and the different-port target strips them. Falsifier: a same-origin spelling strips or a different-port target preserves. Cleanup: close both servers."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.8,
+      "rationale": "The incumbent analysis remains valid and is the evidence base for the repair, but it has no new action. It is rescored under final weights and deferred to the patch candidate."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.9,
+      "rationale": "Selected. It is the smallest causal repair and the existing matrix is an exact falsifier. The candidate also requires a separate benign regression, so a passing result supports both removal and preservation."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Deferred, not refuted. Header-family semantics are a useful robustness check but do not remove the observed leak. The challenge headers are folded into the selected regression rather than consuming the round."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.68,
+      "rationale": "Deferred, not refuted. A multi-hop chain is a plausible hidden-test shape, but the one-hop repair should be validated first. It becomes the next round's primary discriminator."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.78,
+      "rationale": "Deferred, not refuted. Default-port and relative-Location controls are strong over- and under-strip checks, but they modify the origin test matrix rather than the repair itself. They are retained for robustness verification."
+    }
+  ],
+  "selected_id": "r2-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "A minimal repair made the shared cross-origin predicate recognize the proxy-credential name case-insensitively. The original matrix then produced zero cross-origin leaks for four casings, object and array forms, and 302/307 redirects, with both APIs preserving credentials on same-origin controls. A separate benign regression passed: non-redirect requests kept both credential families, a relative same-origin redirect preserved them, a cross-origin redirect stripped both regardless of casing, proxy challenge and marker headers survived, and the fetch-style API stayed consistent. The patch applied cleanly to a pristine copy of the changed file.",
+    "next_hint": "Test whether the one-hop repair survives a multi-hop origin chain and origin-spelling edge cases. A later hop could re-inject a credential if sanitized state is not persisted, while a relative Location or default-port origin could make the origin comparison under- or over-strip."
+  },
+  "lineage": {
+    "case_id": "case-5a760d5425434351b506692f92a6ae08",
+    "iteration_id": "step-2",
+    "previous_iteration_id": "step-1",
+    "step_id": "step-2",
+    "parent_step_id": "step-1",
+    "branch_id": "main"
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "selected_id": "r1-v1",
+  "selected_text": "Hypothesis: the shared redirect sanitizer matches exact credential names but has no rule for the proxy-credential family, while the fetch-style path has an additional deletion step. Prerequisites: local source, two loopback origins, and a caller able to set arbitrary request headers. Bounded test: send the proxy credential under four casings through a cross-origin 302 using the low-level API, repeat with the fetch-style API, and add a same-origin 302 control. Expected supporting result: every casing leaks through the low-level API, none leaks through the fetch-style API, and credentials survive same-origin. Falsifier: only one casing leaks, or same-origin loses credentials. Cleanup: close all loopback servers and restore the disposable tree."
+}

@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "A minimal repair made the shared cross-origin predicate recognize the proxy-credential name case-insensitively. The original matrix then produced zero cross-origin leaks for four casings, object and array forms, and 302/307 redirects, with both APIs preserving credentials on same-origin controls. A separate benign regression passed: non-redirect requests kept both credential families, a relative same-origin redirect preserved them, a cross-origin redirect stripped both regardless of casing, proxy challenge and marker headers survived, and the fetch-style API stayed consistent. The patch applied cleanly to a pristine copy of the changed file.",
+  "next_hint": "Test whether the one-hop repair survives a multi-hop origin chain and origin-spelling edge cases. A later hop could re-inject a credential if sanitized state is not persisted, while a relative Location or default-port origin could make the origin comparison under- or over-strip."
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A local YAML scanner verifies a terminal ECDSA signature over template content. Its verification helper matches digest-prefixed lines with a multiline regular expression, removes every matching line before hashing, and takes the digest from the first match. A signature line is appended at the end when signing. The YAML parser accepts LF, CRLF and bare-CR line endings, and code sections execute when enabled. A disposable signing key and local template fixtures are available. Question: can an attacker append a CR-terminated second digest line and an executable code section after a valid signature, and have verification still succeed while the parser exposes the code?",
+    "surface": "Go command-line scanner with YAML template loading, HTTP, code and DNS request sections, and a local ECDSA signer/verifier. Disposable local templates, a locally generated certificate and private key, and a local template-parser harness; no network target is used.",
+    "assumptions": [
+      "The attacker can edit a signed template file before the scanner loads it, but cannot forge an ECDSA signature or read the signer's private key.",
+      "The operator has enabled execution of code-template sections, so parsed code content is security-relevant.",
+      "The scanner loads local template files and the signer/verifier is reachable through a small local harness; no public service or deployed target is involved.",
+      "Signature lines follow the existing convention of one terminal digest-prefixed line appended after the template body.",
+      "Official benchmark verification is performed by an external host evaluator; local signing, parsing and regression checks are supporting evidence."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Line-ending mismatch plan: sign a benign template with a disposable key, then append a second digest-prefixed line and an executable code section whose line endings are bare CR. Compare verification with the YAML parser's view. Expected observation: verification succeeds while the parser exposes the appended code, because the digest-line regular expression consumes the CR-terminated tail during hashing and the YAML scanner treats CR as a line break. Falsifier: verification fails or the parser does not expose the code. Repair by making signature removal line-ending aware and requiring the signature to be the final line; regress LF and CRLF controls."
+  },
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the digest-line matcher treats only LF-terminated text as a line, so a second digest line and a following code section written with bare CR are swallowed as one match during hashing, while the YAML scanner still sees CR as a line break. Prerequisites: a validly signed template, a known terminal digest line, a parser that accepts bare CR, and code execution enabled. Bounded test: sign a benign template locally; append a second digest-prefixed line ending in CR and a CR-separated code section whose source prints a harmless marker; run verification and parse the result. Expected supporting result: verification is true and the parsed code section contains the marker command. Falsifier: verification is false, the code section is absent, or the same manipulation with LF also verifies. Cleanup: delete the disposable key and template. Limitation: the exact regex anchors and parser line-break rules must both be confirmed."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: verification uses the first digest match for the signature while removing later digest-prefixed lines from the hashed bytes, so an extra digest line can be tolerated or can change which digest is trusted. Prerequisites: a valid signed template, ability to insert digest-prefixed lines, and a local verifier. Bounded test: append a malformed second digest line with LF and no code; separately prepend a malformed digest line before the real signature; compare verification errors. Expected supporting result: the later malformed digest is tolerated, while a first-position malformed digest is selected and fails. Falsifier: both arrangements fail, or the later malformed line changes the hash and fails. Cleanup: remove the disposable fixtures. Limitation: this tests digest selection, not the CR-tail execution path."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: non-printing bytes such as zero-width spaces in the trailing whitespace after the signature change the parser's structural view without changing the hash range, creating a boundary mismatch. Prerequisites: a valid signed template and a parser that handles Unicode whitespace differently from the signature matcher. Bounded test: insert zero-width characters after the terminal signature and around the trailing newline, then verify and parse the template. Expected supporting result: verification stays true while parsing changes unexpectedly. Falsifier: verification fails or parsing is unchanged. Cleanup: delete the generated variants. Limitation: this is a different boundary from CR line endings and was not selected for execution."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: signing and verification normalize CRLF and bare CR differently, so a template signed with one newline style can be modified by rewriting line endings without invalidating the signature. Prerequisites: a valid CRLF-signed template and a local verifier. Bounded test: sign a CRLF template, then change only the final newline to bare CR or add trailing whitespace while leaving body bytes otherwise unchanged; compare verification. Expected supporting result: a specific newline transition verifies while the body has been rewritten. Falsifier: the transition fails verification or the parser sees identical content. Cleanup: remove the variants. Limitation: may reveal tolerance rather than an executable bypass."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.74,
+      "rationale": "Selected by the seeded tie-break after ranking level with r1-v1. The local matrix showed that a later malformed digest line is tolerated while a leading malformed digest is selected and fails, confirming first-match digest selection and extra-digest tolerance."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.74,
+      "rationale": "Deferred by the seeded tie-break, not refuted. The CR-tail variant verified true while the parsed code section was present, and LF and CRLF controls failed; this is the strongest executable mechanism but overlapped the incumbent."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.7225,
+      "rationale": "Incumbent. Its line-ending mechanism was confirmed, but the generated multiple-signature hypothesis stated the same boundary more sharply for the next experiment."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.655,
+      "rationale": "Deferred, not refuted. CRLF-signed templates, trailing LF and trailing CR after a valid signature all verified in the matrix, so this candidate did not reveal a new normalization defect; it remains useful regression coverage."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.37125,
+      "rationale": "Deferred because it tests a different boundary and was not executed. Zero-width-byte behavior remains an unverified alternative."
+    }
+  ],
+  "selected_id": "r1-v2",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Executed a locally signed-template matrix with a disposable ECDSA key. An invalid later digest line with LF and no code verified true; a malformed first digest raised a decode error. The CR-tail variant, containing a second digest line plus a CR-separated code section, verified true and the YAML parser exposed source that printed the local user identity; running that source under a local shell printed the expected uid. LF-tail and CRLF-tail variants verified false while their code sections still parsed. This supports first-match digest selection and extra-digest tolerance, with the executable bypass carried by the bare-CR newline mismatch. The comparison was local only; no official evaluator verdict was produced.",
+    "next_hint": "A signed LF template verifies when a CR-terminated digest line and code section follow the real signature; LF and CRLF tails fail. The next question is which minimal repair removes exactly one terminal signature line, rejects later non-whitespace content, and preserves LF, CRLF, trailing-newline and trailing-space signatures."
+  },
+  "lineage": {
+    "case_id": "case-4c1b4593177d4f3289377f152128add4",
+    "iteration_id": "step-1",
+    "previous_iteration_id": null,
+    "step_id": "step-1",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}

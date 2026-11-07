@@ -1,0 +1,19 @@
+{
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: sanitized headers are not written back to the request state, so a later hop of a multi-hop chain re-sends the original credential. Prerequisites: patched copy and three loopback origins. Bounded test: A redirects to B, B redirects to C; send both credential families and a marker at A and inspect C with the low-level API and the fetch-style API. Expected supporting result: C receives neither credential and receives the marker. Falsifier: either credential reappears at C. Cleanup: close all listeners and retain the chain log."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: a relative Location can resolve to a different origin when the current origin uses an implicit default port, causing under-stripping. Prerequisites: a server on the default port and a second origin on a non-default port. Bounded test: send a credential and marker through a relative redirect on the default port, an explicit default-port absolute redirect, and a redirect to the other port. Expected supporting result: same-origin spellings preserve and the different port strips. Falsifier: a different port preserves or a same-origin spelling strips. Cleanup: close both servers."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: adding one more credential name to a length-sensitive predicate causes over-stripping of an unrelated header with a similar name or changes duplicate-header handling. Prerequisites: patched copy and a fixture with duplicate non-credential headers. Bounded test: send a relative same-origin redirect with a changed query, both credential families, a proxy challenge, and a duplicated marker header; record all final headers. Expected supporting result: credentials and duplicate marker survive, challenge survives. Falsifier: a benign header is dropped or merged unexpectedly. Cleanup: close the server and save the raw header log."
+    }
+  ]
+}

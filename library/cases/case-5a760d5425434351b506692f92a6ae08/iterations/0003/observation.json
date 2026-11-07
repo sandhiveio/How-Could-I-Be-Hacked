@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "The patched client was exercised on a two-hop cross-origin chain (A to B to C). The low-level and fetch-style APIs both delivered the final request without either credential family and with the marker intact. A relative same-origin redirect with a changed query preserved both credentials and a duplicated non-credential header. A 303 changed the method, removed content-type, stripped both credentials, and kept the marker. A separate default-port test showed that relative and explicit default-port Locations preserved credentials while a different port stripped them. No later-hop re-injection or origin-spelling error was observed.",
+  "next_hint": "Verify the exported patch on a fresh pristine tree rather than the in-place development copy. Apply only the saved diff, confirm the changed-file scope, and rerun the canonical matrix and benign regression there before preparing the external evaluator handoff."
+}

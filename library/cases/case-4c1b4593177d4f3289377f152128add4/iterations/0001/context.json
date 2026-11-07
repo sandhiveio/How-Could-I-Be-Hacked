@@ -1,0 +1,10 @@
+{
+  "case_id": "case-4c1b4593177d4f3289377f152128add4",
+  "iteration_id": "step-1",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Line-ending mismatch plan: sign a benign template with a disposable key, then append a second digest-prefixed line and an executable code section whose line endings are bare CR. Compare verification with the YAML parser's view. Expected observation: verification succeeds while the parser exposes the appended code, because the digest-line regular expression consumes the CR-terminated tail during hashing and the YAML scanner treats CR as a line break. Falsifier: verification fails or the parser does not expose the code. Repair by making signature removal line-ending aware and requiring the signature to be the final line; regress LF and CRLF controls."
+  },
+  "hint": "A local YAML scanner verifies a terminal ECDSA signature over template content. Its verification helper matches digest-prefixed lines with a multiline regular expression, removes every matching line before hashing, and takes the digest from the first match. A signature line is appended at the end when signing. The YAML parser accepts LF, CRLF and bare-CR line endings, and code sections execute when enabled. A disposable signing key and local template fixtures are available. Question: can an attacker append a CR-terminated second digest line and an executable code section after a valid signature, and have verification still succeed while the parser exposes the code?"
+}

@@ -1,0 +1,4 @@
+{
+  "selected_id": "r2-v2",
+  "selected_text": "Hypothesis: verification should hash every byte except exactly one terminal signature block, rather than stripping all digest-looking lines anywhere; this removes both the multiple-signature and CR-tail discrepancies. Prerequisites: repaired verifier, a local ECDSA signer, and a parser harness. Bounded test: implement a final-non-whitespace-line helper that recognizes LF, CRLF and bare CR; use it for terminal digest selection and for removing only that one line; then run the CR/LF/CRLF matrix, body-tamper checks and representative signed templates. Expected supporting result: CR, LF and CRLF executable tails fail; valid LF and CRLF signatures and trailing whitespace pass. Falsifier: an executable tail still verifies or a valid signature regresses. Cleanup: restore the pristine source copy after recording the patch. Limitation: embedded digest-looking body lines become part of the signed range."
+}

@@ -1,0 +1,28 @@
+{
+  "evaluations": [
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.85,
+      "rationale": "The incumbent patch remains the best artifact and is the fallback, but it has no new check. It is rescored and deferred to the chain experiment, which tests a failure mode not covered by one-hop evidence."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.88,
+      "rationale": "Selected. Multi-hop re-injection is the most plausible way the one-hop repair could fail and is directly executable on the existing fixture. It also gives both APIs a shared expected header set."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.78,
+      "rationale": "Deferred, not refuted. The default-port and relative-Location control is strong but overlaps the selected chain action, so it is folded into the same run rather than repeated as a separate round."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.72,
+      "rationale": "Deferred, not refuted. Duplicate-header and challenge survival are useful over-strip controls and are folded into the selected robustness script, but they do not discriminate a state-persistence failure."
+    }
+  ]
+}

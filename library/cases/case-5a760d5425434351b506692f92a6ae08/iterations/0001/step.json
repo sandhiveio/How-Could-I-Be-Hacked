@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A dependency-free HTTP client has a low-level request API and a fetch-style API. Both follow redirects; the shared redirect handler decides which headers survive a cross-origin hop. A local two-server fixture shows that a caller-supplied proxy credential reaches a second origin after a redirect through the low-level API, while the fetch-style API removes it. In the same run, an ordinary authorization credential is removed by both APIs and a harmless marker survives. The next question is whether the cause is a missing credential-name rule, a casing bug, a header-storage form bug, or post-sanitization injection.",
+    "surface": "A dependency-free JavaScript HTTP client with a low-level request entry point, a fetch-style entry point, a shared redirect handler, a proxy-agent component, and disposable loopback HTTP servers.",
+    "assumptions": [
+      "The observer can read and modify a disposable local source tree, run a JavaScript runtime, and start ephemeral loopback servers; no public target, production service, or installed dependency is used.",
+      "The attacker controls caller-supplied request header names and values and the destination of a redirect, but not the client source or the local fixture.",
+      "A proxy credential is a request header intended only for a proxy, while an ordinary authorization credential is intended for the origin; both must be removed when the redirect target changes origin.",
+      "The client source ships without installed development dependencies, so purpose-built local scripts are used; official benchmark evaluation is external and local logs are not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Compare redirect header sanitation across the two request APIs. Drive cross-origin and same-origin redirects with distinct marker headers, identify the missing proxy-credential rule in the shared sanitizer, add that rule, and rerun ordinary and redirect regressions before exporting a minimal patch."
+  },
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the shared redirect sanitizer matches exact credential names but has no rule for the proxy-credential family, while the fetch-style path has an additional deletion step. Prerequisites: local source, two loopback origins, and a caller able to set arbitrary request headers. Bounded test: send the proxy credential under four casings through a cross-origin 302 using the low-level API, repeat with the fetch-style API, and add a same-origin 302 control. Expected supporting result: every casing leaks through the low-level API, none leaks through the fetch-style API, and credentials survive same-origin. Falsifier: only one casing leaks, or same-origin loses credentials. Cleanup: close all loopback servers and restore the disposable tree."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: flat-array header storage bypasses the object-key checks in the redirect sanitizer. Prerequisites: the low-level API accepts both object and flat key-value array header forms. Bounded test: send the proxy credential once as an object and once as a flat array through cross-origin 302 and 307 redirects, recording the destination headers. Expected supporting result: the array form leaks even if the object form is stripped. Falsifier: both forms behave identically. Cleanup: close servers and delete fixture logs only after saving the result."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the credential is injected after the sanitizer runs, so cleaning the pre-redirect header state is insufficient. Prerequisites: the redirect handler calls an internal dispatch after computing the new origin. Bounded test: instrument a disposable copy to record the header list immediately before and after the origin-change decision, then compare with the destination-observed header set. Expected supporting result: the header is absent before injection but present at the destination. Falsifier: the header is already present before the origin-change decision. Cleanup: revert instrumentation in the disposable copy."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a repair that strips on every redirect will over-strip credentials that should survive when only the path or query changes. Prerequisites: one loopback server serving both the redirect and its target. Bounded test: send both credential families and a marker through a relative same-origin 302 with a changed query, using both APIs. Expected supporting result: both credentials and the marker survive. Falsifier: any credential disappears on a same-origin hop. Cleanup: close the server and confirm no process remains."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: parity between the two APIs is accidental, so a patch on only one path creates future divergence. Prerequisites: identify shared versus separate redirect code and have a candidate repair. Bounded test: apply a minimal rule to the shared sanitizer, then compare both APIs across cross-origin 302 and 307 redirects with mixed headers. Expected supporting result: both APIs strip the proxy credential consistently and preserve the marker. Falsifier: the fetch-style API changes behavior or a non-credential header is lost. Cleanup: retain the patch only in a disposable copy."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.7,
+      "rationale": "The broad plan remains valid: it names parity, a local fixture, a repair, and a regression route. It is deferred in favor of the generated casing matrix because that candidate is the smallest test that discriminates the competing causes."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.86,
+      "rationale": "Selected. It directly discriminates a missing name rule from casing and fetch-path effects with one bounded matrix and includes the same-origin control. The baseline result already supports the expected pattern."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.63,
+      "rationale": "Deferred, not refuted. Array storage is a plausible bypass, but the baseline used object headers and had already produced a leak, so this candidate cannot be the primary explanation. It is folded into the selected matrix as a control."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.57,
+      "rationale": "Deferred, not refuted. Post-sanitization injection is a distinct mechanism, but internal instrumentation is more invasive than observing destination headers and is unnecessary while a missing name rule explains the same evidence."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.82,
+      "rationale": "Deferred, not refuted. The same-origin control is essential for repair validation but does not explain the cross-origin leak. It is included in the selected matrix so one action covers both."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.61,
+      "rationale": "Deferred, not refuted. Cross-API parity and 307 coverage are useful later regression work but require a candidate patch first, so this candidate belongs to a later round."
+    }
+  ],
+  "selected_id": "r1-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "A local two-server matrix sent the proxy credential through cross-origin 302 and 307 redirects. The low-level API delivered it for four casings and for object and flat-array header forms, while the fetch-style API removed it in all casing cases. Ordinary authorization was removed cross-origin by both APIs, the marker survived, and both APIs preserved credentials on a same-origin 302. The result rules out casing and storage form as causes and supports a missing proxy-credential rule in the low-level redirect sanitizer; same-origin preservation is a control, not a leak.",
+    "next_hint": "Apply the smallest explicit proxy-credential rule to the shared sanitizer in a disposable copy, then rerun the same matrix plus ordinary direct requests and same-origin controls. The repair must remove the credential for every casing and header form while leaving non-redirect requests and same-origin redirects unchanged."
+  },
+  "lineage": {
+    "case_id": "case-5a760d5425434351b506692f92a6ae08",
+    "iteration_id": "step-1",
+    "previous_iteration_id": null,
+    "step_id": "step-1",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}

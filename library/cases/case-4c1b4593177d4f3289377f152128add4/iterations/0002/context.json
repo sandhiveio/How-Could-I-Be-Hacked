@@ -1,0 +1,10 @@
+{
+  "case_id": "case-4c1b4593177d4f3289377f152128add4",
+  "iteration_id": "step-2",
+  "previous_iteration_id": "step-1",
+  "incumbent": {
+    "id": "r1-v2",
+    "text": "Hypothesis: verification uses the first digest match for the signature while removing later digest-prefixed lines from the hashed bytes, so an extra digest line can be tolerated or can change which digest is trusted. Prerequisites: a valid signed template, ability to insert digest-prefixed lines, and a local verifier. Bounded test: append a malformed second digest line with LF and no code; separately prepend a malformed digest line before the real signature; compare verification errors. Expected supporting result: the later malformed digest is tolerated, while a first-position malformed digest is selected and fails. Falsifier: both arrangements fail, or the later malformed line changes the hash and fails. Cleanup: remove the disposable fixtures. Limitation: this tests digest selection, not the CR-tail execution path."
+  },
+  "hint": "A local YAML scanner verifies a terminal ECDSA signature over template bytes. Verification previously removed every digest-prefixed line before hashing and selected the first digest, so a CR-terminated second digest line plus CR-separated code verified while the parser exposed the code. LF and CRLF tails failed. The current repair task is to define a terminal-signature boundary that leaves exactly one signature line outside the hashed bytes, rejects extra non-whitespace content after it, and still accepts valid LF, CRLF, trailing-newline and trailing-space signatures. Disposable local fixtures cover HTTP, code and DNS template shapes."
+}

@@ -1,0 +1,10 @@
+{
+  "case_id": "case-5a760d5425434351b506692f92a6ae08",
+  "iteration_id": "step-4",
+  "previous_iteration_id": "step-3",
+  "incumbent": {
+    "id": "r3-v1",
+    "text": "Hypothesis: sanitized headers are not written back to the request state, so a later hop of a multi-hop chain re-sends the original credential. Prerequisites: patched copy and three loopback origins. Bounded test: A redirects to B, B redirects to C; send both credential families and a marker at A and inspect C with the low-level API and the fetch-style API. Expected supporting result: C receives neither credential and receives the marker. Falsifier: either credential reappears at C. Cleanup: close all listeners and retain the chain log."
+  },
+  "hint": "A minimal redirect-sanitizer repair passes one-hop, multi-hop, relative, default-port, 303, duplicate-header, and fetch-parity checks in the development copy. The remaining question is whether the saved patch is self-contained: does it apply to a fresh pristine tree, change only the intended file, and reproduce the same behavior there rather than depending on the edited working copy?"
+}

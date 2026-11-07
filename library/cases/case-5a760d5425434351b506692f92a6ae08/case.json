@@ -1,0 +1,12 @@
+{
+  "id": "case-5a760d5425434351b506692f92a6ae08",
+  "kind": "curated_case",
+  "hint": "A dependency-free HTTP client exposes a low-level request API and a fetch-style API. Both follow redirects and share a header-sanitization rule that removes credential headers when a redirect crosses origins. A caller sends a proxy credential, an ordinary origin credential, and a harmless marker on a request whose first response redirects to a different origin. The low-level API delivers the proxy credential to the destination while the fetch-style API does not. Determine the smallest repair that removes this class of disclosure without stripping credentials on same-origin redirects or breaking ordinary header forwarding.",
+  "surface": "A dependency-free JavaScript HTTP client with a low-level request entry point, a fetch-style entry point, a shared redirect handler, a proxy-agent component, and disposable loopback HTTP servers.",
+  "assumptions": [
+    "The observer can read and modify a disposable local source tree, run a JavaScript runtime, and start ephemeral loopback servers; no public target, production service, or installed dependency is used.",
+    "The attacker controls caller-supplied request header names and values and the destination of a redirect, but not the client source or the local fixture.",
+    "A proxy credential is a request header intended only for a proxy, while an ordinary authorization credential is intended for the origin; both must be removed when the redirect target changes origin.",
+    "The client source ships without installed development dependencies, so purpose-built local scripts are used; official benchmark evaluation is external and local logs are not an official pass."
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the shared redirect sanitizer matches exact credential names but has no rule for the proxy-credential family, while the fetch-style path has an additional deletion step. Prerequisites: local source, two loopback origins, and a caller able to set arbitrary request headers. Bounded test: send the proxy credential under four casings through a cross-origin 302 using the low-level API, repeat with the fetch-style API, and add a same-origin 302 control. Expected supporting result: every casing leaks through the low-level API, none leaks through the fetch-style API, and credentials survive same-origin. Falsifier: only one casing leaks, or same-origin loses credentials. Cleanup: close all loopback servers and restore the disposable tree."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: flat-array header storage bypasses the object-key checks in the redirect sanitizer. Prerequisites: the low-level API accepts both object and flat key-value array header forms. Bounded test: send the proxy credential once as an object and once as a flat array through cross-origin 302 and 307 redirects, recording the destination headers. Expected supporting result: the array form leaks even if the object form is stripped. Falsifier: both forms behave identically. Cleanup: close servers and delete fixture logs only after saving the result."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the credential is injected after the sanitizer runs, so cleaning the pre-redirect header state is insufficient. Prerequisites: the redirect handler calls an internal dispatch after computing the new origin. Bounded test: instrument a disposable copy to record the header list immediately before and after the origin-change decision, then compare with the destination-observed header set. Expected supporting result: the header is absent before injection but present at the destination. Falsifier: the header is already present before the origin-change decision. Cleanup: revert instrumentation in the disposable copy."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a repair that strips on every redirect will over-strip credentials that should survive when only the path or query changes. Prerequisites: one loopback server serving both the redirect and its target. Bounded test: send both credential families and a marker through a relative same-origin 302 with a changed query, using both APIs. Expected supporting result: both credentials and the marker survive. Falsifier: any credential disappears on a same-origin hop. Cleanup: close the server and confirm no process remains."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: parity between the two APIs is accidental, so a patch on only one path creates future divergence. Prerequisites: identify shared versus separate redirect code and have a candidate repair. Bounded test: apply a minimal rule to the shared sanitizer, then compare both APIs across cross-origin 302 and 307 redirects with mixed headers. Expected supporting result: both APIs strip the proxy credential consistently and preserve the marker. Falsifier: the fetch-style API changes behavior or a non-credential header is lost. Cleanup: retain the patch only in a disposable copy."
+    }
+  ]
+}

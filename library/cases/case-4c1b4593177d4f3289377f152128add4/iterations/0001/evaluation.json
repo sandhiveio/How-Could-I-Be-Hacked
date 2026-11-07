@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.74,
+      "rationale": "Selected by the seeded tie-break after ranking level with r1-v1. The local matrix showed that a later malformed digest line is tolerated while a leading malformed digest is selected and fails, confirming first-match digest selection and extra-digest tolerance."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.74,
+      "rationale": "Deferred by the seeded tie-break, not refuted. The CR-tail variant verified true while the parsed code section was present, and LF and CRLF controls failed; this is the strongest executable mechanism but overlapped the incumbent."
+    },
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.7225,
+      "rationale": "Incumbent. Its line-ending mechanism was confirmed, but the generated multiple-signature hypothesis stated the same boundary more sharply for the next experiment."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.655,
+      "rationale": "Deferred, not refuted. CRLF-signed templates, trailing LF and trailing CR after a valid signature all verified in the matrix, so this candidate did not reveal a new normalization defect; it remains useful regression coverage."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.37125,
+      "rationale": "Deferred because it tests a different boundary and was not executed. Zero-width-byte behavior remains an unverified alternative."
+    }
+  ]
+}

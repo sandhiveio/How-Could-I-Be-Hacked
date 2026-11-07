@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "A local two-server matrix sent the proxy credential through cross-origin 302 and 307 redirects. The low-level API delivered it for four casings and for object and flat-array header forms, while the fetch-style API removed it in all casing cases. Ordinary authorization was removed cross-origin by both APIs, the marker survived, and both APIs preserved credentials on a same-origin 302. The result rules out casing and storage form as causes and supports a missing proxy-credential rule in the low-level redirect sanitizer; same-origin preservation is a control, not a leak.",
+  "next_hint": "Apply the smallest explicit proxy-credential rule to the shared sanitizer in a disposable copy, then rerun the same matrix plus ordinary direct requests and same-origin controls. The repair must remove the credential for every casing and header form while leaving non-redirect requests and same-origin redirects unchanged."
+}

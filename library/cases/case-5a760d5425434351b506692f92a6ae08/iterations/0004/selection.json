@@ -1,0 +1,4 @@
+{
+  "selected_id": "r4-v2",
+  "selected_text": "Hypothesis: behavior observed in the development copy reproduces when only the exported patch is applied to a fresh tree. Prerequisites: fresh copy, saved patch, and the existing loopback scripts parameterized by source root. Bounded test: apply the patch to a fresh copy, run the canonical cross-origin matrix, benign regression, and multi-hop robustness scripts against that copy, and compare the expected header sets. Expected supporting result: zero cross-origin leaks and all benign controls pass. Falsifier: any leak or benign regression appears only in the fresh tree. Cleanup: stop servers and keep the fresh tree and logs."
+}

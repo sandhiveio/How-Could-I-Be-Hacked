@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.8,
+      "rationale": "The incumbent analysis remains valid and is the evidence base for the repair, but it has no new action. It is rescored under final weights and deferred to the patch candidate."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.9,
+      "rationale": "Selected. It is the smallest causal repair and the existing matrix is an exact falsifier. The candidate also requires a separate benign regression, so a passing result supports both removal and preservation."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Deferred, not refuted. Header-family semantics are a useful robustness check but do not remove the observed leak. The challenge headers are folded into the selected regression rather than consuming the round."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.68,
+      "rationale": "Deferred, not refuted. A multi-hop chain is a plausible hidden-test shape, but the one-hop repair should be validated first. It becomes the next round's primary discriminator."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.78,
+      "rationale": "Deferred, not refuted. Default-port and relative-Location controls are strong over- and under-strip checks, but they modify the origin test matrix rather than the repair itself. They are retained for robustness verification."
+    }
+  ]
+}

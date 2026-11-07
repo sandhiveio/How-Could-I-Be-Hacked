@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.82,
+      "rationale": "The incumbent robustness result remains the strongest behavioral evidence, but it was produced in the development copy. It is rescored and deferred to the fresh-tree verification."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.86,
+      "rationale": "Deferred, not refuted. Patch application and one-file scope are necessary preconditions but do not prove behavior. They are folded into the selected fresh-tree run."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.9,
+      "rationale": "Selected. It is the only candidate that tests the exported artifact end-to-end on a pristine tree and directly falsifies dependence on the development copy or a stale patch."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.62,
+      "rationale": "Deferred, not refuted. Hostname case handling is a plausible origin edge but lies outside the changed name predicate and would not validate the saved patch. It remains a viable follow-up hypothesis for another target."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.55,
+      "rationale": "Deferred, not refuted. Module loading checks syntax and coupling, but the patch is confined to one already-loadable file and a full sweep may fail for absent optional facilities. It is lower information than behavioral verification."
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "selected_id": "r1-v2",
+  "selected_text": "Hypothesis: verification uses the first digest match for the signature while removing later digest-prefixed lines from the hashed bytes, so an extra digest line can be tolerated or can change which digest is trusted. Prerequisites: a valid signed template, ability to insert digest-prefixed lines, and a local verifier. Bounded test: append a malformed second digest line with LF and no code; separately prepend a malformed digest line before the real signature; compare verification errors. Expected supporting result: the later malformed digest is tolerated, while a first-position malformed digest is selected and fails. Falsifier: both arrangements fail, or the later malformed line changes the hash and fails. Cleanup: remove the disposable fixtures. Limitation: this tests digest selection, not the CR-tail execution path."
+}

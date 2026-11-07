@@ -1,0 +1,24 @@
+{
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: adding a case-insensitive proxy-credential name check to the shared cross-origin predicate removes all observed leaks without a second code path. Prerequisites: a disposable patched copy and the existing two-server fixture. Bounded test: patch the predicate, rerun the casing and array matrix for 302 and 307, then run a benign regression with a direct request, a relative same-origin redirect, a cross-origin redirect carrying mixed-case credentials plus a proxy challenge and duplicate marker header, and the fetch-style API. Expected supporting result: zero cross-origin credential deliveries, same-origin and direct requests preserved, challenge and marker headers preserved. Falsifier: any leak remains or any benign header is lost. Cleanup: keep the patch in the disposable copy and export only the diff."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a name-based rule is too narrow because related authentication headers form a family and a length-sensitive edit may accidentally affect a challenge header. Prerequisites: patched copy and a fixture that can send authorization, proxy authorization, proxy challenge, and origin challenge headers together. Bounded test: send all four through a cross-origin 302 and record which survive. Expected supporting result: both credential headers are stripped, both challenge headers survive. Falsifier: a challenge header is stripped or a credential survives. Cleanup: close servers and compare the patched tree only with its disposable baseline."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a one-hop repair still allows re-injection on a later hop of a redirect chain because sanitized headers are not stored back into the request state. Prerequisites: three loopback origins and a patched copy. Bounded test: chain A to B to C with a proxy credential and marker at A, then inspect C with both request APIs. Expected supporting result: C receives no credential and the marker survives. Falsifier: the credential reappears at C. Cleanup: stop all three servers and keep the chain log."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: the repair under-strips when an origin has an implicit default port or over-strips when a relative Location or explicit default-port spelling is used. Prerequisites: permission to bind an ephemeral loopback port and the default HTTP port locally. Bounded test: from an origin on the default port, redirect relatively, to an explicit default-port URL, and to a different port; compare credential survival with a marker control. Expected supporting result: the two same-origin spellings preserve credentials and the different-port target strips them. Falsifier: a same-origin spelling strips or a different-port target preserves. Cleanup: close both servers."
+    }
+  ]
+}
