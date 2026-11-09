@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the token parser trusts stored token-identifier membership and skips live enabled state, so a disabled account with an intact identifier still authenticates. Prerequisites: two local accounts sharing a signing key, one enabled control with a stored identifier, and one account disabled after issuance with its identifier retained. Bounded test: issue both tokens, switch only the disabled account flag in a fresh settings view, replay both through the public parser, then re-enable and replay again. Expected supporting result: the disabled token is rejected while the enabled token and the post-re-enable token are accepted. Falsifier: the disabled token is accepted or the enabled control is rejected. Cleanup: restore the flag and discard the fake clients."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: project-role tokens remain valid for a disabled account because project-role validation precedes account lookup and never consults account state. Prerequisites: a project role with a stored role-token identifier and an account disabled after issuance. Bounded test: issue a role token, disable the associated account, and replay the role token through the parser alongside an enabled-account control. Expected supporting result: the role token remains valid, showing branch independence. Falsifier: the role token fails with an account-state error. Cleanup: restore the account and project fixtures. Limitation: the role token subject is a role identifier rather than a local account, so disablement is not necessarily expected to invalidate it."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: stale in-memory settings conceal the missing predicate, so the parser appears to ignore enabled state only because it reads an old account view. Prerequisites: a mutable local settings object whose enabled flag can change independently of password time and token identifiers. Bounded test: issue a token under enabled configuration, then build a fresh settings view with identical signing material and the account disabled but no time or identifier changes, and replay. Expected supporting result: the fresh view rejects the token if the predicate is present or the cause is live state. Falsifier: the fresh view still accepts the token, which would leave stale state as the explanation. Cleanup: discard both settings views."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: anonymous fallback in the server middleware masks a parser gap by turning a disabled identity into an anonymous successful request instead of an error. Prerequisites: a middleware chain that permits anonymous access when token verification fails. Bounded test: send a disabled account's validly signed token through the middleware and inspect the returned context subject and error code. Expected supporting result: an explicit unauthenticated rejection, not a successful anonymous identity. Falsifier: the handler receives an anonymous subject without an error. Cleanup: close the local server fixture."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: stored token-identifier removal and account disablement race, so a token replayed during the transition window is accepted even though the enabled flag has changed. Prerequisites: a fixture that can stagger flag inversion and identifier cleanup. Bounded test: disable the account, replay immediately before and after identifier cleanup, and record each verdict. Expected supporting result: enabled-state rejection before cleanup and identifier rejection after cleanup. Falsifier: any acceptance after disablement. Cleanup: restore the flag and identifier list. Limitation: the observed code path is synchronous, so this is a concurrency hypothesis rather than an observed state transition."
+    }
+  ]
+}

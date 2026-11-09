@@ -1,0 +1,9 @@
+{
+  "plans": [
+    "Token-validation-first: issue a token for an enabled account with the service signing key, switch the authoritative settings view to disabled, and replay the token through the public parser. Then add the smallest enabled-state predicate at the parser boundary and run an enabled, disabled, revoked-identifier, password-time, and project-role regression matrix.",
+    "Authentication-boundary-first: leave the parser unchanged and reject a disabled subject in the server authentication middleware after signature verification, consulting the same settings store. Compare account tokens, project-role tokens, and anonymous fallback on the vulnerable and repaired copies.",
+    "Issuer-revocation-first: make disabling an account revoke outstanding tokens at the configuration update site by removing stored identifiers or rotating a per-account issuance epoch, then verify that no per-request enabled check is needed and that re-enabling does not resurrect old tokens.",
+    "Cached-settings-first: test whether a token issued before a configuration change is accepted because the account view is stale. Compare the original settings manager with a fresh manager that has identical signing material but disabled account state."
+  ],
+  "selected_id": "plan-1"
+}

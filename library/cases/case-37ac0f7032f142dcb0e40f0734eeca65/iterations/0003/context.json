@@ -1,0 +1,10 @@
+{
+  "case_id": "case-37ac0f7032f142dcb0e40f0734eeca65",
+  "iteration_id": "step-3",
+  "previous_iteration_id": "step-2",
+  "incumbent": {
+    "id": "r1-v1",
+    "text": "Hypothesis: decoding every named and numeric HTML character reference for the URI policy comparison will remove entity-hidden disallowed schemes, because the serializer keeps the original reference spelling while the policy sees the resolved scheme. Prerequisite: a policy-local decoder built from the parser's named-entity table plus decimal and hexadecimal numeric parsing. Bounded test: sanitize link attributes containing hex, decimal, uppercase-hex, named-colon, named-tab, named-newline and numeric-control variants of javascript: and file:, then compare against allowed http(s), mailto, relative, query-ampersand and custom-protocol controls. Expected result: all entity-hidden disallowed values lose the URI attribute; allowed and relative values keep their exact serialized bytes. Falsifier: any entity-hidden scheme survives, or any allowed control changes bytes. Cleanup: revert the one policy line and helper in the disposable copy; limitations: the comparison value is decoded but the emitted value intentionally stays encoded."
+  },
+  "hint": "The policy-local decoder passed a multi-attribute robustness matrix, but it still accepted only semicolon-terminated references. An HTML tokenizer consumes the longest possible run of decimal or hex digits and treats the trailing semicolon as optional, so a decimal reference such as &#106avascript: resolves to j plus avascript: even without a semicolon. The serializer escapes an unrecognized ampersand in that form, which reduces the practical impact, but the policy comparison remains inconsistent with parser semantics. The next step is to implement numeric-reference termination faithfully and bound the compatibility cost for invalid values."
+}

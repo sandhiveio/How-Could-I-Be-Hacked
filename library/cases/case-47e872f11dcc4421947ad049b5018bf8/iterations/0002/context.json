@@ -1,0 +1,10 @@
+{
+  "case_id": "case-47e872f11dcc4421947ad049b5018bf8",
+  "iteration_id": "step-2",
+  "previous_iteration_id": "step-1",
+  "incumbent": {
+    "id": "r1-v1",
+    "text": "Hypothesis: the token parser trusts stored token-identifier membership and skips live enabled state, so a disabled account with an intact identifier still authenticates. Prerequisites: two local accounts sharing a signing key, one enabled control with a stored identifier, and one account disabled after issuance with its identifier retained. Bounded test: issue both tokens, switch only the disabled account flag in a fresh settings view, replay both through the public parser, then re-enable and replay again. Expected supporting result: the disabled token is rejected while the enabled token and the post-re-enable token are accepted. Falsifier: the disabled token is accepted or the enabled control is rejected. Cleanup: restore the flag and discard the fake clients."
+  },
+  "hint": "A Go authorization service issues HMAC-signed session tokens. Password login rejects a disabled account, but the token parser checks only account existence, optional stored token-identifier membership, and password modification time. A local test already showed that a disabled account's validly signed token with an intact identifier is accepted by a fresh settings view, while an enabled control and a project-role token pass. The next question is where to place the smallest enabled-state check so account tokens are rejected without changing project-role tokens, identifier revocation, password-time invalidation, or enabled sessions."
+}

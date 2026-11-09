@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.67,
+      "rationale": "Selected incumbent. Strongest saved evidence and the repair to be closed out; the new candidates are verification branches that refine the same mechanism."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.56,
+      "rationale": "Deferred but incorporated. The strongest semantic falsifier: re-parse the emitted value instead of trusting the decoder's internal view."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.51,
+      "rationale": "Deferred but incorporated as controls. Real over-decoding risk, already partly covered by query-ampersand tests."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.49,
+      "rationale": "Deferred. Adds nested-depth coverage without likely changing the repair."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.52,
+      "rationale": "Deferred but required for handoff. Clean-copy application is a mandatory packaging check, not a causal hypothesis."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.55,
+      "rationale": "Deferred but incorporated. Correctly asks for a single deterministic matrix artifact and pristine-versus-patched proof."
+    }
+  ]
+}

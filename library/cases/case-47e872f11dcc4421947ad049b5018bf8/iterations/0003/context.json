@@ -1,0 +1,10 @@
+{
+  "case_id": "case-47e872f11dcc4421947ad049b5018bf8",
+  "iteration_id": "step-3",
+  "previous_iteration_id": "step-2",
+  "incumbent": {
+    "id": "r2-v1",
+    "text": "Hypothesis: inserting the enabled-state check immediately after account lookup and before identifier membership rejects disabled accounts without altering revocation logic. Prerequisites: the vulnerable local source, fake settings clients, one disabled account with a valid identifier, and one enabled account with a revoked identifier. Bounded test: apply the minimal check, replay the disabled valid-identifier token, the enabled token, and the revoked-identifier token, and compare error classes. Expected supporting result: the disabled token fails with a disabled error, the enabled token succeeds, and the revoked token still fails for a missing identifier. Falsifier: any disabled token succeeds or a control changes its error class. Cleanup: restore fixtures and retain the patch in a disposable copy."
+  },
+  "hint": "A Go session service has a one-hunk patch that adds an enabled-state check in the account branch of token parsing. In the development tree the patch rejects a disabled account token and preserves enabled, project-role, revoked-identifier, and password-time controls, and the full session package test suite passes. The next question is whether that patch is self-sufficient: does it apply cleanly to a pristine source copy and reproduce the same results without any development-tree edit outside the hunk?"
+}

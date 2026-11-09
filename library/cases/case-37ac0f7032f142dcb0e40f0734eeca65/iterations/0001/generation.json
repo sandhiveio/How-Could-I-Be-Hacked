@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: decoding every named and numeric HTML character reference for the URI policy comparison will remove entity-hidden disallowed schemes, because the serializer keeps the original reference spelling while the policy sees the resolved scheme. Prerequisite: a policy-local decoder built from the parser's named-entity table plus decimal and hexadecimal numeric parsing. Bounded test: sanitize link attributes containing hex, decimal, uppercase-hex, named-colon, named-tab, named-newline and numeric-control variants of javascript: and file:, then compare against allowed http(s), mailto, relative, query-ampersand and custom-protocol controls. Expected result: all entity-hidden disallowed values lose the URI attribute; allowed and relative values keep their exact serialized bytes. Falsifier: any entity-hidden scheme survives, or any allowed control changes bytes. Cleanup: revert the one policy line and helper in the disposable copy; limitations: the comparison value is decoded but the emitted value intentionally stays encoded."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: making the parser or serializer resolve character references for URI attributes removes the check-versus-render mismatch without a bespoke decoder. Prerequisite: a disposable copy and an entity-resolution toggle or attribute-scoped filter. Bounded test: compare byte-for-byte output for allowed http with &amp;, a non-ASCII named entity in a relative path, a hex-hidden javascript value and ordinary text nodes before and after the toggle. Expected result: the hidden scheme is rejected, but text-node entity spelling or allowed attribute bytes may change, exposing compatibility cost. Falsifier: if allowed controls keep identical bytes and text nodes are untouched, this becomes preferable; otherwise it is too broad. Cleanup: restore the toggle and rerun the byte comparison. Limitations: couples policy correctness to parser configuration."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a strict post-decode allowlist that accepts only relative references or explicitly configured schemes will drop entity-hidden schemes and encoded control-character prefixes more reliably than a denylist. Prerequisite: decode the value, normalize control characters, then match an anchored scheme pattern. Bounded test: run existing plain, file, custom-protocol and relative cases plus encoded tab, newline, named-colon and semicolon-less numeric payloads. Expected result: all hidden schemes are dropped and custom protocols still work. Falsifier: any explicitly configured scheme or ordinary relative value is rejected, or an unusual but allowed value changes. Cleanup: revert the predicate. Limitations: may over-reject exotic-but-legal relative references and diverges from the library's configurable protocol model."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: nested or double-encoded references need repeated decoding to a fixed point because one pass may expose a second reference layer. Prerequisite: a bounded loop of at most four decode passes with a no-change exit. Bounded test: sanitize single-encoded, double-encoded and three-layer references in a link attribute and record whether any emitted value resolves to a blocked scheme after one browser-parse pass. Expected result: if a browser resolves only one layer, a single pass is sufficient and a fixed-point loop changes nothing; repeated passes are needed only if emitted markup demonstrably decodes again. Falsifier: an emitted attribute whose first browser parse yields a blocked scheme after single-pass decoding. Cleanup: remove the loop. Limitations: the hypothesis may confuse serializer escaping with browser decoding."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a repair is not trustworthy unless a byte-for-byte snapshot gate shows the diff is limited to malicious attributes. Prerequisite: capture pristine outputs for allowed, relative, query-ampersand, non-ASCII and custom-protocol inputs before editing. Bounded test: run the same fixture twice on the pristine and patched copies, compare every control byte and every malicious case, then repeat to check determinism. Expected result: only attack attributes differ; all controls are identical across runs. Falsifier: any control drift or nondeterministic output. Cleanup: discard the temporary fixture. Limitations: this is a verification strategy, not a causal repair hypothesis."
+    }
+  ]
+}

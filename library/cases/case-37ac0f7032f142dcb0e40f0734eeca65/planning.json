@@ -1,0 +1,8 @@
+{
+  "plans": [
+    "Decode every HTML character reference in each URI-valued attribute for the protocol-policy comparison only, leaving the serializer's entity-preserving output unchanged. Test numeric, named, mixed-case and malformed references plus allowed and relative controls.",
+    "Make the HTML parser or serializer resolve character references for URI attributes so the policy sees the same value a browser would. Test the blast radius on text nodes, ordinary attributes and allowed URI bytes.",
+    "Apply a strict post-decode scheme allowlist that accepts only relative references or explicitly allowed schemes and drops every other URI attribute. Test compatibility with custom protocols and existing serialization expectations."
+  ],
+  "selected_id": "plan-1"
+}

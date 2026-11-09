@@ -1,0 +1,4 @@
+{
+  "selected_id": "r4-v1",
+  "selected_text": "Hypothesis: the authentication middleware distinguishes a parser rejection from an absent token and returns an unauthenticated error for the disabled account. Prerequisites: a local server fixture built on the pristine patched source, a valid disabled-account token, and an enabled control token. Bounded test: present both tokens through the middleware token slot, inspect the returned status and handler-context subject, and compare with an absent-token request. Expected supporting result: the disabled token yields an unauthenticated disabled error, the enabled token yields its subject, and only the absent token follows anonymous fallback. Falsifier: the disabled token yields a successful anonymous context. Cleanup: close the fixture and discard temporary clients."
+}

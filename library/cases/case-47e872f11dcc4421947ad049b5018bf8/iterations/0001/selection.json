@@ -1,0 +1,4 @@
+{
+  "selected_id": "r1-v1",
+  "selected_text": "Hypothesis: the token parser trusts stored token-identifier membership and skips live enabled state, so a disabled account with an intact identifier still authenticates. Prerequisites: two local accounts sharing a signing key, one enabled control with a stored identifier, and one account disabled after issuance with its identifier retained. Bounded test: issue both tokens, switch only the disabled account flag in a fresh settings view, replay both through the public parser, then re-enable and replay again. Expected supporting result: the disabled token is rejected while the enabled token and the post-re-enable token are accepted. Falsifier: the disabled token is accepted or the enabled control is rejected. Cleanup: restore the flag and discard the fake clients."
+}

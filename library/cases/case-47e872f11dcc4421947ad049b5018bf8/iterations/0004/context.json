@@ -1,0 +1,10 @@
+{
+  "case_id": "case-47e872f11dcc4421947ad049b5018bf8",
+  "iteration_id": "step-4",
+  "previous_iteration_id": "step-3",
+  "incumbent": {
+    "id": "r3-v1",
+    "text": "Hypothesis: the saved one-hunk patch applies to a pristine source copy and reproduces disabled-account rejection there. Prerequisites: the pristine source snapshot, the saved patch, a local Go toolchain, and the test harness copied separately from the development tree. Bounded test: copy the snapshot fresh, run a patch dry check, apply only the hunk, copy the harness without other source edits, and replay a disabled valid-identifier token plus an enabled control. Expected supporting result: the hunk applies, the disabled token is rejected, and the enabled token is accepted. Falsifier: the hunk rejects or fuzzes context, the disabled token is accepted, or any extra source edit is required. Cleanup: remove the temporary tree."
+  },
+  "hint": "A Go session service has a verified one-hunk parser repair that rejects disabled account tokens after a pristine-tree patch application and preserves enabled, project-role, revoked-identifier, and password-time controls. The remaining boundary is the server authentication middleware: when a validly signed disabled-account token is presented, does it return the parser's unauthenticated error, or does it silently create an anonymous request? A valid enabled token must still put its subject into the handler context."
+}

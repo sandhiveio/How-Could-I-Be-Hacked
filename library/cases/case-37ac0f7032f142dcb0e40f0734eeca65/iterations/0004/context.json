@@ -1,0 +1,10 @@
+{
+  "case_id": "case-37ac0f7032f142dcb0e40f0734eeca65",
+  "iteration_id": "step-4",
+  "previous_iteration_id": "step-3",
+  "incumbent": {
+    "id": "r3-v1",
+    "text": "Hypothesis: an attacker can hide a disallowed scheme behind a numeric character reference without a trailing semicolon, which the current decoder leaves intact because it only matches terminated references. Prerequisite: a policy decoder that can consume a maximal digit run. Bounded test: sanitize a link with &#106avascript: plus a plain javascript: control, then also test zero-padded and uppercase-hex variants; record whether the URI attribute remains. Expected result: the repaired decoder consumes decimal or hex digits greedily, optionally consumes one semicolon, resolves the value, and removes the attribute. Falsifier: any no-semicolon form still resolves to a blocked scheme after the repair. Cleanup: revert one helper. Limitations: greedy consumption must not turn a legitimate reference-lookalike into a different scheme."
+  },
+  "hint": "The decoder now handles named references and decimal or hex numeric references with optional semicolons, and invalid numeric references are left unchanged. The full local suite passes. The remaining closure question is semantic rather than mechanism-level: after sanitization, does any emitted URI attribute re-parse to a blocked scheme when processed by the same HTML parser? A second requirement is packaging: the official patch must contain only the source delta, apply cleanly to a fresh snapshot and reproduce the verified behavior, because tests or run state in the patch would break the host-side evaluation."
+}

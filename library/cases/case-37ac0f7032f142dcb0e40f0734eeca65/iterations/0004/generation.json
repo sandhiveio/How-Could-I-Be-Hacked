@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: a decoder can agree with itself yet still disagree with the renderer, so the only decisive check is to re-parse every emitted URI attribute with the same HTML parser and look for a blocked scheme in the post-parse value. Prerequisite: the same parser used by the sanitizer. Bounded test: sanitize a matrix of attack and control cases, re-parse each emitted attribute once, normalize whitespace/control characters and test the scheme prefix against the allowlist. Expected result: no emitted attack value resolves to a blocked scheme. Falsifier: any surviving javascript: or file: after one parse. Cleanup: keep the matrix script and logs. Limitations: a browser URL parser may differ slightly from the HTML parser."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: aggressive numeric decoding may corrupt legitimate values that merely resemble references, such as a bare ampersand, an AT&T-like query value or an entity-lookalike inside a path. Prerequisite: pristine byte snapshots for those controls. Bounded test: sanitize bare-ampersand, digit-run-in-query and entity-lookalike values before and after the patch and compare bytes. Expected result: all controls are identical. Falsifier: any allowed or relative value changes. Cleanup: discard the fixture. Limitations: some invalid reference forms may legitimately be over-rejected."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: double or nested encoding may survive if the decoder resolves a different number of layers than the browser. Prerequisite: knowledge that the serializer emits one unresolved layer. Bounded test: sanitize one-, two- and three-layer nested references, re-parse the output once, and check the resolved scheme; also inspect raw bytes. Expected result: no first-parse value is a blocked scheme. Falsifier: an emitted value whose first parse yields javascript:. Cleanup: remove the nested cases. Limitations: an external repeated-decoding intermediary could change the result."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: a patch export containing only the source delta will apply cleanly to a fresh snapshot and reproduce the focused and full test results, while test files or run state would cause drift. Prerequisite: a pristine copy and a JSONL with one source-only patch. Bounded test: apply the patch with a patch-check tool, import the fresh copy, rerun the focused and full suites, and compare the matrix output with the working copy. Expected result: clean application and identical tests/output. Falsifier: apply failure, test drift or an extra file in the patch. Cleanup: discard the fresh copy. Limitations: official evaluation is still host-side."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: closure evidence needs one deterministic artifact mapping every attack and control case to its sanitized output, parsed attribute, scheme verdict and pass/fail status, run on both pristine and patched copies. Prerequisite: a consolidated runner keyed by stable case IDs. Bounded test: run the matrix once on pristine and once on patched, assert that attack attributes are gone and control bytes match, then repeat for determinism. Expected result: saved logs show the difference is limited to malicious attributes. Falsifier: any nondeterministic row, surviving attack scheme or control drift. Cleanup: keep both logs as handoff evidence. Limitations: this is verification and packaging, not a new repair mechanism."
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "selected_id": "r3-v1",
+  "selected_text": "Hypothesis: the saved one-hunk patch applies to a pristine source copy and reproduces disabled-account rejection there. Prerequisites: the pristine source snapshot, the saved patch, a local Go toolchain, and the test harness copied separately from the development tree. Bounded test: copy the snapshot fresh, run a patch dry check, apply only the hunk, copy the harness without other source edits, and replay a disabled valid-identifier token plus an enabled control. Expected supporting result: the hunk applies, the disabled token is rejected, and the enabled token is accepted. Falsifier: the hunk rejects or fuzzes context, the disabled token is accepted, or any extra source edit is required. Cleanup: remove the temporary tree."
+}

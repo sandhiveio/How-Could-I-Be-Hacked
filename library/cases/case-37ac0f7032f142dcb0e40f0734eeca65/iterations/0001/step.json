@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A Python sanitizer removes a plain disallowed scheme from a URI attribute, but the attribute policy compares an incompletely unescaped value while the serializer deliberately leaves character references unresolved. Baseline observation: plain javascript: is removed; hexadecimal, decimal, named-colon and named-tab variants of the same scheme remain in the emitted attribute; an allowed http value containing &amp; and a relative path are emitted unchanged. The policy comparison currently uses a minimal unescape that handles only amp, lt and gt. The next step is to choose a repair scope and implement the smallest decoder that makes the policy see fully resolved characters without changing allowed output.",
+    "surface": "Python library made of a streaming HTML tokenizer, an attribute policy filter and an entity-preserving serializer. Untrusted markup enters through a sanitize API configured with allowed tags, allowed attributes and allowed URI schemes.",
+    "assumptions": [
+      "The attacker controls the entire untrusted HTML fragment but not the sanitizer configuration or the local filesystem.",
+      "Allowed attributes include at least one URI-valued attribute on a link, an image, a video poster, a form action, a cite/background attribute and an SVG link.",
+      "The sanitizer's protocol list is configurable; http, https and mailto are allowed by default and a caller may add a custom scheme.",
+      "All experiments use a disposable local Python environment and in-memory strings; no network service or public target is involved.",
+      "The official benchmark evaluator is external; local test results are not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Decode every HTML character reference in each URI-valued attribute for the protocol-policy comparison only, leaving the serializer's entity-preserving output unchanged. Test numeric, named, mixed-case and malformed references plus allowed and relative controls."
+  },
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: decoding every named and numeric HTML character reference for the URI policy comparison will remove entity-hidden disallowed schemes, because the serializer keeps the original reference spelling while the policy sees the resolved scheme. Prerequisite: a policy-local decoder built from the parser's named-entity table plus decimal and hexadecimal numeric parsing. Bounded test: sanitize link attributes containing hex, decimal, uppercase-hex, named-colon, named-tab, named-newline and numeric-control variants of javascript: and file:, then compare against allowed http(s), mailto, relative, query-ampersand and custom-protocol controls. Expected result: all entity-hidden disallowed values lose the URI attribute; allowed and relative values keep their exact serialized bytes. Falsifier: any entity-hidden scheme survives, or any allowed control changes bytes. Cleanup: revert the one policy line and helper in the disposable copy; limitations: the comparison value is decoded but the emitted value intentionally stays encoded."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: making the parser or serializer resolve character references for URI attributes removes the check-versus-render mismatch without a bespoke decoder. Prerequisite: a disposable copy and an entity-resolution toggle or attribute-scoped filter. Bounded test: compare byte-for-byte output for allowed http with &amp;, a non-ASCII named entity in a relative path, a hex-hidden javascript value and ordinary text nodes before and after the toggle. Expected result: the hidden scheme is rejected, but text-node entity spelling or allowed attribute bytes may change, exposing compatibility cost. Falsifier: if allowed controls keep identical bytes and text nodes are untouched, this becomes preferable; otherwise it is too broad. Cleanup: restore the toggle and rerun the byte comparison. Limitations: couples policy correctness to parser configuration."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a strict post-decode allowlist that accepts only relative references or explicitly configured schemes will drop entity-hidden schemes and encoded control-character prefixes more reliably than a denylist. Prerequisite: decode the value, normalize control characters, then match an anchored scheme pattern. Bounded test: run existing plain, file, custom-protocol and relative cases plus encoded tab, newline, named-colon and semicolon-less numeric payloads. Expected result: all hidden schemes are dropped and custom protocols still work. Falsifier: any explicitly configured scheme or ordinary relative value is rejected, or an unusual but allowed value changes. Cleanup: revert the predicate. Limitations: may over-reject exotic-but-legal relative references and diverges from the library's configurable protocol model."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: nested or double-encoded references need repeated decoding to a fixed point because one pass may expose a second reference layer. Prerequisite: a bounded loop of at most four decode passes with a no-change exit. Bounded test: sanitize single-encoded, double-encoded and three-layer references in a link attribute and record whether any emitted value resolves to a blocked scheme after one browser-parse pass. Expected result: if a browser resolves only one layer, a single pass is sufficient and a fixed-point loop changes nothing; repeated passes are needed only if emitted markup demonstrably decodes again. Falsifier: an emitted attribute whose first browser parse yields a blocked scheme after single-pass decoding. Cleanup: remove the loop. Limitations: the hypothesis may confuse serializer escaping with browser decoding."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: a repair is not trustworthy unless a byte-for-byte snapshot gate shows the diff is limited to malicious attributes. Prerequisite: capture pristine outputs for allowed, relative, query-ampersand, non-ASCII and custom-protocol inputs before editing. Bounded test: run the same fixture twice on the pristine and patched copies, compare every control byte and every malicious case, then repeat to check determinism. Expected result: only attack attributes differ; all controls are identical across runs. Falsifier: any control drift or nondeterministic output. Cleanup: discard the temporary fixture. Limitations: this is a verification strategy, not a causal repair hypothesis."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.72,
+      "rationale": "Selected initial plan. It localizes the defect to the policy comparison and has a clear bounded experiment, but it must be extended to cover named entities and later numeric termination."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.92,
+      "rationale": "Selected. The most direct continuation: full entity decoding only for the policy view, with explicit allowed and relative controls. It preserves the serializer contract and is immediately testable."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Deferred. A useful parser-level alternative and a strong compatibility falsifier, but a larger blast radius than the policy-local repair."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.64,
+      "rationale": "Deferred. Coherent strict allowlist fallback; risks changing custom-protocol and exotic relative semantics."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.49,
+      "rationale": "Retained as an unexecuted alternative. The nested-encoding claim is testable but likely confused about single-pass browser resolution; it was not selected."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.58,
+      "rationale": "Deferred. Useful byte-for-byte regression gate and determinism control, but not a competing causal repair."
+    }
+  ],
+  "selected_id": "r1-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Implemented a policy-local decoder that maps named references from the parser's entity table and decimal or hexadecimal numeric references to characters, using the decoded value only for the URI scheme comparison. Bounded local test: hex, decimal, uppercase-hex, named-colon, named-tab, named-newline and numeric-control variants of javascript: and file: lost the URI attribute; plain allowed http(s), mailto, relative, query-ampersand and custom-protocol values kept their exact serialized bytes. The original local suite passed (234 tests), and 16 new focused checks passed (250 total, 2 expected failures). A nested double-encoded reference stayed unchanged, consistent with single-pass browser resolution. Evidence strength: direct local causal result with byte-level controls. Limitation: only link attributes and semicolon-terminated references were exercised; the official evaluator was not run.",
+    "next_hint": "Apply the same check to every URI-valued attribute class and to malformed, out-of-range, double-encoded and semicolon-less references. Distinguish a shared policy repair from a link-only special case, and look for a reference form the decoder still misses."
+  },
+  "lineage": {
+    "case_id": "case-37ac0f7032f142dcb0e40f0734eeca65",
+    "iteration_id": "step-1",
+    "previous_iteration_id": null,
+    "step_id": "step-1",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}

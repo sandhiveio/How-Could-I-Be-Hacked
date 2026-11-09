@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A Go authorization service issues HMAC-signed session tokens. Password login rejects an account whose enabled flag is false, but the token parser checks only that the account exists, that an optional stored token identifier is present, and that the password has not changed since issuance. A local fixture can issue a token while the account is enabled, then replay it through a fresh settings view in which the account is disabled but the signing key and stored token identifier are unchanged. The next question is which test distinguishes a missing enabled-state predicate from stale settings, token-identifier effects, project-role branching, and anonymous fallback.",
+    "surface": "A Go authorization service with a session manager, an account and project settings store, a token parser with separate account and project-role branches, server authentication middleware, and package-level tests backed by fake settings clients.",
+    "assumptions": [
+      "The observer can read and modify a disposable local source tree, run the local Go toolchain, and create fake settings clients; no public target, production service, or installed dependency is used.",
+      "The attacker holds an existing validly signed token for an account that is later disabled and cannot change the server signing key.",
+      "An enabled account token and a project-role token are legitimate controls that must keep working.",
+      "Stored token-identifier removal and password modification time are existing revocation mechanisms that must keep working after the repair.",
+      "Official benchmark evaluation is host-side; local package tests and a clean patch application are not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Token-validation-first: issue a token for an enabled account with the service signing key, switch the authoritative settings view to disabled, and replay the token through the public parser. Then add the smallest enabled-state predicate at the parser boundary and run an enabled, disabled, revoked-identifier, password-time, and project-role regression matrix."
+  },
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the token parser trusts stored token-identifier membership and skips live enabled state, so a disabled account with an intact identifier still authenticates. Prerequisites: two local accounts sharing a signing key, one enabled control with a stored identifier, and one account disabled after issuance with its identifier retained. Bounded test: issue both tokens, switch only the disabled account flag in a fresh settings view, replay both through the public parser, then re-enable and replay again. Expected supporting result: the disabled token is rejected while the enabled token and the post-re-enable token are accepted. Falsifier: the disabled token is accepted or the enabled control is rejected. Cleanup: restore the flag and discard the fake clients."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: project-role tokens remain valid for a disabled account because project-role validation precedes account lookup and never consults account state. Prerequisites: a project role with a stored role-token identifier and an account disabled after issuance. Bounded test: issue a role token, disable the associated account, and replay the role token through the parser alongside an enabled-account control. Expected supporting result: the role token remains valid, showing branch independence. Falsifier: the role token fails with an account-state error. Cleanup: restore the account and project fixtures. Limitation: the role token subject is a role identifier rather than a local account, so disablement is not necessarily expected to invalidate it."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: stale in-memory settings conceal the missing predicate, so the parser appears to ignore enabled state only because it reads an old account view. Prerequisites: a mutable local settings object whose enabled flag can change independently of password time and token identifiers. Bounded test: issue a token under enabled configuration, then build a fresh settings view with identical signing material and the account disabled but no time or identifier changes, and replay. Expected supporting result: the fresh view rejects the token if the predicate is present or the cause is live state. Falsifier: the fresh view still accepts the token, which would leave stale state as the explanation. Cleanup: discard both settings views."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: anonymous fallback in the server middleware masks a parser gap by turning a disabled identity into an anonymous successful request instead of an error. Prerequisites: a middleware chain that permits anonymous access when token verification fails. Bounded test: send a disabled account's validly signed token through the middleware and inspect the returned context subject and error code. Expected supporting result: an explicit unauthenticated rejection, not a successful anonymous identity. Falsifier: the handler receives an anonymous subject without an error. Cleanup: close the local server fixture."
+    },
+    {
+      "id": "r1-v5",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: stored token-identifier removal and account disablement race, so a token replayed during the transition window is accepted even though the enabled flag has changed. Prerequisites: a fixture that can stagger flag inversion and identifier cleanup. Bounded test: disable the account, replay immediately before and after identifier cleanup, and record each verdict. Expected supporting result: enabled-state rejection before cleanup and identifier rejection after cleanup. Falsifier: any acceptance after disablement. Cleanup: restore the flag and identifier list. Limitation: the observed code path is synchronous, so this is a concurrency hypothesis rather than an observed state transition."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.6338,
+      "rationale": "The broad plan remains valid and supplies the enabled, disabled, revoked, and project-role regression route. It is deferred in favor of the generated matrix because that matrix names the exact branch and the enabled control that discriminate the competing explanations."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.6917,
+      "rationale": "Selected. It directly tests a validly signed account token whose stored identifier is intact but whose current enabled state is false, with an enabled control and a re-enable cleanup. This gives a causal result and a minimal repair target."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.563,
+      "rationale": "Deferred, not refuted. The project-role branch does precede account handling, but a role subject is not a local account, so disablement is not ordinarily expected to invalidate it. It remains a valuable post-repair regression."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.6192,
+      "rationale": "Deferred and folded into the selected test as a control. A fresh settings view with identical signing material separates stale object state from a missing predicate without changing the repair."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.5813,
+      "rationale": "Deferred, not refuted. A full middleware check could reveal anonymous fallback, but it needs a larger server fixture. It is a follow-up check after parser behavior is observed."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.5065,
+      "rationale": "Deferred, not refuted. An identifier/state race is a distinct concurrency hypothesis, but the visible path is synchronous and no cleanup window is evident yet. It needs a separate stagger fixture."
+    }
+  ],
+  "selected_id": "r1-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "A package-level Go test issued a token for account B while enabled, with a valid stored identifier, then replayed it through a fresh settings view that had the same signing key but account B disabled. The parser returned no error and resolved subject B, so the disabled account still authenticated. Controls passed: an enabled account token with its own identifier was accepted, and a project-role token was accepted through its separate branch. The fresh view rules out stale settings, the intact identifier rules out revocation, and the resolved subject rules out anonymous fallback. Local only; no official evaluation ran.",
+    "next_hint": "Add the smallest enabled-state predicate in the account branch and run an enabled, disabled, revoked-identifier, password-time, and project-role regression matrix."
+  },
+  "lineage": {
+    "case_id": "case-47e872f11dcc4421947ad049b5018bf8",
+    "iteration_id": "step-1",
+    "previous_iteration_id": null,
+    "step_id": "step-1",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}

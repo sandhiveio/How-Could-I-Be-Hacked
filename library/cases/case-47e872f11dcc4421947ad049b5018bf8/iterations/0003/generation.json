@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: the saved one-hunk patch applies to a pristine source copy and reproduces disabled-account rejection there. Prerequisites: the pristine source snapshot, the saved patch, a local Go toolchain, and the test harness copied separately from the development tree. Bounded test: copy the snapshot fresh, run a patch dry check, apply only the hunk, copy the harness without other source edits, and replay a disabled valid-identifier token plus an enabled control. Expected supporting result: the hunk applies, the disabled token is rejected, and the enabled token is accepted. Falsifier: the hunk rejects or fuzzes context, the disabled token is accepted, or any extra source edit is required. Cleanup: remove the temporary tree."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: the server authentication middleware surfaces the new parser error rather than falling back to anonymous access. Prerequisites: a local server fixture with the patched parser, a valid disabled-account token, and an enabled control token. Bounded test: present both tokens through the middleware token slot, inspect status and context subject, and compare with an absent-token request. Expected supporting result: the disabled token yields an unauthenticated disabled error, the enabled token yields its subject, and only the absent token follows anonymous fallback. Falsifier: the disabled token reaches an anonymous successful context. Cleanup: close the fixture and discard temporary clients."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: the patch does not reorder lifecycle errors in a pristine tree, so disabled state still takes precedence over a changed password and a revoked identifier still wins by identifier lookup. Prerequisites: a pristine patched tree and fixtures for a disabled account with a stale password time and an enabled account with a removed identifier. Bounded test: replay both tokens and record error class and ordering. Expected supporting result: the disabled token fails with a disabled error and the revoked token fails with an identifier error. Falsifier: either order flips or the error class changes unexpectedly. Cleanup: remove the patched clone."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: project-role tokens keep working in a pristine patched tree because their branch still runs before the account branch. Prerequisites: a pristine patched tree, a project role with a stored identifier, and an account flag that can be disabled. Bounded test: issue and replay a project-role token after disabling an associated account, and compare with the development-tree result. Expected supporting result: the role token remains accepted and its subject is unchanged. Falsifier: the role token is rejected or its subject changes. Cleanup: reset the fake settings store."
+    },
+    {
+      "id": "r3-v5",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: a single consolidated matrix on a pristine tree with only the saved hunk applied is sufficient to show the patch has no hidden dependency on other development-tree edits. Prerequisites: a fresh copy, the patch only, and a compact test harness. Bounded test: apply the hunk alone and run disabled-reject, enabled-accept, project-role-accept, revoked-identifier-reject, and password-time-reject cells. Expected supporting result: every cell matches the development-tree results and only the intended source file differs. Falsifier: any cell diverges or an extra source edit is needed. Cleanup: delete the clone and marker fixtures."
+    }
+  ]
+}

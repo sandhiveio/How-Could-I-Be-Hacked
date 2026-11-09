@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.69,
+      "rationale": "Selected incumbent. It has the strongest saved local evidence and the round-2 action is a robustness extension of the same repair; the new candidates are verification branches rather than competing mechanisms."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.55,
+      "rationale": "Deferred but incorporated. Correctly identifies the shared attribute branch and the main breadth gap; lacks its own executed result."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.48,
+      "rationale": "Deferred but incorporated. Malformed-input safety is a real risk and should be a matrix case."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.45,
+      "rationale": "Deferred. Mostly repeats the existing nested-reference control."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.41,
+      "rationale": "Deferred. Lower discrimination because scheme names are ASCII."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.46,
+      "rationale": "Deferred packaging check; required for the official handoff regardless of selection."
+    }
+  ]
+}

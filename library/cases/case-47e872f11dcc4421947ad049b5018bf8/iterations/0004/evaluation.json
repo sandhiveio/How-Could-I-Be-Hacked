@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.6525,
+      "rationale": "The incumbent pristine-tree portability result is established and needs no repetition. It is deferred because it cannot answer the remaining middleware fail-open question."
+    },
+    {
+      "id": "r4-v1",
+      "eligible": true,
+      "score": 0.6555,
+      "rationale": "Selected. It turns the parser-level rejection into a server-boundary question: does the middleware return unauthenticated or treat the disabled result as anonymous? The disabled rejection is already observed, so this adds the downstream propagation evidence needed for the handoff."
+    },
+    {
+      "id": "r4-v2",
+      "eligible": true,
+      "score": 0.5965,
+      "rationale": "Deferred and folded into the selected server check as the positive control. An enabled token must still put its subject into the handler context, proving the middleware is not over-blocking."
+    },
+    {
+      "id": "r4-v3",
+      "eligible": true,
+      "score": 0.6055,
+      "rationale": "Deferred, not refuted. Project-role independence is already established at parser level; a middleware role control is useful but secondary to the disabled-account propagation question."
+    },
+    {
+      "id": "r4-v4",
+      "eligible": true,
+      "score": 0.356,
+      "rationale": "Deferred, not refuted. A concurrent toggle race needs a mutable settings store and many iterations. The predicate reads an account copy from an informer-backed store, so the simpler propagation test is higher value."
+    },
+    {
+      "id": "r4-v5",
+      "eligible": true,
+      "score": 0.61,
+      "rationale": "Deferred, not refuted. Line-ending portability is a real packaging concern, but the host applies the patch to a Linux source snapshot and the hunk context is small. It is less informative than the server-boundary check."
+    }
+  ]
+}

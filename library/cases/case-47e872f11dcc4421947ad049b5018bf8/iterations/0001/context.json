@@ -1,0 +1,10 @@
+{
+  "case_id": "case-47e872f11dcc4421947ad049b5018bf8",
+  "iteration_id": "step-1",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Token-validation-first: issue a token for an enabled account with the service signing key, switch the authoritative settings view to disabled, and replay the token through the public parser. Then add the smallest enabled-state predicate at the parser boundary and run an enabled, disabled, revoked-identifier, password-time, and project-role regression matrix."
+  },
+  "hint": "A Go authorization service issues HMAC-signed session tokens. Password login rejects an account whose enabled flag is false, but the token parser checks only that the account exists, that an optional stored token identifier is present, and that the password has not changed since issuance. A local fixture can issue a token while the account is enabled, then replay it through a fresh settings view in which the account is disabled but the signing key and stored token identifier are unchanged. The next question is which test distinguishes a missing enabled-state predicate from stale settings, token-identifier effects, project-role branching, and anonymous fallback."
+}

@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.6795,
+      "rationale": "The incumbent has direct local evidence: a disabled account with an intact identifier parsed successfully while enabled and project-role controls passed. It remains the baseline to repair but does not specify patch placement or error-order regression, so it is deferred."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.7385,
+      "rationale": "Selected. It gives the minimal placement in the account branch and a matrix that separates disabled-state rejection from identifier revocation. The earlier observation supplies the vulnerable baseline, so one action can test the repair and lifecycle controls."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.56,
+      "rationale": "Deferred and folded into the selected regression matrix. Checking after password-time validation also rejects the token, but the error becomes time-specific. The same matrix can include a changed-password control without choosing this placement."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.614,
+      "rationale": "Deferred, not refuted. The earlier test already showed a project-role token accepted independently, so the expected result is supported before the repair. It is retained as a post-repair regression."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.5225,
+      "rationale": "Deferred, not refuted. Middleware propagation is a real downstream boundary, but the server fixture is larger than the package-level repair check and the parser already returns an error. It is a plausible later robustness check."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.379,
+      "rationale": "Deferred, not refuted. Concurrent toggling is a distinct concern, but the parser receives account copies and the new predicate adds no shared mutable state. Lower value than patch application and lifecycle regression."
+    }
+  ]
+}

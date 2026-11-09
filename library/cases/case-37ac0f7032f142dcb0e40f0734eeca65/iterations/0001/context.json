@@ -1,0 +1,10 @@
+{
+  "case_id": "case-37ac0f7032f142dcb0e40f0734eeca65",
+  "iteration_id": "step-1",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Decode every HTML character reference in each URI-valued attribute for the protocol-policy comparison only, leaving the serializer's entity-preserving output unchanged. Test numeric, named, mixed-case and malformed references plus allowed and relative controls."
+  },
+  "hint": "A Python sanitizer removes a plain disallowed scheme from a URI attribute, but the attribute policy compares an incompletely unescaped value while the serializer deliberately leaves character references unresolved. Baseline observation: plain javascript: is removed; hexadecimal, decimal, named-colon and named-tab variants of the same scheme remain in the emitted attribute; an allowed http value containing &amp; and a relative path are emitted unchanged. The policy comparison currently uses a minimal unescape that handles only amp, lt and gt. The next step is to choose a repair scope and implement the smallest decoder that makes the policy see fully resolved characters without changing allowed output."
+}

@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: the repair sits in the shared URI-attribute policy branch, so entity-hidden schemes are removed for image source, video poster, form action, cite/background and SVG link attributes exactly as for a link. Prerequisite: configure each tag and URI attribute explicitly, then use the same decoder. Bounded test: sanitize a hexadecimal javascript value on each attribute class and allowed/relative controls on the same classes; record whether any URI attribute remains and whether every control is byte-identical to the pristine output. Expected result: all malicious attributes are dropped and all controls match. Falsifier: any class retains the hidden scheme or differs on an allowed value. Cleanup: use a disposable fixture. Limitations: SVG namespace handling may differ from plain attributes."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: malformed, empty, surrogate or out-of-range numeric references can raise during character conversion or silently corrupt the policy value. Prerequisite: a decoder that catches conversion errors. Bounded test: sanitize link values containing an empty numeric reference, an overflowing hexadecimal value, an overflowing decimal value, a surrogate code point and an unknown named reference; compare output bytes before and after the patch and verify no exception escapes. Expected result: no exception, controls unchanged, and no malformed value becomes a blocked scheme. Falsifier: any exception or control drift. Cleanup: remove the temporary cases. Limitations: replacement-character policy may legitimately over-reject a malformed relative value."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: nested or double-encoded references do not survive because the serializer resolves only one entity layer and a browser also resolves only one layer. Prerequisite: the same serializer behavior. Bounded test: sanitize a double-encoded reference and re-parse the emitted attribute once with the same HTML parser; also inspect the raw emitted bytes. Expected result: the re-parsed value is not a blocked scheme. Falsifier: any emitted attribute whose first parse yields javascript: or another blocked scheme. Cleanup: none beyond the fixture. Limitations: repeated decoding by an intermediary could change the result."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: non-ASCII or high-Unicode references are classified correctly because only the resolved scheme prefix is examined. Prerequisite: a decoder that returns Unicode characters. Bounded test: sanitize an allowed scheme whose first letter is a numeric reference, a relative path beginning with a named non-ASCII entity, and a high code point before a colon; compare bytes with the pristine output. Expected result: no crash and no blocked scheme. Falsifier: a non-ASCII prefix is mistaken for an allowed scheme or an allowed value changes. Cleanup: remove the fixture. Limitations: URI scheme names are ASCII, so this is mostly a robustness control."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a minimal exported patch that contains only the source delta will apply to a fresh snapshot and reproduce the same behavior, whereas test files or run state in the delta will break the official handoff. Prerequisite: a pristine copy and a JSONL export containing only the source change. Bounded test: apply the patch to a fresh copy, import it, run the focused and full suites, and compare the robustness matrix with the working copy. Expected result: clean application and identical output. Falsifier: apply failure, test drift or any extra file in the patch. Cleanup: discard the fresh copy. Limitations: official evaluation remains external."
+    }
+  ]
+}

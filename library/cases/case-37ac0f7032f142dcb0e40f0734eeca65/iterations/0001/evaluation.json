@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.72,
+      "rationale": "Selected initial plan. It localizes the defect to the policy comparison and has a clear bounded experiment, but it must be extended to cover named entities and later numeric termination."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.92,
+      "rationale": "Selected. The most direct continuation: full entity decoding only for the policy view, with explicit allowed and relative controls. It preserves the serializer contract and is immediately testable."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Deferred. A useful parser-level alternative and a strong compatibility falsifier, but a larger blast radius than the policy-local repair."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.64,
+      "rationale": "Deferred. Coherent strict allowlist fallback; risks changing custom-protocol and exotic relative semantics."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.49,
+      "rationale": "Retained as an unexecuted alternative. The nested-encoding claim is testable but likely confused about single-pass browser resolution; it was not selected."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.58,
+      "rationale": "Deferred. Useful byte-for-byte regression gate and determinism control, but not a competing causal repair."
+    }
+  ]
+}

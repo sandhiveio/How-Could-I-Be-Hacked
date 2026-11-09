@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A Go session service has a one-hunk patch that adds an enabled-state check in the account branch of token parsing. In the development tree the patch rejects a disabled account token and preserves enabled, project-role, revoked-identifier, and password-time controls, and the full session package test suite passes. The next question is whether that patch is self-sufficient: does it apply cleanly to a pristine source copy and reproduce the same results without any development-tree edit outside the hunk?",
+    "surface": "A Go authorization service with a session manager, an account and project settings store, a token parser with separate account and project-role branches, server authentication middleware, and package-level tests backed by fake settings clients.",
+    "assumptions": [
+      "The observer can read and modify a disposable local source tree, run the local Go toolchain, and create fake settings clients; no public target, production service, or installed dependency is used.",
+      "The attacker holds an existing validly signed token for an account that is later disabled and cannot change the server signing key.",
+      "An enabled account token and a project-role token are legitimate controls that must keep working.",
+      "Stored token-identifier removal and password modification time are existing revocation mechanisms that must keep working after the repair.",
+      "Official benchmark evaluation is host-side; local package tests and a clean patch application are not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "r2-v1",
+    "text": "Hypothesis: inserting the enabled-state check immediately after account lookup and before identifier membership rejects disabled accounts without altering revocation logic. Prerequisites: the vulnerable local source, fake settings clients, one disabled account with a valid identifier, and one enabled account with a revoked identifier. Bounded test: apply the minimal check, replay the disabled valid-identifier token, the enabled token, and the revoked-identifier token, and compare error classes. Expected supporting result: the disabled token fails with a disabled error, the enabled token succeeds, and the revoked token still fails for a missing identifier. Falsifier: any disabled token succeeds or a control changes its error class. Cleanup: restore fixtures and retain the patch in a disposable copy."
+  },
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: the saved one-hunk patch applies to a pristine source copy and reproduces disabled-account rejection there. Prerequisites: the pristine source snapshot, the saved patch, a local Go toolchain, and the test harness copied separately from the development tree. Bounded test: copy the snapshot fresh, run a patch dry check, apply only the hunk, copy the harness without other source edits, and replay a disabled valid-identifier token plus an enabled control. Expected supporting result: the hunk applies, the disabled token is rejected, and the enabled token is accepted. Falsifier: the hunk rejects or fuzzes context, the disabled token is accepted, or any extra source edit is required. Cleanup: remove the temporary tree."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: the server authentication middleware surfaces the new parser error rather than falling back to anonymous access. Prerequisites: a local server fixture with the patched parser, a valid disabled-account token, and an enabled control token. Bounded test: present both tokens through the middleware token slot, inspect status and context subject, and compare with an absent-token request. Expected supporting result: the disabled token yields an unauthenticated disabled error, the enabled token yields its subject, and only the absent token follows anonymous fallback. Falsifier: the disabled token reaches an anonymous successful context. Cleanup: close the fixture and discard temporary clients."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: the patch does not reorder lifecycle errors in a pristine tree, so disabled state still takes precedence over a changed password and a revoked identifier still wins by identifier lookup. Prerequisites: a pristine patched tree and fixtures for a disabled account with a stale password time and an enabled account with a removed identifier. Bounded test: replay both tokens and record error class and ordering. Expected supporting result: the disabled token fails with a disabled error and the revoked token fails with an identifier error. Falsifier: either order flips or the error class changes unexpectedly. Cleanup: remove the patched clone."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: project-role tokens keep working in a pristine patched tree because their branch still runs before the account branch. Prerequisites: a pristine patched tree, a project role with a stored identifier, and an account flag that can be disabled. Bounded test: issue and replay a project-role token after disabling an associated account, and compare with the development-tree result. Expected supporting result: the role token remains accepted and its subject is unchanged. Falsifier: the role token is rejected or its subject changes. Cleanup: reset the fake settings store."
+    },
+    {
+      "id": "r3-v5",
+      "parent_id": "r2-v1",
+      "text": "Hypothesis: a single consolidated matrix on a pristine tree with only the saved hunk applied is sufficient to show the patch has no hidden dependency on other development-tree edits. Prerequisites: a fresh copy, the patch only, and a compact test harness. Bounded test: apply the hunk alone and run disabled-reject, enabled-accept, project-role-accept, revoked-identifier-reject, and password-time-reject cells. Expected supporting result: every cell matches the development-tree results and only the intended source file differs. Falsifier: any cell diverges or an extra source edit is needed. Cleanup: delete the clone and marker fixtures."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.6514,
+      "rationale": "The incumbent repair is already causally supported in the development tree. It remains the patch under test but does not provide pristine-tree portability evidence, so it is deferred."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.7495,
+      "rationale": "Selected. It directly resolves the handoff uncertainty by applying only the saved hunk to a pristine snapshot and reproducing the disabled rejection. This distinguishes a self-sufficient artifact from a development-tree-only change."
+    },
+    {
+      "id": "r3-v5",
+      "eligible": true,
+      "score": 0.7103,
+      "rationale": "Deferred and folded into the selected action. The consolidated matrix is a stronger form of the same fresh-tree check, so the selected run will execute the enabled, disabled, project-role, revoked-identifier, and password-time cells."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.575,
+      "rationale": "Deferred, not refuted. Middleware propagation is a distinct downstream fail-open question, but it needs a server fixture and is less central to patch portability. It remains a plausible later check."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.6239,
+      "rationale": "Deferred and folded into the fresh-tree matrix. Error precedence was already observed in the development tree; repeating it after patch-only application adds portability evidence but not a new mechanism."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.603,
+      "rationale": "Deferred and folded into the fresh-tree matrix. The project-role branch is already established; one post-patch role control in the pristine tree is sufficient."
+    }
+  ],
+  "selected_id": "r3-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Created a pristine copy of the source snapshot, verified the saved one-hunk patch with a dry check, applied only that patch, then copied the test harness without other source changes. The pristine patched tree rejected the disabled account token with an unauthenticated disabled error. The same run kept the enabled account, project-role, revoked-identifier, password-time, and disabled-before-password-time results. A file comparison showed only the intended source hunk and the separately copied harness files. The patch is self-sufficient for the tested matrix. Local only; no official evaluation ran.",
+    "next_hint": "Check whether the server authentication middleware returns the parser's disabled error rather than converting it into an anonymous identity, with an enabled-token subject control."
+  },
+  "lineage": {
+    "case_id": "case-47e872f11dcc4421947ad049b5018bf8",
+    "iteration_id": "step-3",
+    "previous_iteration_id": "step-2",
+    "step_id": "step-3",
+    "parent_step_id": "step-2",
+    "branch_id": "main"
+  }
+}

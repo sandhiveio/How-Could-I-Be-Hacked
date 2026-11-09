@@ -1,0 +1,13 @@
+{
+  "id": "case-47e872f11dcc4421947ad049b5018bf8",
+  "kind": "curated_case",
+  "hint": "A Go authorization service issues HMAC-signed session tokens for local accounts and separate project-role tokens. Password login rejects an account whose enabled flag is false, but token parsing checks only account existence, optional stored token-identifier membership, and password modification time. A token issued while an account was enabled therefore still authenticates after the account is disabled. Determine the smallest repair that makes disabled state effective for existing account tokens while preserving enabled sessions, project-role tokens, token-identifier revocation, password-change invalidation, and explicit middleware rejection instead of anonymous fallback.",
+  "surface": "A Go authorization service with a session manager, an account and project settings store, a token parser with separate account and project-role branches, server authentication middleware, and package-level tests backed by fake settings clients.",
+  "assumptions": [
+    "The observer can read and modify a disposable local source tree, run the local Go toolchain, and create fake settings clients; no public target, production service, or installed dependency is used.",
+    "The attacker holds an existing validly signed token for an account that is later disabled and cannot change the server signing key.",
+    "An enabled account token and a project-role token are legitimate controls that must keep working.",
+    "Stored token-identifier removal and password modification time are existing revocation mechanisms that must keep working after the repair.",
+    "Official benchmark evaluation is host-side; local package tests and a clean patch application are not an official pass."
+  ]
+}

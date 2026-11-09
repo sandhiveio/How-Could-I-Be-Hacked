@@ -4,7 +4,7 @@ Explore how your code could be attacked using real security investigation trajec
 Find applicable hypotheses, run targeted checks, and turn verified findings into regression
 tests — all locally, without API access.
 
-**20 cases · 65 steps · 379 searchable hypothesis entries**
+**22 cases · 73 steps · 426 searchable hypothesis entries**
 
 **Works offline. No API keys required.**
 
@@ -43,7 +43,8 @@ Then [ask your agent to review your repository](#use-with-an-agent).
 - **Authorization, rendering, and tooling.** Checks cover streaming RPC authentication,
   path-dependent authorization caching, HTML template autoescaping, secret redaction
   in logs, Git clone option validation, and line-ending differences between YAML template
-  parsing and signature verification.
+  parsing and signature verification. Additional trajectories cover entity-encoded URI schemes
+  in HTML sanitizers and revocation of existing session tokens when an account is disabled.
 
 Planned coverage includes archive symlinks, CSRF, session handling, and cryptography
 challenges. The queue also includes release provenance, sanitizer
@@ -103,7 +104,7 @@ The toolkit assists an agent; it does not autonomously scan code or execute retr
 
 ## Data and evidence
 
-Snapshot updated November 6, 2026. Daily updates are planned once the pipeline is configured.
+Snapshot updated November 8, 2026. Daily updates are planned once the pipeline is configured.
 
 The library is a snapshot of the project's curated local library. Raw producer runs, private
 identity mappings and credentials are excluded. Do not commit assessments or target logs here.

@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.66,
+      "rationale": "Retained incumbent. Its named-entity repair is the base, but the round-2 matrix proved it incomplete for numeric-reference termination."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.72,
+      "rationale": "Selected. Names the exact observed gap and prescribes a bounded parser-faithful termination rule with a clear falsifier."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.59,
+      "rationale": "Deferred but incorporated as the invalid-reference control. Important compatibility guard, not the primary repair."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.62,
+      "rationale": "Deferred as regression coverage. Correctly extends the numeric concern to hex and over-consumption controls."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.53,
+      "rationale": "Deferred. Useful named-entity and query-string coverage, weaker discrimination than the demonstrated numeric gap."
+    }
+  ]
+}

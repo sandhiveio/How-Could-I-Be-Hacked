@@ -1,0 +1,24 @@
+{
+  "candidates": [
+    {
+      "id": "r3-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: an attacker can hide a disallowed scheme behind a numeric character reference without a trailing semicolon, which the current decoder leaves intact because it only matches terminated references. Prerequisite: a policy decoder that can consume a maximal digit run. Bounded test: sanitize a link with &#106avascript: plus a plain javascript: control, then also test zero-padded and uppercase-hex variants; record whether the URI attribute remains. Expected result: the repaired decoder consumes decimal or hex digits greedily, optionally consumes one semicolon, resolves the value, and removes the attribute. Falsifier: any no-semicolon form still resolves to a blocked scheme after the repair. Cleanup: revert one helper. Limitations: greedy consumption must not turn a legitimate reference-lookalike into a different scheme."
+    },
+    {
+      "id": "r3-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: out-of-range, empty or surrogate numeric references can raise during character conversion or cause over-rejection, turning a robustness fix into a compatibility regression. Prerequisite: numeric parsing with explicit invalid-value handling. Bounded test: sanitize link values containing an empty numeric reference, a value above the Unicode maximum, a surrogate and a zero code point; compare emitted bytes with the pristine snapshot and verify no exception. Expected result: no exception and unchanged control bytes; invalid references are left for the policy view because a browser maps them to a replacement character that cannot form a scheme. Falsifier: any exception or control drift. Cleanup: remove the cases. Limitations: replacement-character behavior may differ by parser version."
+    },
+    {
+      "id": "r3-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: hexadecimal references with mixed case, a leading x/X and zero padding, with or without a semicolon, exercise the same termination rule and should be covered alongside decimal. Prerequisite: the same numeric decoder. Bounded test: sanitize uppercase-X, lowercase-x, zero-padded and short hex forms, including a hex run that consumes the leading a of avascript and therefore is not the javascript scheme; compare relative and allowed controls. Expected result: forms resolving to javascript: are removed; the over-consuming hex form stays a non-scheme and keeps its bytes. Falsifier: a surviving javascript: form or a changed control. Cleanup: none beyond the fixture. Limitations: exact code-point mapping can vary for invalid values."
+    },
+    {
+      "id": "r3-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: named references beyond colon and tab, such as newline, slash, question mark, percent or number, could assemble or break URI values differently from numeric parsing because named tables are case-sensitive. Prerequisite: full named-entity decoding. Bounded test: sanitize a table of named references inside otherwise allowed relative and query values, and named references inside disallowed scheme prefixes; compare bytes with the pristine snapshot. Expected result: disallowed schemes are removed and ordinary query/relative values are unchanged. Falsifier: a named reference changes an allowed control or assembles a surviving blocked scheme. Cleanup: remove the table fixture. Limitations: very large entity alphabets are mostly repeated coverage."
+    }
+  ]
+}

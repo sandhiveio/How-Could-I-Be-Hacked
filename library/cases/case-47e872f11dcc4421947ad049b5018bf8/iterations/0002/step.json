@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "A Go authorization service issues HMAC-signed session tokens. Password login rejects a disabled account, but the token parser checks only account existence, optional stored token-identifier membership, and password modification time. A local test already showed that a disabled account's validly signed token with an intact identifier is accepted by a fresh settings view, while an enabled control and a project-role token pass. The next question is where to place the smallest enabled-state check so account tokens are rejected without changing project-role tokens, identifier revocation, password-time invalidation, or enabled sessions.",
+    "surface": "A Go authorization service with a session manager, an account and project settings store, a token parser with separate account and project-role branches, server authentication middleware, and package-level tests backed by fake settings clients.",
+    "assumptions": [
+      "The observer can read and modify a disposable local source tree, run the local Go toolchain, and create fake settings clients; no public target, production service, or installed dependency is used.",
+      "The attacker holds an existing validly signed token for an account that is later disabled and cannot change the server signing key.",
+      "An enabled account token and a project-role token are legitimate controls that must keep working.",
+      "Stored token-identifier removal and password modification time are existing revocation mechanisms that must keep working after the repair.",
+      "Official benchmark evaluation is host-side; local package tests and a clean patch application are not an official pass."
+    ]
+  },
+  "incumbent": {
+    "id": "r1-v1",
+    "text": "Hypothesis: the token parser trusts stored token-identifier membership and skips live enabled state, so a disabled account with an intact identifier still authenticates. Prerequisites: two local accounts sharing a signing key, one enabled control with a stored identifier, and one account disabled after issuance with its identifier retained. Bounded test: issue both tokens, switch only the disabled account flag in a fresh settings view, replay both through the public parser, then re-enable and replay again. Expected supporting result: the disabled token is rejected while the enabled token and the post-re-enable token are accepted. Falsifier: the disabled token is accepted or the enabled control is rejected. Cleanup: restore the flag and discard the fake clients."
+  },
+  "candidates": [
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: inserting the enabled-state check immediately after account lookup and before identifier membership rejects disabled accounts without altering revocation logic. Prerequisites: the vulnerable local source, fake settings clients, one disabled account with a valid identifier, and one enabled account with a revoked identifier. Bounded test: apply the minimal check, replay the disabled valid-identifier token, the enabled token, and the revoked-identifier token, and compare error classes. Expected supporting result: the disabled token fails with a disabled error, the enabled token succeeds, and the revoked token still fails for a missing identifier. Falsifier: any disabled token succeeds or a control changes its error class. Cleanup: restore fixtures and retain the patch in a disposable copy."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: placing the enabled check after password-modification-time validation also rejects a disabled account but lets the time error mask the disabled state. Prerequisites: a token issued before both a password change and a disablement. Bounded test: create that token, change the password time, disable the account, and replay against a fresh view; compare the error with a disabled-only control. Expected supporting result: rejection occurs, but the error is time-specific unless enabled state is checked first. Falsifier: the token is accepted or a disabled-only token is accepted. Cleanup: restore the original password hash and account flag."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a project-role token remains valid after an associated account is disabled because its validation branch is independent of account state. Prerequisites: a project role with a stored role identifier and an account whose enabled flag can change. Bounded test: issue a role token, disable the associated account, and replay the role token through the parser without changing project settings. Expected supporting result: the role token succeeds, showing orthogonality. Falsifier: the role token fails with an account-state error. Cleanup: restore the account and project fixtures. Limitation: the role subject is not a local account, so this is a branch-isolation regression rather than an account-token behavior."
+    },
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: the server authentication middleware propagates a parser error for a disabled account instead of falling back to an anonymous identity. Prerequisites: a local server fixture with anonymous fallback configured and a validly signed disabled-account token. Bounded test: present the token through the middleware token slot and inspect the returned context subject and status code; repeat with an enabled token. Expected supporting result: the disabled token yields an unauthenticated error and the enabled token yields the correct subject. Falsifier: the disabled token yields an anonymous successful context. Cleanup: close the server fixture."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: concurrent enable and disable toggles do not create intermittent acceptance because the parser reads a copied account view rather than shared mutable state. Prerequisites: a settings fixture whose enabled flag can be toggled while tokens are parsed. Bounded test: toggle the flag in a loop while parsing the same token in parallel workers, recording every verdict and panic. Expected supporting result: each parse reflects either the enabled or disabled state consistently, with no panic. Falsifier: a parse accepts after disablement or crashes. Cleanup: stop workers and restore the final flag."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.6795,
+      "rationale": "The incumbent has direct local evidence: a disabled account with an intact identifier parsed successfully while enabled and project-role controls passed. It remains the baseline to repair but does not specify patch placement or error-order regression, so it is deferred."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.7385,
+      "rationale": "Selected. It gives the minimal placement in the account branch and a matrix that separates disabled-state rejection from identifier revocation. The earlier observation supplies the vulnerable baseline, so one action can test the repair and lifecycle controls."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.56,
+      "rationale": "Deferred and folded into the selected regression matrix. Checking after password-time validation also rejects the token, but the error becomes time-specific. The same matrix can include a changed-password control without choosing this placement."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.614,
+      "rationale": "Deferred, not refuted. The earlier test already showed a project-role token accepted independently, so the expected result is supported before the repair. It is retained as a post-repair regression."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.5225,
+      "rationale": "Deferred, not refuted. Middleware propagation is a real downstream boundary, but the server fixture is larger than the package-level repair check and the parser already returns an error. It is a plausible later robustness check."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.379,
+      "rationale": "Deferred, not refuted. Concurrent toggling is a distinct concern, but the parser receives account copies and the new predicate adds no shared mutable state. Lower value than patch application and lifecycle regression."
+    }
+  ],
+  "selected_id": "r2-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Applied the minimal enabled-state predicate after account lookup and before identifier membership. A validly signed token issued for the account while it was enabled now failed with an unauthenticated disabled-account error. Controls passed: an enabled account token was accepted, a project-role token remained accepted, a missing identifier still failed with a token-identifier error, a later password time still failed with a password-change error, and disabled state took precedence over a changed password. The complete session package test suite passed in the development tree. A one-hunk patch was saved. Local only; no official evaluation ran.",
+    "next_hint": "Apply only the saved one-hunk patch to a pristine copy and reproduce the disabled rejection with the full control matrix."
+  },
+  "lineage": {
+    "case_id": "case-47e872f11dcc4421947ad049b5018bf8",
+    "iteration_id": "step-2",
+    "previous_iteration_id": "step-1",
+    "step_id": "step-2",
+    "parent_step_id": "step-1",
+    "branch_id": "main"
+  }
+}

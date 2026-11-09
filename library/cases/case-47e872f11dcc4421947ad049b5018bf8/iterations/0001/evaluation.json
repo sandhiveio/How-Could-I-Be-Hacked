@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.6338,
+      "rationale": "The broad plan remains valid and supplies the enabled, disabled, revoked, and project-role regression route. It is deferred in favor of the generated matrix because that matrix names the exact branch and the enabled control that discriminate the competing explanations."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.6917,
+      "rationale": "Selected. It directly tests a validly signed account token whose stored identifier is intact but whose current enabled state is false, with an enabled control and a re-enable cleanup. This gives a causal result and a minimal repair target."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.563,
+      "rationale": "Deferred, not refuted. The project-role branch does precede account handling, but a role subject is not a local account, so disablement is not ordinarily expected to invalidate it. It remains a valuable post-repair regression."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.6192,
+      "rationale": "Deferred and folded into the selected test as a control. A fresh settings view with identical signing material separates stale object state from a missing predicate without changing the repair."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.5813,
+      "rationale": "Deferred, not refuted. A full middleware check could reveal anonymous fallback, but it needs a larger server fixture. It is a follow-up check after parser behavior is observed."
+    },
+    {
+      "id": "r1-v5",
+      "eligible": true,
+      "score": 0.5065,
+      "rationale": "Deferred, not refuted. An identifier/state race is a distinct concurrency hypothesis, but the visible path is synchronous and no cleanup window is evident yet. It needs a separate stagger fixture."
+    }
+  ]
+}

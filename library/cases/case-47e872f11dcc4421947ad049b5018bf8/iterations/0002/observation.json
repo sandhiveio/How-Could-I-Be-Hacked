@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Applied the minimal enabled-state predicate after account lookup and before identifier membership. A validly signed token issued for the account while it was enabled now failed with an unauthenticated disabled-account error. Controls passed: an enabled account token was accepted, a project-role token remained accepted, a missing identifier still failed with a token-identifier error, a later password time still failed with a password-change error, and disabled state took precedence over a changed password. The complete session package test suite passed in the development tree. A one-hunk patch was saved. Local only; no official evaluation ran.",
+  "next_hint": "Apply only the saved one-hunk patch to a pristine copy and reproduce the disabled rejection with the full control matrix."
+}

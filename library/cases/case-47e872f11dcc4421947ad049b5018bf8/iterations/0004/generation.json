@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r4-v1",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: the authentication middleware distinguishes a parser rejection from an absent token and returns an unauthenticated error for the disabled account. Prerequisites: a local server fixture built on the pristine patched source, a valid disabled-account token, and an enabled control token. Bounded test: present both tokens through the middleware token slot, inspect the returned status and handler-context subject, and compare with an absent-token request. Expected supporting result: the disabled token yields an unauthenticated disabled error, the enabled token yields its subject, and only the absent token follows anonymous fallback. Falsifier: the disabled token yields a successful anonymous context. Cleanup: close the fixture and discard temporary clients."
+    },
+    {
+      "id": "r4-v2",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: an enabled account token still propagates its specific subject into the handler context after the repair, so the middleware does not over-block legitimate sessions. Prerequisites: a patched local server fixture and an enabled account with a valid identifier. Bounded test: present the enabled token through the middleware and inspect the context subject; compare with an absent-token request. Expected supporting result: no error and the exact enabled subject. Falsifier: a missing or anonymous subject, or an unexpected rejection. Cleanup: reset the fixture."
+    },
+    {
+      "id": "r4-v3",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: project-role tokens remain independent of account enabled state at the middleware boundary because their parser branch runs before account handling. Prerequisites: a patched server fixture, a project role with a stored role identifier, and an account flag that can be disabled. Bounded test: send a project-role token after disabling an associated account and inspect status and subject; compare with an enabled-account token. Expected supporting result: the role token is accepted with its role subject. Falsifier: the middleware rejects it with an account-state error. Cleanup: reset the project and account fixtures. Limitation: the server fixture may need a started project informer, so this is secondary to the account-token boundary."
+    },
+    {
+      "id": "r4-v4",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: concurrent enable and disable toggles do not create intermittent middleware acceptance because the parser reads a copied account view. Prerequisites: a mutable fake settings store and a valid token. Bounded test: toggle the account flag in a loop while presenting the same token to the middleware in parallel workers, recording every verdict. Expected supporting result: each request is consistently rejected or accepted according to the state read, with no panic. Falsifier: a request succeeds after disablement or the fixture crashes. Cleanup: stop workers and restore the final flag. Limitation: this tests the fixture store rather than a distributed settings cache."
+    },
+    {
+      "id": "r4-v5",
+      "parent_id": "r3-v1",
+      "text": "Hypothesis: the saved patch is robust to minor line-ending variation when applied by common patch tooling. Prerequisites: two pristine copies of the same source, one with LF and one with CRLF line endings, and the saved hunk. Bounded test: apply the patch to both copies, compare the resulting source bytes, and verify the same disabled-token result where the harness can run. Expected supporting result: both applications succeed and produce equivalent source semantics. Falsifier: one copy rejects the hunk or produces different code. Cleanup: delete both copies. Limitation: the official host applies the patch to a Linux snapshot, so this is a packaging robustness check."
+    }
+  ]
+}

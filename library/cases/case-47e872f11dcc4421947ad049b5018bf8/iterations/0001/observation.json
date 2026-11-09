@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "A package-level Go test issued a token for account B while enabled, with a valid stored identifier, then replayed it through a fresh settings view that had the same signing key but account B disabled. The parser returned no error and resolved subject B, so the disabled account still authenticated. Controls passed: an enabled account token with its own identifier was accepted, and a project-role token was accepted through its separate branch. The fresh view rules out stale settings, the intact identifier rules out revocation, and the resolved subject rules out anonymous fallback. Local only; no official evaluation ran.",
+  "next_hint": "Add the smallest enabled-state predicate in the account branch and run an enabled, disabled, revoked-identifier, password-time, and project-role regression matrix."
+}

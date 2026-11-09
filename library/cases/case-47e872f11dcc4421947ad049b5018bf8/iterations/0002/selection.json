@@ -1,0 +1,4 @@
+{
+  "selected_id": "r2-v1",
+  "selected_text": "Hypothesis: inserting the enabled-state check immediately after account lookup and before identifier membership rejects disabled accounts without altering revocation logic. Prerequisites: the vulnerable local source, fake settings clients, one disabled account with a valid identifier, and one enabled account with a revoked identifier. Bounded test: apply the minimal check, replay the disabled valid-identifier token, the enabled token, and the revoked-identifier token, and compare error classes. Expected supporting result: the disabled token fails with a disabled error, the enabled token succeeds, and the revoked token still fails for a missing identifier. Falsifier: any disabled token succeeds or a control changes its error class. Cleanup: restore fixtures and retain the patch in a disposable copy."
+}

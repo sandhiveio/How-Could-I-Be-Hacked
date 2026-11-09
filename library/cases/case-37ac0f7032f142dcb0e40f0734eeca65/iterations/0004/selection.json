@@ -1,0 +1,4 @@
+{
+  "selected_id": "r3-v1",
+  "selected_text": "Hypothesis: an attacker can hide a disallowed scheme behind a numeric character reference without a trailing semicolon, which the current decoder leaves intact because it only matches terminated references. Prerequisite: a policy decoder that can consume a maximal digit run. Bounded test: sanitize a link with &#106avascript: plus a plain javascript: control, then also test zero-padded and uppercase-hex variants; record whether the URI attribute remains. Expected result: the repaired decoder consumes decimal or hex digits greedily, optionally consumes one semicolon, resolves the value, and removes the attribute. Falsifier: any no-semicolon form still resolves to a blocked scheme after the repair. Cleanup: revert one helper. Limitations: greedy consumption must not turn a legitimate reference-lookalike into a different scheme."
+}

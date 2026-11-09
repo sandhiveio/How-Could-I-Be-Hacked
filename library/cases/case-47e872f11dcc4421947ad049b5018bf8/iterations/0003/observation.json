@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Created a pristine copy of the source snapshot, verified the saved one-hunk patch with a dry check, applied only that patch, then copied the test harness without other source changes. The pristine patched tree rejected the disabled account token with an unauthenticated disabled error. The same run kept the enabled account, project-role, revoked-identifier, password-time, and disabled-before-password-time results. A file comparison showed only the intended source hunk and the separately copied harness files. The patch is self-sufficient for the tested matrix. Local only; no official evaluation ran.",
+  "next_hint": "Check whether the server authentication middleware returns the parser's disabled error rather than converting it into an anonymous identity, with an enabled-token subject control."
+}

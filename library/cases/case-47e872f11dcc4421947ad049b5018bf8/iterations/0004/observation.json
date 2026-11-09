@@ -1,0 +1,5 @@
+{
+  "outcome": "supported",
+  "summary": "Ran a server-package test on the pristine patched tree. A validly signed token for the disabled account was presented through the gRPC metadata token slot to the authentication middleware. The middleware returned an unauthenticated error carrying the parser's disabled-account message, so it did not fall back to an anonymous identity. A valid enabled account token in the same middleware returned no error and placed subject A in the handler context, proving the rejection did not over-block enabled sessions. Project-role middleware behavior was not exercised in this server fixture. Local only; no official evaluation ran.",
+  "next_hint": "The local evidence and patch are complete for the account-token mechanism; the remaining step is the external host-side evaluator, which may still reject the patch or expose an untested behavior."
+}

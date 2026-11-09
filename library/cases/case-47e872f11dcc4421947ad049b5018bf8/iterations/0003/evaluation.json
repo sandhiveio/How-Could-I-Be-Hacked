@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.6514,
+      "rationale": "The incumbent repair is already causally supported in the development tree. It remains the patch under test but does not provide pristine-tree portability evidence, so it is deferred."
+    },
+    {
+      "id": "r3-v1",
+      "eligible": true,
+      "score": 0.7495,
+      "rationale": "Selected. It directly resolves the handoff uncertainty by applying only the saved hunk to a pristine snapshot and reproducing the disabled rejection. This distinguishes a self-sufficient artifact from a development-tree-only change."
+    },
+    {
+      "id": "r3-v5",
+      "eligible": true,
+      "score": 0.7103,
+      "rationale": "Deferred and folded into the selected action. The consolidated matrix is a stronger form of the same fresh-tree check, so the selected run will execute the enabled, disabled, project-role, revoked-identifier, and password-time cells."
+    },
+    {
+      "id": "r3-v2",
+      "eligible": true,
+      "score": 0.575,
+      "rationale": "Deferred, not refuted. Middleware propagation is a distinct downstream fail-open question, but it needs a server fixture and is less central to patch portability. It remains a plausible later check."
+    },
+    {
+      "id": "r3-v3",
+      "eligible": true,
+      "score": 0.6239,
+      "rationale": "Deferred and folded into the fresh-tree matrix. Error precedence was already observed in the development tree; repeating it after patch-only application adds portability evidence but not a new mechanism."
+    },
+    {
+      "id": "r3-v4",
+      "eligible": true,
+      "score": 0.603,
+      "rationale": "Deferred and folded into the fresh-tree matrix. The project-role branch is already established; one post-patch role control in the pristine tree is sufficient."
+    }
+  ]
+}
