@@ -1,0 +1,10 @@
+{
+  "case_id": "case-848c1c44088843f38fba5e0a8b3d1514",
+  "iteration_id": "iteration-0001",
+  "previous_iteration_id": null,
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Lifecycle threat-model audit: walk the token lifecycle (mint, bind to cookie, validate unsafe request, rotate, single-use delete, expiry) across the handler and both storage backends, enumerate every point where the validated secret could become caller-controlled or constant, confirm each candidate flaw with an in-process request-sequence replay that logs exact cookie and status values, then repair the flawed lifecycle point and add a sequence-level regression test asserting the issued token stays unpredictable per client."
+  },
+  "hint": "Source inspection of the CSRF-style middleware found that both storage backends record a fixed one-character placeholder as the value stored under each token key, and the request handler takes the value returned by the storage lookup as the token itself: on safe methods it copies the looked-up value into the token variable, and on state-changing methods it does the same whenever tokens are not single-use. The handler then re-stores the token under that value as a new key and rotates the client cookie to it. If the looked-up value is the constant placeholder rather than the minted random secret, every issued cookie could collapse onto an attacker-known constant after a client's second request, and any client could then satisfy both the double-submit check and the storage lookup with that constant. The open question: which exact request sequence discriminally demonstrates acceptance of an attacker-known token versus normal per-client unpredictable behavior, and does the session-backed backend differ from the memory backend? Permissions: disposable local source copy, local toolchain, in-process fake requests only."
+}

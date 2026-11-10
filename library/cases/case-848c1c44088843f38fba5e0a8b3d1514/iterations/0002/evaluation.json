@@ -1,0 +1,40 @@
+{
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.7625,
+      "rationale": "Selected (incumbent wins on evidence). Its hypothesis was executed and confirmed with a discriminating controlled experiment in the previous round, and its remaining implication is exactly the minimal repair plus regression replay; the useful sub-checks from all four alternatives (write-path scope, backend and extraction-source matrix, cross-client ownership assertion, suite plus countercheck checklist) were absorbed into this single bounded action."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.6825,
+      "rationale": "Deferred, not refuted. Correctly identifies that a lookup-only repair fails on the write path; its per-source mint-rotate assertion became part of the executed regression matrix. Lower evidence because the child claim was unexecuted at scoring time."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.6425,
+      "rationale": "Deferred. Targets the real open question (session-backend exploitability after a victim's repeat visit) and contributes the backend-by-extraction-source replay matrix; its causal claim about where the fix belongs was partially inverted, so it informed rather than replaced the incumbent action."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.6325,
+      "rationale": "Deferred. Its backend-only repair scope was contradicted by source reading (the session record also stores the placeholder), retained as a coherent alternative scope that its own regression would falsify."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.61,
+      "rationale": "Deferred. Ownership assertions guard against one cosmetic repair class; folded into the final matrix as the cross-client difference and no-false-denial checks."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.475,
+      "rationale": "Deferred. Checklist-style closure design; the all-accept countercheck was executed as part of the final matrix (unknown-value control)."
+    }
+  ]
+}

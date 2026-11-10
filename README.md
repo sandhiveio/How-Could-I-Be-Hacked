@@ -4,7 +4,7 @@ Explore how your code could be attacked using real security investigation trajec
 Find applicable hypotheses, run targeted checks, and turn verified findings into regression
 tests — all locally, without API access.
 
-**22 cases · 73 steps · 426 searchable hypothesis entries**
+**23 cases · 75 steps · 437 searchable hypothesis entries**
 
 **Works offline. No API keys required.**
 
@@ -46,7 +46,10 @@ Then [ask your agent to review your repository](#use-with-an-agent).
   parsing and signature verification. Additional trajectories cover entity-encoded URI schemes
   in HTML sanitizers and revocation of existing session tokens when an account is disabled.
 
-Planned coverage includes archive symlinks, CSRF, session handling, and cryptography
+Additional CSRF checks cover token collapse onto a constant across memory and session
+stores, with double-submit, extraction-source, and single-use replay controls.
+
+Planned coverage includes archive symlinks, session handling, and cryptography
 challenges. The queue also includes release provenance, sanitizer
 compatibility, and behavioral replay.
 

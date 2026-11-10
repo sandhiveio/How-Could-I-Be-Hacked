@@ -1,0 +1,34 @@
+{
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.705,
+      "rationale": "Deferred, not refuted: the incumbent audit plan was strong and its next action overlaps the chosen one, but its first step was broader than the single discriminating experiment now implicated by source reading. It remained in the candidate set and won the following round on evidence."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.719,
+      "rationale": "Selected. Its mechanism matches the source-derived causal chain exactly and its two-control test (attacker-known constant versus unknown value) is the single most discriminating first experiment; adaptation noted: the default memory backend already exhibits the constant, no custom backend needed."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.694,
+      "rationale": "Deferred. Trivially executable and shows the cookie collapse without any state-changing request, but cookie collapse alone does not prove unsafe-method acceptance; its three-GET check was folded into the selected sequence."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.652,
+      "rationale": "Deferred. Valuable second-stage discriminator for session binding, premised on the primary bypass result; premature as the first action."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.48,
+      "rationale": "Deferred as a control experiment. Scientifically clean but elaborate for the current step and does not by itself establish the bypass; retained as a robustness ingredient."
+    }
+  ]
+}

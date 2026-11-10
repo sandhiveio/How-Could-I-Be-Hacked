@@ -1,0 +1,13 @@
+{
+  "id": "case-848c1c44088843f38fba5e0a8b3d1514",
+  "kind": "curated_case",
+  "hint": "A web framework's CSRF-protection middleware issues a random token, returns it to the browser in a cookie, and validates state-changing requests by checking that a client-supplied token matches the cookie (double submit) and exists server-side. Two interchangeable server-side backends hold the token state: a process-local memory store keyed by the token string, and an optional session store that keeps a token record struct. Source reading shows both backends store a fixed one-character placeholder as the recorded value under the token key, and the request handler copies the value returned by the storage lookup back into the token variable, re-stores it under that value as a new key, and rotates the cookie to it. The observer must determine whether this collapses validation onto an attacker-known constant, demonstrate it with a minimal in-process request replay, and repair it without breaking legitimate flows.",
+  "surface": "Single-process HTTP web framework middleware with pluggable token extraction sources (header, form field, query, URL parameter, cookie), two storage backends (process-local memory store keyed by token; session-backed record store), a safe-method branch that only re-issues state, an unsafe-method branch with a double-submit cookie check plus storage lookup, an optional single-use rotation mode, and a pluggable error handler. Testing uses disposable in-process app fixtures and a fake request interface; no network listener and no deployed service is involved.",
+  "assumptions": [
+    "The observer may read the middleware source, copy it into a disposable working tree, and build and run local test binaries with the language toolchain.",
+    "Only the middleware itself is in scope; callers supply the configuration, and the default configuration uses the memory store and header extraction.",
+    "Ordinary client flows (first visit, repeat visit, valid state-changing request, expired token, replayed single-use token) are available as functional controls.",
+    "Both storage backends must keep working through the same public constructor and configuration; the repair may not change the exported API.",
+    "Official verification of an exported patch happens in a separate offline harness that is unavailable to the observer; local green suites are necessary but not official evidence."
+  ]
+}

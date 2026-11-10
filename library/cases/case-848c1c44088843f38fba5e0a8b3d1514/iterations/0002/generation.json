@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: repairing only the storage lookup's return value fails, because the write path still stores the placeholder under whichever token is current, so the next rotation reintroduces the constant as a key; the fix must cover the handler's write path too. Prerequisites: patched source copy, in-process fixtures. Bounded test: after any lookup-only fix, drive a mint-rotate-mint sequence per extraction source and capture every rotated cookie value. Expected support: a repeated constant or a two-value cycle appears. Falsifier: strictly fresh unpredictable values every rotation. Limitation: overlaps the incumbent's call-site repair; useful as the write-path assertion inside the final regression matrix. Cleanup: none beyond fixtures."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a narrow patch leaves the session backend exploitable after a victim's repeat visit, because the session record keeps the placeholder as its raw value; replay must be driven across both backends and all extraction sources to expose any surviving path. Prerequisites: instrumented backends or observable cookie/status outputs, both backend configurations. Bounded test: victim mint-then-rotate, then attacker replay of the constant, for each backend and extraction source combination. Expected support: at least one combination still accepts the constant after a narrow fix. Falsifier: all combinations reject it. Limitation: its causal claim is partially inverted (a handler call-site fix neutralizes both backends at once), but the matrix is the right robustness check; absorbed into the final matrix. Cleanup: revert instrumentation."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a cosmetic repair that merely re-randomizes the cookie after validation still lets two clients share an accepted value, so ownership must be asserted explicitly. Prerequisites: two concurrent clients, single-use mode off. Bounded test: rotate each client once, assert their cookie values differ, then cross-submit each client's pair from the other client. Expected support: values differ and cross-submission of a mismatched pair is rejected while each client's own pair is accepted. Falsifier: identical cookies across clients or accepted mismatched pairs. Limitation: a guard against a specific cosmetic fix rather than the primary mechanism; folded into the final matrix. Cleanup: none."
+    },
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: the storage backend's get/set contract is the sole defect; changing only that backend's lookup to return the minted secret closes both backends. Prerequisites: source access to the backend pair, disposable copies. Bounded test: apply the backend-only change and rerun the bypass sequence and the upstream suite. Expected support: constant requests rejected, suite green. Falsifier: the session backend still collapses (its record also stores the placeholder as the raw value), or an upstream regression appears. Limitation: scope claim contradicted by source reading; retained as a coherent alternative repair scope that its own test would falsify. Cleanup: revert before trying other scopes."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: closure requires the full upstream suite plus targeted additions across both backends and all extraction sources, plus an all-accept countercheck (a deliberately invalid request must fail), catching cosmetic repairs that accept everything. Prerequisites: patched copy and upstream suite. Bounded test: run suite, targeted matrix, countercheck. Expected support: green suite, matrix passes, invalid request rejected. Falsifier: silent pass on the invalid request. Limitation: verification design, not a causal hypothesis; absorbed into the incumbent's final action. Cleanup: none."
+    }
+  ]
+}

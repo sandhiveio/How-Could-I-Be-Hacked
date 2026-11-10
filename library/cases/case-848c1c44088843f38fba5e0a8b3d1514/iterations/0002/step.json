@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "The confirmed mechanism: the middleware stores a fixed one-character placeholder as the recorded value under each token key in both backends, and the handler treats the value returned by the storage lookup as the validated token, re-stores it under that constant as a key, and rotates the client cookie to it; a completely fresh client then passes validation using the attacker-known constant. The session backend also stores the placeholder as the record's raw value, so a repair scoped only to one backend's lookup would leave the other path collapsing. The open question: what is the minimal repair that restores an unpredictable per-client secret across both backends and all extraction sources without changing the public API, and which regression matrix distinguishes it from cosmetic fixes? Permissions unchanged: disposable local source copy, local toolchain, in-process fake requests; official patch verification happens in a separate host-side harness that is unavailable here.",
+    "surface": "Single-process HTTP web framework middleware with pluggable token extraction sources (header, form field, query, URL parameter, cookie), two storage backends (process-local memory store keyed by token; session-backed record store), a safe-method branch that only re-issues state, an unsafe-method branch with a double-submit cookie check plus storage lookup, an optional single-use rotation mode, and a pluggable error handler. Testing uses disposable in-process app fixtures and a fake request interface; no network listener and no deployed service is involved.",
+    "assumptions": [
+      "The observer may read the middleware source, copy it into a disposable working tree, and build and run local test binaries with the language toolchain.",
+      "Only the middleware itself is in scope; callers supply the configuration, and the default configuration uses the memory store and header extraction.",
+      "Ordinary client flows (first visit, repeat visit, valid state-changing request, expired token, replayed single-use token) are available as functional controls.",
+      "Both storage backends must keep working through the same public constructor and configuration; the repair may not change the exported API.",
+      "Official verification of an exported patch happens in a separate offline harness that is unavailable to the observer; local green suites are necessary but not official evidence."
+    ]
+  },
+  "incumbent": {
+    "id": "r1-v1",
+    "text": "Hypothesis: the storage path's constant recorded value collapses token entropy, because the lookup returns the stored value, not the key it looked up, and the handler re-uses that value as the validated token; validation therefore accepts a fixed constant that any attacker knows in advance. Prerequisites: default non-single-use configuration with the memory backend, disposable in-process app, fake request interface. Bounded test: first safe request mints a random cookie; replay it on a second safe request and read the rotated cookie value; then send a state-changing request from a completely fresh client with the suspected constant as both the extracted token and the cookie, plus a control state-changing request with an attacker-chosen unknown random value. Expected support: the second safe response rotates the cookie to the constant and the fresh-client constant request is accepted (success status) while the unknown value is rejected. Falsifier: the constant request is rejected or the cookie never collapses. Cleanup: fixtures are disposable; keep the sequence script as the regression core."
+  },
+  "candidates": [
+    {
+      "id": "r2-v4",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: repairing only the storage lookup's return value fails, because the write path still stores the placeholder under whichever token is current, so the next rotation reintroduces the constant as a key; the fix must cover the handler's write path too. Prerequisites: patched source copy, in-process fixtures. Bounded test: after any lookup-only fix, drive a mint-rotate-mint sequence per extraction source and capture every rotated cookie value. Expected support: a repeated constant or a two-value cycle appears. Falsifier: strictly fresh unpredictable values every rotation. Limitation: overlaps the incumbent's call-site repair; useful as the write-path assertion inside the final regression matrix. Cleanup: none beyond fixtures."
+    },
+    {
+      "id": "r2-v2",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a narrow patch leaves the session backend exploitable after a victim's repeat visit, because the session record keeps the placeholder as its raw value; replay must be driven across both backends and all extraction sources to expose any surviving path. Prerequisites: instrumented backends or observable cookie/status outputs, both backend configurations. Bounded test: victim mint-then-rotate, then attacker replay of the constant, for each backend and extraction source combination. Expected support: at least one combination still accepts the constant after a narrow fix. Falsifier: all combinations reject it. Limitation: its causal claim is partially inverted (a handler call-site fix neutralizes both backends at once), but the matrix is the right robustness check; absorbed into the final matrix. Cleanup: revert instrumentation."
+    },
+    {
+      "id": "r2-v3",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: a cosmetic repair that merely re-randomizes the cookie after validation still lets two clients share an accepted value, so ownership must be asserted explicitly. Prerequisites: two concurrent clients, single-use mode off. Bounded test: rotate each client once, assert their cookie values differ, then cross-submit each client's pair from the other client. Expected support: values differ and cross-submission of a mismatched pair is rejected while each client's own pair is accepted. Falsifier: identical cookies across clients or accepted mismatched pairs. Limitation: a guard against a specific cosmetic fix rather than the primary mechanism; folded into the final matrix. Cleanup: none."
+    },
+    {
+      "id": "r2-v1",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: the storage backend's get/set contract is the sole defect; changing only that backend's lookup to return the minted secret closes both backends. Prerequisites: source access to the backend pair, disposable copies. Bounded test: apply the backend-only change and rerun the bypass sequence and the upstream suite. Expected support: constant requests rejected, suite green. Falsifier: the session backend still collapses (its record also stores the placeholder as the raw value), or an upstream regression appears. Limitation: scope claim contradicted by source reading; retained as a coherent alternative repair scope that its own test would falsify. Cleanup: revert before trying other scopes."
+    },
+    {
+      "id": "r2-v5",
+      "parent_id": "r1-v1",
+      "text": "Hypothesis: closure requires the full upstream suite plus targeted additions across both backends and all extraction sources, plus an all-accept countercheck (a deliberately invalid request must fail), catching cosmetic repairs that accept everything. Prerequisites: patched copy and upstream suite. Bounded test: run suite, targeted matrix, countercheck. Expected support: green suite, matrix passes, invalid request rejected. Falsifier: silent pass on the invalid request. Limitation: verification design, not a causal hypothesis; absorbed into the incumbent's final action. Cleanup: none."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.7625,
+      "rationale": "Selected (incumbent wins on evidence). Its hypothesis was executed and confirmed with a discriminating controlled experiment in the previous round, and its remaining implication is exactly the minimal repair plus regression replay; the useful sub-checks from all four alternatives (write-path scope, backend and extraction-source matrix, cross-client ownership assertion, suite plus countercheck checklist) were absorbed into this single bounded action."
+    },
+    {
+      "id": "r2-v4",
+      "eligible": true,
+      "score": 0.6825,
+      "rationale": "Deferred, not refuted. Correctly identifies that a lookup-only repair fails on the write path; its per-source mint-rotate assertion became part of the executed regression matrix. Lower evidence because the child claim was unexecuted at scoring time."
+    },
+    {
+      "id": "r2-v2",
+      "eligible": true,
+      "score": 0.6425,
+      "rationale": "Deferred. Targets the real open question (session-backend exploitability after a victim's repeat visit) and contributes the backend-by-extraction-source replay matrix; its causal claim about where the fix belongs was partially inverted, so it informed rather than replaced the incumbent action."
+    },
+    {
+      "id": "r2-v1",
+      "eligible": true,
+      "score": 0.6325,
+      "rationale": "Deferred. Its backend-only repair scope was contradicted by source reading (the session record also stores the placeholder), retained as a coherent alternative scope that its own regression would falsify."
+    },
+    {
+      "id": "r2-v3",
+      "eligible": true,
+      "score": 0.61,
+      "rationale": "Deferred. Ownership assertions guard against one cosmetic repair class; folded into the final matrix as the cross-client difference and no-false-denial checks."
+    },
+    {
+      "id": "r2-v5",
+      "eligible": true,
+      "score": 0.475,
+      "rationale": "Deferred. Checklist-style closure design; the all-accept countercheck was executed as part of the final matrix (unknown-value control)."
+    }
+  ],
+  "selected_id": "r1-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Executed the incumbent's repair-and-regression action. Recipe: in a disposable copy of the middleware, change the safe-method branch to take the token from the client's cookie value and the state-changing branch to take it from the validated extracted token (both were previously copied from the stored placeholder value returned by the lookup); leave both backends and the public API unchanged. Then run a sixteen-check matrix: repeat-visit cookie stability, fresh-client and fresh-session constant requests, unknown-value control, legitimate victim and cross-client requests, form-field and cookie extraction variants, session-backed replay with session-cookie round trip, and single-use accept-then-replay-reject. Observed: every constant request rejected with the forbidden status in every configuration; no cookie ever collapsed to the constant; all legitimate flows accepted; single-use semantics preserved; two clients held different random tokens; upstream middleware suite fully green and the whole module built. Two unrelated timing-sensitive limiter suite failures were reproduced identically on pristine unmodified source and are pre-existing environment flakes, not caused by the change. The exported two-location source change applies cleanly to a pristine copy. These are local causal results with controls, not official harness results; official patch verification runs in a separate host-side harness and remains outstanding. Evidence strength: strong local support; limits: one runtime, in-process transport, no official verdict yet.",
+    "next_hint": "The repair is complete locally and the regression matrix is green. The remaining step is procedural, not technical: hand the exported patch to the official host-side evaluation and record its verdict; no further local discriminating experiment is pending."
+  },
+  "lineage": {
+    "case_id": "case-848c1c44088843f38fba5e0a8b3d1514",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001",
+    "step_id": "iteration-0002",
+    "parent_step_id": "iteration-0001",
+    "branch_id": "main"
+  }
+}

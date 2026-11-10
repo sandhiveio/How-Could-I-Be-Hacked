@@ -1,0 +1,8 @@
+{
+  "plans": [
+    "Lifecycle threat-model audit: walk the token lifecycle (mint, bind to cookie, validate unsafe request, rotate, single-use delete, expiry) across the handler and both storage backends, enumerate every point where the validated secret could become caller-controlled or constant, confirm each candidate flaw with an in-process request-sequence replay that logs exact cookie and status values, then repair the flawed lifecycle point and add a sequence-level regression test asserting the issued token stays unpredictable per client.",
+    "Black-box differential behavior testing: treat the middleware as a black box, build disposable app fixtures in the main configurations (header, form, and cookie extraction with each backend, plus single-use variants), script attacker-relevant request sequences using only values an attacker can know, and mark any accepted request whose token was never minted as a per-client random secret as a bypass; fix whatever acceptance rule leaks and keep the differential script as regression evidence.",
+    "Storage-contract unit review: state the invariant that validation must compare a freshly minted random server-side secret, unit-test both backends directly (after storing under a key, the lookup must return the minted secret, never a constant; deletion must invalidate; expiry must hold), find where one backend breaks the contract the other satisfies, restore the contract without changing the public API, and add contract-level unit tests plus one end-to-end middleware check."
+  ],
+  "selected_id": "plan-1"
+}

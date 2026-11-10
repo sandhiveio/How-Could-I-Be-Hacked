@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "kind": "curated_case",
+  "context": {
+    "hint": "Source inspection of the CSRF-style middleware found that both storage backends record a fixed one-character placeholder as the value stored under each token key, and the request handler takes the value returned by the storage lookup as the token itself: on safe methods it copies the looked-up value into the token variable, and on state-changing methods it does the same whenever tokens are not single-use. The handler then re-stores the token under that value as a new key and rotates the client cookie to it. If the looked-up value is the constant placeholder rather than the minted random secret, every issued cookie could collapse onto an attacker-known constant after a client's second request, and any client could then satisfy both the double-submit check and the storage lookup with that constant. The open question: which exact request sequence discriminally demonstrates acceptance of an attacker-known token versus normal per-client unpredictable behavior, and does the session-backed backend differ from the memory backend? Permissions: disposable local source copy, local toolchain, in-process fake requests only.",
+    "surface": "Single-process HTTP web framework middleware with pluggable token extraction sources (header, form field, query, URL parameter, cookie), two storage backends (process-local memory store keyed by token; session-backed record store), a safe-method branch that only re-issues state, an unsafe-method branch with a double-submit cookie check plus storage lookup, an optional single-use rotation mode, and a pluggable error handler. Testing uses disposable in-process app fixtures and a fake request interface; no network listener and no deployed service is involved.",
+    "assumptions": [
+      "The observer may read the middleware source, copy it into a disposable working tree, and build and run local test binaries with the language toolchain.",
+      "Only the middleware itself is in scope; callers supply the configuration, and the default configuration uses the memory store and header extraction.",
+      "Ordinary client flows (first visit, repeat visit, valid state-changing request, expired token, replayed single-use token) are available as functional controls.",
+      "Both storage backends must keep working through the same public constructor and configuration; the repair may not change the exported API.",
+      "Official verification of an exported patch happens in a separate offline harness that is unavailable to the observer; local green suites are necessary but not official evidence."
+    ]
+  },
+  "incumbent": {
+    "id": "plan-1",
+    "text": "Lifecycle threat-model audit: walk the token lifecycle (mint, bind to cookie, validate unsafe request, rotate, single-use delete, expiry) across the handler and both storage backends, enumerate every point where the validated secret could become caller-controlled or constant, confirm each candidate flaw with an in-process request-sequence replay that logs exact cookie and status values, then repair the flawed lifecycle point and add a sequence-level regression test asserting the issued token stays unpredictable per client."
+  },
+  "candidates": [
+    {
+      "id": "r1-v1",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: the storage path's constant recorded value collapses token entropy, because the lookup returns the stored value, not the key it looked up, and the handler re-uses that value as the validated token; validation therefore accepts a fixed constant that any attacker knows in advance. Prerequisites: default non-single-use configuration with the memory backend, disposable in-process app, fake request interface. Bounded test: first safe request mints a random cookie; replay it on a second safe request and read the rotated cookie value; then send a state-changing request from a completely fresh client with the suspected constant as both the extracted token and the cookie, plus a control state-changing request with an attacker-chosen unknown random value. Expected support: the second safe response rotates the cookie to the constant and the fresh-client constant request is accepted (success status) while the unknown value is rejected. Falsifier: the constant request is rejected or the cookie never collapses. Cleanup: fixtures are disposable; keep the sequence script as the regression core."
+    },
+    {
+      "id": "r1-v2",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: token rotation fails because the new token equals the previous constant value, creating a standing replay window visible on safe methods alone. Prerequisites: non-single-use mode, disposable app fixture. Bounded test: issue three sequential safe requests in one client session, logging the cookie value each time. Expected support: after the first repeat the cookie stays the fixed constant indefinitely. Falsifier: cookie values vary across requests. Limitation: cookie collapse alone does not prove a state-changing request is accepted, so pair with an unsafe-method check. Cleanup: discard fixtures."
+    },
+    {
+      "id": "r1-v3",
+      "parent_id": "plan-1",
+      "text": "Hypothesis: accepted tokens are not bound to any client session at all, so a token observed from one client validates from a different client. Prerequisites: two independent client sessions against one disposable app instance. Bounded test: obtain a cookie pair from client A, then submit a state-changing request from client B using the same values. Expected support: client B's request is accepted. Falsifier: it is rejected. Limitation: with the constant-collapse mechanism this tests binding rather than predictability; most informative after the primary bypass is shown. Cleanup: reset stores between clients."
+    },
+    {
+      "id": "r1-v4",
+      "parent_id": "plan-1",
+      "text": "Hypothesis (control): constant-value predictability, not storage indirection itself, is necessary for trivial exploitation. Prerequisites: a configurable fake storage backend that can return distinct random values. Bounded test: drive the same request sequence against a backend returning distinct random values per key and compare acceptance behavior with the constant-value backend. Expected support: only the constant backend accepts the attacker-known value. Falsifier: the random-value backend also accepts it, which would indicate a second defect beyond entropy loss. Limitation: an elaborate control for the first step; better used as a robustness ingredient after the primary mechanism is confirmed. Cleanup: remove the fake backend."
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "plan-1",
+      "eligible": true,
+      "score": 0.705,
+      "rationale": "Deferred, not refuted: the incumbent audit plan was strong and its next action overlaps the chosen one, but its first step was broader than the single discriminating experiment now implicated by source reading. It remained in the candidate set and won the following round on evidence."
+    },
+    {
+      "id": "r1-v1",
+      "eligible": true,
+      "score": 0.719,
+      "rationale": "Selected. Its mechanism matches the source-derived causal chain exactly and its two-control test (attacker-known constant versus unknown value) is the single most discriminating first experiment; adaptation noted: the default memory backend already exhibits the constant, no custom backend needed."
+    },
+    {
+      "id": "r1-v2",
+      "eligible": true,
+      "score": 0.694,
+      "rationale": "Deferred. Trivially executable and shows the cookie collapse without any state-changing request, but cookie collapse alone does not prove unsafe-method acceptance; its three-GET check was folded into the selected sequence."
+    },
+    {
+      "id": "r1-v3",
+      "eligible": true,
+      "score": 0.652,
+      "rationale": "Deferred. Valuable second-stage discriminator for session binding, premised on the primary bypass result; premature as the first action."
+    },
+    {
+      "id": "r1-v4",
+      "eligible": true,
+      "score": 0.48,
+      "rationale": "Deferred as a control experiment. Scientifically clean but elaborate for the current step and does not by itself establish the bypass; retained as a robustness ingredient."
+    }
+  ],
+  "selected_id": "r1-v1",
+  "observation": {
+    "outcome": "supported",
+    "summary": "Executed the selected bypass test in an in-process fixture (no network listener). Recipe: construct a minimal app with the middleware under default configuration and three routes behavior (safe home, protected submit); request the safe route with a fresh client and record the issued cookie; repeat the safe request with that cookie and record the rotated cookie; then send the protected request from a fresh client with the suspected constant as both extracted token and cookie, and a control with an attacker-chosen unknown value. Observed: first safe response issued a random UUID-style cookie; the repeat visit rotated the cookie to the fixed one-character placeholder constant; the fresh-client constant request was ACCEPTED (success status with the protected handler body) while the unknown-value control was rejected with the forbidden status; the original victim token remained accepted. A session-backed configuration blocked the fresh-client constant request, but the probe read only the first cookie header there, so the session path's collapse after a victim's repeat visit stayed unresolved. This supports the constant-collapse mechanism with a discriminating local causal result including controls; it is not an official harness result. Limits: one fixture configuration per check, in-process transport only.",
+    "next_hint": "The bypass is confirmed for the memory backend and the collapse mechanism lives in the handler re-using the looked-up stored value as the token. Determine the minimal API-compatible repair that also covers the session backend and every extraction source, and which regression matrix (extraction-source variants, single-use mode, cross-client ownership, upstream suite, all-accept countercheck) discriminates a real repair from one that merely hides the cookie collapse."
+  },
+  "lineage": {
+    "case_id": "case-848c1c44088843f38fba5e0a8b3d1514",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null,
+    "step_id": "iteration-0001",
+    "parent_step_id": null,
+    "branch_id": "main"
+  }
+}
