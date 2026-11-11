@@ -93,6 +93,14 @@ See [workflow commands](references/workflow.md) and the [offline iteration proto
 for inspecting trajectories, recording assessments and validating completed steps.
 On Windows without a native Python installation, run these commands using Python in WSL.
 
+## Defensive review examples
+
+Use these examples to review implementation invariants and design regression checks for repaired code.
+
+- [Account-level sign-in limits](library/checks/defensive-review-examples.md#account-level-sign-in-limits)
+- [Archive extraction containment](library/checks/defensive-review-examples.md#archive-extraction-containment)
+- [Transcoder process arguments](library/checks/defensive-review-examples.md#transcoder-process-arguments)
+
 ## What is included
 
 - Anonymous cases with independently readable investigation steps.

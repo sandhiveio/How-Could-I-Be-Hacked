@@ -16,6 +16,8 @@ subject to their original license terms.
 - `cases/case-<id>/iterations/<nnnn>/step.json` — one independent capsule per executed step.
 - `cases/case-<id>/manifest.json` — SHA-256 hashes of every exported case artifact.
 - `checks/static-file-containment.md` — a reusable checklist derived from the executed case.
+- [Defensive review examples](checks/defensive-review-examples.md) for sign-in limits,
+  archive extraction, and transcoder arguments.
 
 Each trajectory preserves multiple investigation steps and records why candidates were
 selected, rejected, or ruled ineligible. Historical scores and observations describe the
