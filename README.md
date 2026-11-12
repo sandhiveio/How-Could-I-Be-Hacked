@@ -74,10 +74,18 @@ steps. You can inspect their evidence and decisions with the [trajectory command
 | [Prompt injection in calendar workflows](library/cases/case-7e8b17932d2b4018ae2513dd56b953c4/case.json) | Calendar edit scope when an assistant reads event descriptions | 2 |
 | [Prompt injection in messaging workflows](library/cases/case-fce6af02155649cfb97771c91053dd0b/case.json) | Message-send authorization when an assistant reads a webpage | 2 |
 
-The library also includes defensive review examples for
-[account-level sign-in limits](library/checks/defensive-review-examples.md#account-level-sign-in-limits),
-[archive extraction containment](library/checks/defensive-review-examples.md#archive-extraction-containment),
-and [transcoder process arguments](library/checks/defensive-review-examples.md#transcoder-process-arguments).
+### Defensive review examples
+
+These OpenCode-derived checklists pair code-review questions with regression assertions
+for repaired code. Open them directly in the [defensive review guide](library/checks/defensive-review-examples.md).
+The case and search counts above describe the indexed trajectories.
+
+| Review area | Examples |
+| --- | --- |
+| Identity and authorization | [Account-level sign-in limits](library/checks/defensive-review-examples.md#account-level-sign-in-limits), [OIDC group membership](library/checks/defensive-review-examples.md#oidc-group-membership), [Authorization model changes](library/checks/defensive-review-examples.md#authorization-model-changes) |
+| Files and processes | [Archive extraction containment](library/checks/defensive-review-examples.md#archive-extraction-containment), [Upload destination containment](library/checks/defensive-review-examples.md#upload-destination-containment), [Transcoder process arguments](library/checks/defensive-review-examples.md#transcoder-process-arguments) |
+| Data and outbound requests | [List query fields and sorting](library/checks/defensive-review-examples.md#list-query-fields-and-sorting), [Outbound discovery requests](library/checks/defensive-review-examples.md#outbound-discovery-requests) |
+| Configuration and releases | [OIDC client-secret redaction](library/checks/defensive-review-examples.md#oidc-client-secret-redaction), [Release artifact visibility](library/checks/defensive-review-examples.md#release-artifact-visibility) |
 
 ## How it works
 

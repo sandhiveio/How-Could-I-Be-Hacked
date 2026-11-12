@@ -8,7 +8,7 @@ description: Explore how your code could be attacked using real security investi
 Resolve all toolkit paths relative to this SKILL.md, regardless of the target repository.
 Python 3.10+ with SQLite FTS5 is sufficient; no packages, credentials or API are needed.
 The bundled library is a snapshot of opencode-near/workspace/library. Run `scripts/toolkit.py stats`
-for current counts rather than relying on the library's historical README.
+for the bundled case, step and search-entry counts.
 
 Use this toolkit for local library consumption. It does not generate new corpus trajectories:
 that separate workflow requires the project's benchmark-creative-search skill and mandatory
@@ -66,7 +66,11 @@ When extending tests, cover the mechanism plus a legitimate control and relevant
 (e.g. decoding order, alternate handlers, concurrency, platform behavior). After a repair,
 verify the reproducer fails before the repair and passes after it where feasible, then run
 relevant regressions. Mark tests you could not run and remaining uncertainty explicitly.
-Use existing library/checks checklists only where their prerequisites match.
+For a review focused on implementation and regressions, start with the
+[defensive review examples](library/checks/defensive-review-examples.md). Pick an example whose
+prerequisites match the code, trace the stated invariant through the relevant entry points,
+and use its acceptance criteria to check the repaired behavior with ordinary inputs and
+deterministic fixtures. These Markdown examples are browsed directly outside the case index.
 
 For parser CPU-exhaustion hypotheses, isolate each parsing stage with size-doubling probes,
 an external timeout and valid-input controls. A repaired regular expression can expose a

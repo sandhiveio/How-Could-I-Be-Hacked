@@ -1,8 +1,8 @@
 # SandHive local attack library
 
-This directory is the offline, reusable output of a curated security-case trajectory. It
-contains anonymous **step examples**: each step can be retrieved and understood without the
-source case or the preceding steps.
+This directory contains curated security investigations for offline use. Each anonymous
+investigation step can be retrieved and understood independently of the source case and the
+preceding steps.
 
 The original corpus materials in this directory, including the curated examples,
 are available under the [MIT License](LICENSE). Third-party materials remain
@@ -16,8 +16,9 @@ subject to their original license terms.
 - `cases/case-<id>/iterations/<nnnn>/step.json` — one independent capsule per executed step.
 - `cases/case-<id>/manifest.json` — SHA-256 hashes of every exported case artifact.
 - `checks/static-file-containment.md` — a reusable checklist derived from the executed case.
-- [Defensive review examples](checks/defensive-review-examples.md) for sign-in limits,
-  archive extraction, and transcoder arguments.
+- [Defensive review examples](checks/defensive-review-examples.md) for identity, authorization,
+  file handling, process arguments, database queries, outbound requests, configuration, and
+  releases. Open these checklists directly. The SQLite index covers the case artifacts.
 
 Each trajectory preserves multiple investigation steps and records why candidates were
 selected, rejected, or ruled ineligible. Historical scores and observations describe the
@@ -55,5 +56,5 @@ candidates have no observation because they were not executed.
 Check each case's observations for the evidence collected and the remaining uncertainty.
 Retest applicable observations on the new target.
 
-The case was curated from source material and baked with `scripts/corpus.py`. Source identity,
-raw logs, private paths and the source-to-case mapping stay outside `library/`.
+The indexed cases were curated from source material and baked with `scripts/corpus.py`. Source
+identities, raw logs, private paths and source-to-case mappings stay outside `library/`.
