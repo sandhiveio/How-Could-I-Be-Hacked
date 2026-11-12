@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Fresh-copy regression",
+  "context": {
+    "hint": "Evaluate stored relationships against the authorization model selected for the request.",
+    "surface": "An authorization service stores tuples across model versions and supports permission checks and object listings.",
+    "assumptions": [
+      "A disposable in-memory fixture can store relationships created under different model versions."
+    ]
+  },
+  "review": {
+    "invariant": "The selected-model rule remains consistent through the normal build and both public evaluation paths.",
+    "verification": "Run the ordinary build and rerun permission and listing checks against a fresh copy of the repaired source."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The fresh-copy build and the permission and listing regressions passed with the expected model behavior."
+  },
+  "lineage": {
+    "case_id": "case-f2edf20fff384048b52a38a3e0543577",
+    "iteration_id": "iteration-0004",
+    "previous_iteration_id": "iteration-0003"
+  }
+}

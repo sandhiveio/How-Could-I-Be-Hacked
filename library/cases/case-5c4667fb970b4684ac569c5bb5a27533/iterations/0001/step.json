@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Release inventory",
+  "context": {
+    "hint": "Enforce source visibility in bundles, maps, and release provenance.",
+    "surface": "A build publishes separate client and server artifacts and a manifest under an explicit source policy.",
+    "assumptions": [
+      "Use a disposable release fixture with fake private markers and documented public outputs."
+    ]
+  },
+  "review": {
+    "invariant": "Every shipped artifact respects the source visibility policy.",
+    "verification": "Inspect emitted JavaScript, source maps, and the manifest for fake private markers, private module names, and absolute build paths."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The baseline scan found private fixture content in the server artifacts and private paths in the manifest."
+  },
+  "lineage": {
+    "case_id": "case-5c4667fb970b4684ac569c5bb5a27533",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

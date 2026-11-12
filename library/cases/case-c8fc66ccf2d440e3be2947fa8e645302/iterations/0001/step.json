@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Canonical account identity",
+  "context": {
+    "hint": "Apply one failed-sign-in budget per account across supported identifiers.",
+    "surface": "A user provider resolves login identifiers, and a regulator stores authentication attempt counters.",
+    "assumptions": [
+      "The provider supplies a stable identifier for accounts recognized through supported aliases."
+    ]
+  },
+  "review": {
+    "invariant": "Lockout queries and failure updates use the same account identifier returned by the provider.",
+    "verification": "Use fixture accounts with supported aliases. Verify shared accounting for one account and separate accounting for a second account."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "A local test found that identifiers resolving to the same account were tracked separately by the original regulator."
+  },
+  "lineage": {
+    "case_id": "case-c8fc66ccf2d440e3be2947fa8e645302",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

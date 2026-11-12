@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Counter lifecycle",
+  "context": {
+    "hint": "Apply one failed-sign-in budget per account across supported identifiers.",
+    "surface": "A user provider resolves login identifiers, and a regulator stores authentication attempt counters.",
+    "assumptions": [
+      "The provider supplies a stable identifier for accounts recognized through supported aliases."
+    ]
+  },
+  "review": {
+    "invariant": "Canonical accounting preserves successful sign-in and the existing reset and expiry semantics.",
+    "verification": "Check an ordinary sign-in, the failure-counter lifecycle, and the provider integration under a controlled test clock."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "A focused lifecycle check and existing handler and command suites passed with canonical accounting."
+  },
+  "lineage": {
+    "case_id": "case-c8fc66ccf2d440e3be2947fa8e645302",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

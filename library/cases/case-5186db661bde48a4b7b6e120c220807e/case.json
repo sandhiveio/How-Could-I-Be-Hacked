@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-5186db661bde48a4b7b6e120c220807e",
+  "kind": "defensive_case",
+  "title": "List query fields and sorting",
+  "hint": "Keep caller-supplied filter and sort fields within the server's SQL column policy.",
+  "surface": "List handlers pass filter conditions and ordering expressions through a repository query builder.",
+  "assumptions": [
+    "A query builder or stub repository can expose generated statement structure and bound values without a database."
+  ]
+}

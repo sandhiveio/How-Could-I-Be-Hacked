@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Discovery compatibility",
+  "context": {
+    "hint": "Apply outbound request policy to the initial destination and every redirect.",
+    "surface": "A discovery client derives a request URL and follows redirects to fetch a descriptor.",
+    "assumptions": [
+      "A stub transport and controlled clock can observe the request and deadline contract."
+    ]
+  },
+  "review": {
+    "invariant": "Supported identifier forms produce the expected descriptor when the destination policy permits them.",
+    "verification": "Check the descriptor result and the transport call count for an approved identifier. Check denial before transport for disallowed address classes."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "A fresh-copy replay preserved approved discovery and observed no transport call for denied address classes."
+  },
+  "lineage": {
+    "case_id": "case-ae1bcf4332314a34bb6b744ce76ce790",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

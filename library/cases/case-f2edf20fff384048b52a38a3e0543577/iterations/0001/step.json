@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Selected model and historical tuples",
+  "context": {
+    "hint": "Evaluate stored relationships against the authorization model selected for the request.",
+    "surface": "An authorization service stores tuples across model versions and supports permission checks and object listings.",
+    "assumptions": [
+      "A disposable in-memory fixture can store relationships created under different model versions."
+    ]
+  },
+  "review": {
+    "invariant": "A relationship is eligible only when valid under the selected model.",
+    "verification": "Compare expected permissions under an earlier model and a tightened model while retaining a valid relationship as a positive control."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The initial permission-check fixture found that a relationship disallowed by the selected model still contributed to authorization."
+  },
+  "lineage": {
+    "case_id": "case-f2edf20fff384048b52a38a3e0543577",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

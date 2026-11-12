@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import sqlite3
 import sys
+from defensive_cases import index_errors
 from offline_io import read
 
 DEFAULT_LIBRARY = Path(__file__).resolve().parents[1] / "library"
@@ -43,6 +44,8 @@ def verify(root):
                 failures.append(str(path.relative_to(root)))
     with closing(sqlite3.connect((root / "index.sqlite").resolve().as_uri() + "?mode=ro", uri=True)) as db:
         integrity = [r[0] for r in db.execute("PRAGMA integrity_check")]
+        if integrity == ["ok"]:
+            failures.extend(index_errors(root, db))
     if integrity != ["ok"]:
         failures.extend(integrity)
     return {"ok": not failures, "checked_artifacts": checked, "failures": failures}

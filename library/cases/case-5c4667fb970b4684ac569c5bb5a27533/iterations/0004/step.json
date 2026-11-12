@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Private values in bundled code",
+  "context": {
+    "hint": "Enforce source visibility in bundles, maps, and release provenance.",
+    "surface": "A build publishes separate client and server artifacts and a manifest under an explicit source policy.",
+    "assumptions": [
+      "Use a disposable release fixture with fake private markers and documented public outputs."
+    ]
+  },
+  "review": {
+    "invariant": "Private values are excluded from the release even when used within private module code.",
+    "verification": "Include a synthetic marker inside a private module and check the final output inventory. Prefer keeping private logic and runtime configuration outside distributed bundles."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "A follow-up found that checking exported constants alone missed a private fixture value. The revised release layout passed the focused output and visibility checks."
+  },
+  "lineage": {
+    "case_id": "case-5c4667fb970b4684ac569c5bb5a27533",
+    "iteration_id": "iteration-0004",
+    "previous_iteration_id": "iteration-0003"
+  }
+}

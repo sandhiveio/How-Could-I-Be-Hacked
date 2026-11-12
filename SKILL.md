@@ -35,7 +35,9 @@ hypotheses requiring current-target validation. Updates do not grant extra targe
    Search is lexical OR matching, not semantic similarity. Try synonyms and narrower queries;
    no hit means a retrieval gap, never evidence that the code is safe.
 3. Read each hit's hint, assumptions, candidate text, historical evaluation and observation.
-   Inspect the full capsule with `scripts/toolkit.py show --step <artifact_directory>/step.json`.
+   For `defensive_case` hits, read `review.invariant`, `review.verification`, and
+   `source_observation`. Inspect the full capsule with
+   `scripts/toolkit.py show --step <artifact_directory>/step.json`.
    Use `trajectory --case <case_id>` for ordered steps and branch lineage. Full commands are
    in [references/workflow.md](references/workflow.md).
 4. Compare several applicable alternatives, including historical rejected hypotheses.
@@ -70,7 +72,8 @@ For a review focused on implementation and regressions, start with the
 [defensive review examples](library/checks/defensive-review-examples.md). Pick an example whose
 prerequisites match the code, trace the stated invariant through the relevant entry points,
 and use its acceptance criteria to check the repaired behavior with ordinary inputs and
-deterministic fixtures. These Markdown examples are browsed directly outside the case index.
+deterministic fixtures. Search for the same topics in the index to find the individual
+defensive steps and generalized source observations.
 
 For parser CPU-exhaustion hypotheses, isolate each parsing stage with size-doubling probes,
 an external timeout and valid-input controls. A repaired regular expression can expose a

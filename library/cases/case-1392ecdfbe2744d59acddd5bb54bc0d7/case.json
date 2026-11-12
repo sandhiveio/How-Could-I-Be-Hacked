@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-1392ecdfbe2744d59acddd5bb54bc0d7",
+  "kind": "defensive_case",
+  "title": "OIDC group membership",
+  "hint": "Require verified membership before forwarding a configured OIDC group.",
+  "surface": "An identity adapter enriches sessions using configured group names, a user-info claim, and separate project data.",
+  "assumptions": [
+    "The configured names act as a filter over verified membership."
+  ]
+}

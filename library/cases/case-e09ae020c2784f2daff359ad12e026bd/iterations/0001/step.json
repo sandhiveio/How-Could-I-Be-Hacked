@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Process invocation boundary",
+  "context": {
+    "hint": "Keep media inputs within a direct, typed process argument boundary.",
+    "surface": "A media wrapper launches a transcoder with file paths, filter settings, and numeric options.",
+    "assumptions": [
+      "A recording process stub can verify execution configuration and complete argument arrays."
+    ]
+  },
+  "review": {
+    "invariant": "Each operation uses a trusted executable and passes validated values through an argument array with shell interpretation disabled.",
+    "verification": "Trace public operations to process creation and verify the argument array for ordinary paths, Unicode text, and numeric settings."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The initial process-stub comparison found that the wrapper did not consistently preserve the boundary between caller values and process execution."
+  },
+  "lineage": {
+    "case_id": "case-e09ae020c2784f2daff359ad12e026bd",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

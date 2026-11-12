@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "case_id": "case-04fad4b46561488bbf37094f98092b45",
+  "iterations": 2,
+  "artifacts": [
+    {
+      "path": "case.json",
+      "sha256": "5c9ad117484e32673fdddf554c63dfc6ee73747ae73fb8f45a6fb0b8990b3040"
+    },
+    {
+      "path": "iterations/0001/step.json",
+      "sha256": "78d74a687f1af985553966566ae39ce6f54b844ad15d087b775d324e2b92f692"
+    },
+    {
+      "path": "iterations/0002/step.json",
+      "sha256": "e458c662445ccba30d308195b58008db12e0014598d604edd7056324a20b573e"
+    }
+  ]
+}

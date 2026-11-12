@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-04fad4b46561488bbf37094f98092b45",
+  "kind": "defensive_case",
+  "title": "OIDC client-secret redaction",
+  "hint": "Sanitize OIDC provider credentials wherever effective configuration is exposed.",
+  "surface": "A service copies its configuration for startup and reload logs and a management response.",
+  "assumptions": [
+    "A fixture can populate multiple providers and use fake credentials."
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-ae1bcf4332314a34bb6b744ce76ce790",
+  "kind": "defensive_case",
+  "title": "Outbound discovery requests",
+  "hint": "Apply outbound request policy to the initial destination and every redirect.",
+  "surface": "A discovery client derives a request URL and follows redirects to fetch a descriptor.",
+  "assumptions": [
+    "A stub transport and controlled clock can observe the request and deadline contract."
+  ]
+}

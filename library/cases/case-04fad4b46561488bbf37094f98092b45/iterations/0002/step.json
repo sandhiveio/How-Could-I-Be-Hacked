@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Provider coverage and empty values",
+  "context": {
+    "hint": "Sanitize OIDC provider credentials wherever effective configuration is exposed.",
+    "surface": "A service copies its configuration for startup and reload logs and a management response.",
+    "assumptions": [
+      "A fixture can populate multiple providers and use fake credentials."
+    ]
+  },
+  "review": {
+    "invariant": "Provider iteration preserves identifiers, issuer, scopes, and empty values while masking populated secrets.",
+    "verification": "Exercise multiple providers with populated, empty, and whitespace-only secrets. Check that startup, reload, and management output consume the sanitized copy."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The focused regression confirmed masking for populated and whitespace-only secrets, with empty secrets and public fields preserved."
+  },
+  "lineage": {
+    "case_id": "case-04fad4b46561488bbf37094f98092b45",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

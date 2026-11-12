@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-f2edf20fff384048b52a38a3e0543577",
+  "kind": "defensive_case",
+  "title": "Authorization model changes",
+  "hint": "Evaluate stored relationships against the authorization model selected for the request.",
+  "surface": "An authorization service stores tuples across model versions and supports permission checks and object listings.",
+  "assumptions": [
+    "A disposable in-memory fixture can store relationships created under different model versions."
+  ]
+}

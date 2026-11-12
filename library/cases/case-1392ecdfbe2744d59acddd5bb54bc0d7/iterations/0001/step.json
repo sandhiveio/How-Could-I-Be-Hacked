@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Group claim provenance",
+  "context": {
+    "hint": "Require verified membership before forwarding a configured OIDC group.",
+    "surface": "An identity adapter enriches sessions using configured group names, a user-info claim, and separate project data.",
+    "assumptions": [
+      "The configured names act as a filter over verified membership."
+    ]
+  },
+  "review": {
+    "invariant": "Configured group names may appear in a session only when the identity provider attests membership.",
+    "verification": "Review the session enrichment input and output with a stub identity provider. Assert that attested groups are present and omitted groups are absent."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The original enrichment path included an unattested configured group in the session."
+  },
+  "lineage": {
+    "case_id": "case-1392ecdfbe2744d59acddd5bb54bc0d7",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-e09ae020c2784f2daff359ad12e026bd",
+  "kind": "defensive_case",
+  "title": "Transcoder process arguments",
+  "hint": "Keep media inputs within a direct, typed process argument boundary.",
+  "surface": "A media wrapper launches a transcoder with file paths, filter settings, and numeric options.",
+  "assumptions": [
+    "A recording process stub can verify execution configuration and complete argument arrays."
+  ]
+}

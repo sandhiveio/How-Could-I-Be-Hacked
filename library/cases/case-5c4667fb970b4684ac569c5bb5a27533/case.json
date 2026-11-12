@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-5c4667fb970b4684ac569c5bb5a27533",
+  "kind": "defensive_case",
+  "title": "Release artifact visibility",
+  "hint": "Enforce source visibility in bundles, maps, and release provenance.",
+  "surface": "A build publishes separate client and server artifacts and a manifest under an explicit source policy.",
+  "assumptions": [
+    "Use a disposable release fixture with fake private markers and documented public outputs."
+  ]
+}

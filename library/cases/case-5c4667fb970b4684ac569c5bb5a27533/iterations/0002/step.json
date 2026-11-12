@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Public release behavior",
+  "context": {
+    "hint": "Enforce source visibility in bundles, maps, and release provenance.",
+    "surface": "A build publishes separate client and server artifacts and a manifest under an explicit source policy.",
+    "assumptions": [
+      "Use a disposable release fixture with fake private markers and documented public outputs."
+    ]
+  },
+  "review": {
+    "invariant": "Published provenance paths are relative and client maps expose approved public sources.",
+    "verification": "Build the fixture and smoke-test the expected client and server outputs. Check emitted manifest references against the release inventory."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "Local acceptance checks passed after restricting public provenance and changing the artifact build."
+  },
+  "lineage": {
+    "case_id": "case-5c4667fb970b4684ac569c5bb5a27533",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

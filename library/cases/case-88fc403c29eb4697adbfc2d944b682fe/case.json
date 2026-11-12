@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-88fc403c29eb4697adbfc2d944b682fe",
+  "kind": "defensive_case",
+  "title": "Upload destination containment",
+  "hint": "Keep framework uploads and direct storage writes under the intended directory.",
+  "surface": "Multipart parsing and a file field construct a destination before the storage API writes it.",
+  "assumptions": [
+    "Tests use a temporary storage root, harmless filenames, and an isolated storage API."
+  ]
+}

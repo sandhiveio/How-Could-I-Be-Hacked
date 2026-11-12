@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Direct tuple validation",
+  "context": {
+    "hint": "Evaluate stored relationships against the authorization model selected for the request.",
+    "surface": "An authorization service stores tuples across model versions and supports permission checks and object listings.",
+    "assumptions": [
+      "A disposable in-memory fixture can store relationships created under different model versions."
+    ]
+  },
+  "review": {
+    "invariant": "Direct tuple reads apply selected-model restrictions consistently with other relationship readers.",
+    "verification": "Check denial under the tightened model and verify that legitimate relationships and explicit earlier-model selection still work."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The focused repair enforced model restrictions for direct reads and retained the valid relationship behavior. The memory-backed test suite passed."
+  },
+  "lineage": {
+    "case_id": "case-f2edf20fff384048b52a38a3e0543577",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

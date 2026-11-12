@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Framework compatibility",
+  "context": {
+    "hint": "Keep framework uploads and direct storage writes under the intended directory.",
+    "surface": "Multipart parsing and a file field construct a destination before the storage API writes it.",
+    "assumptions": [
+      "Tests use a temporary storage root, harmless filenames, and an isolated storage API."
+    ]
+  },
+  "review": {
+    "invariant": "Containment behavior remains consistent across parsing, field names, generated names, and direct writes.",
+    "verification": "Run the framework's existing upload and storage suites alongside the destination-policy checks."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "A fresh-copy replay confirmed the destination policy and ordinary saves through the reviewed entry points."
+  },
+  "lineage": {
+    "case_id": "case-88fc403c29eb4697adbfc2d944b682fe",
+    "iteration_id": "iteration-0004",
+    "previous_iteration_id": "iteration-0003"
+  }
+}

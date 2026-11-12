@@ -6,7 +6,7 @@ Search for cases that match the code you are reviewing. See which hypotheses wer
 the checks showed, and which alternatives were set aside. Use that context to design local checks
 and turn confirmed findings into regression tests.
 
-**23 anonymized cases · 75 investigation steps · 437 searchable hypothesis entries**
+**33 anonymized cases · 105 investigation and review steps · 467 search entries**
 
 The library and search tools run locally with Python and SQLite. No API key required.
 
@@ -76,24 +76,30 @@ steps. You can inspect their evidence and decisions with the [trajectory command
 
 ### Defensive review examples
 
-These OpenCode-derived checklists pair code-review questions with regression assertions
-for repaired code. Open them directly in the [defensive review guide](library/checks/defensive-review-examples.md).
-The case and search counts above describe the indexed trajectories.
+These ten indexed cases include independent steps with a security invariant, a regression
+assertion, and a generalized source observation. For a compact walkthrough, open the
+[defensive review guide](library/checks/defensive-review-examples.md).
 
-| Review area | Examples |
-| --- | --- |
-| Identity and authorization | [Account-level sign-in limits](library/checks/defensive-review-examples.md#account-level-sign-in-limits), [OIDC group membership](library/checks/defensive-review-examples.md#oidc-group-membership), [Authorization model changes](library/checks/defensive-review-examples.md#authorization-model-changes) |
-| Files and processes | [Archive extraction containment](library/checks/defensive-review-examples.md#archive-extraction-containment), [Upload destination containment](library/checks/defensive-review-examples.md#upload-destination-containment), [Transcoder process arguments](library/checks/defensive-review-examples.md#transcoder-process-arguments) |
-| Data and outbound requests | [List query fields and sorting](library/checks/defensive-review-examples.md#list-query-fields-and-sorting), [Outbound discovery requests](library/checks/defensive-review-examples.md#outbound-discovery-requests) |
-| Configuration and releases | [OIDC client-secret redaction](library/checks/defensive-review-examples.md#oidc-client-secret-redaction), [Release artifact visibility](library/checks/defensive-review-examples.md#release-artifact-visibility) |
+| Case | Review focus | Steps |
+| --- | --- | ---: |
+| [OIDC client-secret redaction](library/cases/case-04fad4b46561488bbf37094f98092b45/case.json) | Mask provider secrets in copies used by logs and management responses | 2 |
+| [OIDC group membership](library/cases/case-1392ecdfbe2744d59acddd5bb54bc0d7/case.json) | Require verified membership before forwarding configured groups | 2 |
+| [List query fields and sorting](library/cases/case-5186db661bde48a4b7b6e120c220807e/case.json) | Validate filter and sort fields and preserve bound values | 4 |
+| [Release artifact visibility](library/cases/case-5c4667fb970b4684ac569c5bb5a27533/case.json) | Apply source policy to shipped bundles, maps, and provenance | 4 |
+| [Upload destination containment](library/cases/case-88fc403c29eb4697adbfc2d944b682fe/case.json) | Enforce containment across framework uploads and direct writes | 4 |
+| [Outbound discovery requests](library/cases/case-ae1bcf4332314a34bb6b744ce76ce790/case.json) | Enforce destination policy and deadlines across redirects | 2 |
+| [Account-level sign-in limits](library/cases/case-c8fc66ccf2d440e3be2947fa8e645302/case.json) | Share the failed-sign-in budget across supported account identifiers | 2 |
+| [Archive extraction containment](library/cases/case-ce0f488a2ad64314a3eccd04cf2d7e9c/case.json) | Confine writes and link operations to the extraction root | 4 |
+| [Transcoder process arguments](library/cases/case-e09ae020c2784f2daff359ad12e026bd/case.json) | Preserve argument boundaries and documented wrapper behavior | 2 |
+| [Authorization model changes](library/cases/case-f2edf20fff384048b52a38a3e0543577/case.json) | Evaluate stored relationships under the selected model | 4 |
 
 ## How it works
 
 1. **Search by mechanism.** The SQLite index looks for any of your query terms in case context
    and candidate hypotheses. Try synonyms when a query misses the terms used in the corpus.
-2. **Read the evidence.** Each step includes its own context, candidate evaluations, and the
-   observation for the check that ran. Follow the full trajectory to see how the review changed
-   as evidence came in.
+2. **Read the evidence.** Investigation steps include candidate evaluations and the observation
+   for the selected check. Defensive review steps include an invariant, a regression assertion,
+   and a generalized source observation. Use the trajectory command to read the steps in order.
 3. **Apply the relevant checks.** Compare the case's assumptions with your own code and collect
    fresh evidence before reporting a finding. Keep assessments private and work within the
    repository's authorized scope.
@@ -114,6 +120,7 @@ python scripts/test_toolkit.py
 integrity. See the [library format](library/README.md), [command reference](references/workflow.md),
 and [offline iteration protocol](references/iteration.md) for trajectory inspection and private
 assessment validation.
+Maintainers can check publication coverage with the [case audit](references/workflow.md#publication-audit).
 
 The [public corpus and its original examples](library/LICENSE) are available under the MIT License.
 The snapshot contains anonymized artifacts. Raw runs and private case mappings stay with the

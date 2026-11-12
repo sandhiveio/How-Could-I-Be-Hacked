@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Mixed-visibility source maps",
+  "context": {
+    "hint": "Enforce source visibility in bundles, maps, and release provenance.",
+    "surface": "A build publishes separate client and server artifacts and a manifest under an explicit source policy.",
+    "assumptions": [
+      "Use a disposable release fixture with fake private markers and documented public outputs."
+    ]
+  },
+  "review": {
+    "invariant": "Removing private source metadata preserves the mapping of approved public sources.",
+    "verification": "Build a fixture with both public and private source classifications. Verify that public source indices and rendered outputs remain stable."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The mixed-map fixture retained public source mappings and runtime behavior while removing private source metadata."
+  },
+  "lineage": {
+    "case_id": "case-5c4667fb970b4684ac569c5bb5a27533",
+    "iteration_id": "iteration-0003",
+    "previous_iteration_id": "iteration-0002"
+  }
+}

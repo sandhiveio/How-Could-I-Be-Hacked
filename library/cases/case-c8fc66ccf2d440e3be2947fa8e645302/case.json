@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-c8fc66ccf2d440e3be2947fa8e645302",
+  "kind": "defensive_case",
+  "title": "Account-level sign-in limits",
+  "hint": "Apply one failed-sign-in budget per account across supported identifiers.",
+  "surface": "A user provider resolves login identifiers, and a regulator stores authentication attempt counters.",
+  "assumptions": [
+    "The provider supplies a stable identifier for accounts recognized through supported aliases."
+  ]
+}

@@ -8,9 +8,10 @@ def read(path):
     return json.loads(Path(path).read_text(encoding="utf-8-sig"))
 
 
-def write(path, data):
+def write(path, data, *, newline=None):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n",
+                   encoding="utf-8", newline=newline)
     os.replace(tmp, path)

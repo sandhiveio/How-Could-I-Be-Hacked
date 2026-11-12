@@ -1,9 +1,14 @@
 """Behavioral checks for offline retrieval, containment and evidence validation."""
 import copy
+from contextlib import closing
+import json
 from pathlib import Path
+import shutil
+import sqlite3
 import tempfile
 import unittest
 from corpus import search
+from defensive_cases import audit
 from toolkit import DEFAULT_LIBRARY, contained, validate_assessment
 from validate_steps import validate
 
@@ -17,6 +22,38 @@ class ToolkitTests(unittest.TestCase):
                 self.assertIsNone(hit["historical_observation"])
         step = contained(DEFAULT_LIBRARY, hits[0]["artifact_directory"] + "/step.json")
         self.assertTrue(step.is_file())
+
+    def test_defensive_case_is_searchable_and_has_a_step(self):
+        hits = search(DEFAULT_LIBRARY, "transcoder process arguments", 10)
+        hit = next(hit for hit in hits if hit["kind"] == "defensive_case"
+                   and hit["case_title"] == "Transcoder process arguments")
+        path = contained(DEFAULT_LIBRARY, hit["artifact_directory"] + "/step.json")
+        step = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(hit["review"], step["review"])
+        self.assertEqual(hit["source_observation"], step["source_observation"])
+        self.assertIsNone(hit["historical_evaluation"])
+
+    def test_publication_audit_detects_a_missing_case_and_wrong_step_id(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            producer = base / "producer"
+            absent_id = "case-" + "a" * 32
+            source = producer / "cases" / absent_id
+            source.mkdir(parents=True)
+            (source / "case.json").write_text('{"kind": "curated_case"}', encoding="utf-8")
+            published = base / "published"
+            shutil.copytree(DEFAULT_LIBRARY, published)
+            with closing(sqlite3.connect(published / "index.sqlite")) as db, db:
+                row_id, record = next((row_id, record) for row_id, payload
+                                      in db.execute("SELECT rowid, record FROM examples")
+                                      if (record := json.loads(payload))["kind"] == "defensive_case")
+                record["iteration_id"] = "iteration-9999"
+                db.execute("UPDATE examples SET record = ? WHERE rowid = ?",
+                           (json.dumps(record), row_id))
+            result = audit(published, producer)
+            self.assertFalse(result["ok"])
+            self.assertEqual(result["missing_cases"], [absent_id])
+            self.assertEqual(result["index_gaps"], [record["case_id"]])
 
     def test_containment(self):
         with self.assertRaises(ValueError):

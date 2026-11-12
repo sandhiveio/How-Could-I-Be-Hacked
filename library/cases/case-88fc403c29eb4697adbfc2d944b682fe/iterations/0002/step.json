@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Generated-name validation",
+  "context": {
+    "hint": "Keep framework uploads and direct storage writes under the intended directory.",
+    "surface": "Multipart parsing and a file field construct a destination before the storage API writes it.",
+    "assumptions": [
+      "Tests use a temporary storage root, harmless filenames, and an isolated storage API."
+    ]
+  },
+  "review": {
+    "invariant": "Field and storage name generators apply a consistent destination policy.",
+    "verification": "Verify that approved basenames and configured subdirectories still work. Check whether the same policy reaches direct writes."
+  },
+  "source_observation": {
+    "outcome": "inconclusive",
+    "summary": "The generated-name checks passed after adding validation. That round did not establish coverage at the direct save entry point."
+  },
+  "lineage": {
+    "case_id": "case-88fc403c29eb4697adbfc2d944b682fe",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

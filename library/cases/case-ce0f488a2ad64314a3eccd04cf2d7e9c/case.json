@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-ce0f488a2ad64314a3eccd04cf2d7e9c",
+  "kind": "defensive_case",
+  "title": "Archive extraction containment",
+  "hint": "Constrain every archive filesystem operation to the extraction root.",
+  "surface": "An extractor accepts archive entries and may create files, directories, links, or metadata.",
+  "assumptions": [
+    "Use a temporary extraction root and a separate benign sibling fixture."
+  ]
+}

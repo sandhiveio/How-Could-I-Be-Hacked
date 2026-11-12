@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Shared sort and filter policy",
+  "context": {
+    "hint": "Keep caller-supplied filter and sort fields within the server's SQL column policy.",
+    "surface": "List handlers pass filter conditions and ordering expressions through a repository query builder.",
+    "assumptions": [
+      "A query builder or stub repository can expose generated statement structure and bound values without a database."
+    ]
+  },
+  "review": {
+    "invariant": "Sort keys, sort directions, filter fields, and filter operators each follow the supported policy.",
+    "verification": "Check that shared validation covers every constructor and that documented field names still work."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "Focused regressions showed validation at the sort and filter constructors while retaining accepted ordinary field names."
+  },
+  "lineage": {
+    "case_id": "case-5186db661bde48a4b7b6e120c220807e",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

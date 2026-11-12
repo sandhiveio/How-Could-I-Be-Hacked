@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Configuration-copy redaction",
+  "context": {
+    "hint": "Sanitize OIDC provider credentials wherever effective configuration is exposed.",
+    "surface": "A service copies its configuration for startup and reload logs and a management response.",
+    "assumptions": [
+      "A fixture can populate multiple providers and use fake credentials."
+    ]
+  },
+  "review": {
+    "invariant": "The sanitized copy masks every nonempty OIDC client secret and preserves the active configuration.",
+    "verification": "Inspect the sanitized object with a fake secret. Verify that changing the original provider entry does not change the copy."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "A focused test found the fake secret in the sanitized copy. The copy was independent of subsequent changes to the original provider entry."
+  },
+  "lineage": {
+    "case_id": "case-04fad4b46561488bbf37094f98092b45",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

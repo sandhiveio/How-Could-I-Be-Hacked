@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Permission and listing consistency",
+  "context": {
+    "hint": "Evaluate stored relationships against the authorization model selected for the request.",
+    "surface": "An authorization service stores tuples across model versions and supports permission checks and object listings.",
+    "assumptions": [
+      "A disposable in-memory fixture can store relationships created under different model versions."
+    ]
+  },
+  "review": {
+    "invariant": "Object listings apply the same relationship eligibility rules as permission checks.",
+    "verification": "Assert that the tightened model omits ineligible relationships from listing results and still includes authorized objects."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The listing fixture confirmed that the repaired evaluation excluded stale relationships while preserving authorized objects."
+  },
+  "lineage": {
+    "case_id": "case-f2edf20fff384048b52a38a3e0543577",
+    "iteration_id": "iteration-0003",
+    "previous_iteration_id": "iteration-0002"
+  }
+}
