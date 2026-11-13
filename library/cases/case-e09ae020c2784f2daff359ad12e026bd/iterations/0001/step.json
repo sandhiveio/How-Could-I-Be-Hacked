@@ -9,6 +9,7 @@
       "A recording process stub can verify execution configuration and complete argument arrays."
     ]
   },
+  "mechanism_tags": ["process argument isolation"],
   "review": {
     "invariant": "Each operation uses a trusted executable and passes validated values through an argument array with shell interpretation disabled.",
     "verification": "Trace public operations to process creation and verify the argument array for ordinary paths, Unicode text, and numeric settings."

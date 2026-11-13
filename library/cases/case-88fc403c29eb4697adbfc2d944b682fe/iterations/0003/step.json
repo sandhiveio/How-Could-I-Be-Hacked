@@ -9,6 +9,7 @@
       "Tests use a temporary storage root, harmless filenames, and an isolated storage API."
     ]
   },
+  "mechanism_tags": ["path containment", "filesystem confinement"],
   "review": {
     "invariant": "Every direct save enforces destination policy before collision handling or file creation.",
     "verification": "Exercise approved writes through both entry points. Use a storage denial test to confirm an error without a created or replaced file."

@@ -9,6 +9,7 @@
       "Use a temporary extraction root and a separate benign sibling fixture."
     ]
   },
+  "mechanism_tags": ["path containment", "link policy"],
   "review": {
     "invariant": "Links and filesystem operations observe whole-component containment and the documented link policy.",
     "verification": "Inspect each link and entry write path. Verify a supported in-root link and check a denial at the filesystem boundary."

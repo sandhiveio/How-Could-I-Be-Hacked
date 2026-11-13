@@ -31,8 +31,10 @@ skill-discoverable, place the folder in that agent's configured skills directory
 installation or remote update is performed by this package. Keep private assessment outputs
 outside this folder. The snapshot contains only library artifacts, no raw producer runs.
 
-Bundled `scripts/corpus.py` is a snapshot of the project's corpus runtime with its JSON-helper
-import changed to `offline_io`. Defensive case entries use the same search interface.
+Bundled `scripts/corpus.py` uses local SQLite and the `offline_io` JSON helpers.
+Use `corpus.py search --library library --mechanism "path containment" --limit 5` to retrieve
+reviewed steps by a specific mechanism. Add `--query` to rank matching tagged steps by text.
+Steps without tags remain accessible through text search. Equal text scores use a stable order.
 
 ## Publication audit
 
@@ -41,7 +43,9 @@ public library. Author reviewed defensive case files using the same format as ex
 `defensive_case` directories. Each step includes the case context, an invariant, a regression
 assertion, and a generalized observation with its recorded outcome. Keep exploit procedures,
 payloads, raw output, and source identity in the producer workspace. Review the full public
-text before indexing it.
+text before indexing it. Add optional `mechanism_tags` to the defensive step JSON using short,
+lowercase English labels for mechanisms established by that step. Reuse existing labels for
+the same mechanism.
 
 ```sh
 python scripts/defensive_cases.py index

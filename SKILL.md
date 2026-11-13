@@ -32,8 +32,9 @@ hypotheses requiring current-target validation. Updates do not grant extra targe
    boundary. Read relevant code and current tests before proposing a finding.
 2. Translate the mechanism into several English queries. Use the maintained corpus interface:
    `python <toolkit>/scripts/corpus.py search --library <toolkit>/library --query "path traversal symlink containment" --limit 5`.
-   Search is lexical OR matching, not semantic similarity. Try synonyms and narrower queries;
-   no hit means a retrieval gap, never evidence that the code is safe.
+   Search uses lexical OR matching. For reviewed defensive steps, add `--mechanism "path containment"`
+   to filter by an exact tag. Use plain text for untagged steps and historical alternatives.
+   Try synonyms and narrower queries. A missing hit indicates a retrieval gap.
 3. Read each hit's hint, assumptions, candidate text, historical evaluation and observation.
    For `defensive_case` hits, read `review.invariant`, `review.verification`, and
    `source_observation`. Inspect the full capsule with

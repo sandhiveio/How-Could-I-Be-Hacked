@@ -9,6 +9,7 @@
       "Tests use a temporary storage root, harmless filenames, and an isolated storage API."
     ]
   },
+  "mechanism_tags": ["path containment"],
   "review": {
     "invariant": "The stored upload stays beneath the configured upload directory after destination resolution.",
     "verification": "Trace an ordinary multipart upload to its final destination and check the destination containment contract."

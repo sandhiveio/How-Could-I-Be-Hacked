@@ -23,7 +23,8 @@ for the producer's mandatory API generation. The current agent performs reasonin
    rationale, never list position. These are judgment aids, not calibrated probabilities.
 5. Select one bounded next action. Before running it define inputs, setup, supporting result,
    falsifier, control and cleanup. Execute using the target's normal local tools. Save command,
-   output, relevant diff and interpretation. Record only the selected action's observation.
+   output or structured result, relevant diff and interpretation. Record only the selected
+   action's observation. Use a fresh result artifact for each check and record its exit code.
 6. Update context using the observation, then retrieve and evaluate again. Complete at least two
    real iterations for a trajectory; after early success use the second for a discriminating
    regression or robustness check. A shorter interrupted review remains partial. Stop at the
@@ -53,6 +54,10 @@ The example is a format illustration, not evidence of execution. For an incumben
 in candidates with origin incumbent and rescore it. Run `scripts/validate_steps.py --file
 <steps.json>` on an array of completed capsules. Evidence paths resolve relative to steps.json.
 The validator checks structure, full evaluation coverage, selected eligibility, lineage and
-existing evidence files. It cannot verify hypotheses, output truth, permissions or anonymity.
+nonempty evidence files. A command with no console output can use a nonempty result artifact
+as evidence. For new records, add `observation.checks` with `command`, integer `exit_code`, and
+`evidence_files` for each command. The observation command must match one check exactly. Each
+check's evidence must also be listed on the observation. Existing records can omit `checks`.
+Review the saved result before drawing a conclusion, including when the exit code is zero.
 Report number of new mechanisms, executed checks and checks that changed the next decision;
 do not count candidate replacement alone as useful progress.

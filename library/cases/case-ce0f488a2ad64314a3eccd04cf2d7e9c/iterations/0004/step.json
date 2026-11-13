@@ -9,6 +9,7 @@
       "Use a temporary extraction root and a separate benign sibling fixture."
     ]
   },
+  "mechanism_tags": ["path containment", "filesystem confinement"],
   "review": {
     "invariant": "Check resolved paths at the filesystem boundary and preserve supported in-root archive entries.",
     "verification": "Verify the final tree for ordinary nested files and supported in-root links. Review cleanup and concurrent filesystem behavior against the product contract."

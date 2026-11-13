@@ -18,9 +18,16 @@ def validate(records, base):
         return isinstance(value, str) and bool(value.strip())
     def evidence(files, label):
         require(isinstance(files, list), label + ": evidence_files array required")
+        paths = set()
         if isinstance(files, list):
             for entry in files:
-                require(nonempty(entry) and (base / entry).is_file(), label + ": evidence file missing")
+                if not nonempty(entry) or not (base / entry).is_file():
+                    errors.append(label + ": evidence file missing")
+                    continue
+                path = (base / entry).resolve()
+                require(path.stat().st_size > 0, label + ": evidence file empty")
+                paths.add(path)
+        return paths
     if not isinstance(records, list) or len(records) < 2:
         return ["A completed trajectory requires an array of at least two actual steps"]
     for i, step in enumerate(records):
@@ -81,8 +88,30 @@ def validate(records, base):
             require(obs.get("outcome") in ("supported", "refuted", "inconclusive"), label + ": actual outcome required")
             for key in ("summary", "command"):
                 require(nonempty(obs.get(key)), label + ": observation " + key + " required")
-            evidence(obs.get("evidence_files"), label)
+            observation_paths = evidence(obs.get("evidence_files"), label)
             require(bool(obs.get("evidence_files")), label + ": completed action requires evidence")
+            if "checks" in obs:
+                checks = obs["checks"]
+                if not isinstance(checks, list) or not checks:
+                    errors.append(label + ": checks must be a nonempty array")
+                else:
+                    commands = set()
+                    for check in checks:
+                        if not isinstance(check, dict):
+                            errors.append(label + ": check object required")
+                            continue
+                        command = check.get("command")
+                        if nonempty(command):
+                            commands.add(command)
+                        else:
+                            errors.append(label + ": check command required")
+                        require(type(check.get("exit_code")) is int, label + ": check exit_code must be an integer")
+                        check_paths = evidence(check.get("evidence_files"), label + ": check")
+                        require(bool(check_paths) and check_paths <= observation_paths,
+                                label + ": check files must belong to the observation")
+                    command = obs.get("command")
+                    require(nonempty(command) and command in commands,
+                            label + ": observation command must match a recorded check")
             remaining = obs.get("remaining_uncertainty")
             require(isinstance(remaining, list) and all(nonempty(x) for x in remaining), label + ": remaining_uncertainty string array required")
         if nonempty(sid):

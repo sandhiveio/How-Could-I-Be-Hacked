@@ -9,6 +9,7 @@
       "A fixture can populate multiple providers and use fake credentials."
     ]
   },
+  "mechanism_tags": ["credential redaction"],
   "review": {
     "invariant": "The sanitized copy masks every nonempty OIDC client secret and preserves the active configuration.",
     "verification": "Inspect the sanitized object with a fake secret. Verify that changing the original provider entry does not change the copy."

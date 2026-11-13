@@ -200,20 +200,28 @@ def bake(case_path, library, denied=()):
             "search_entries": len(records)}
 
 
-def search(library, query, limit=10, include_synthetic=False):
+def search(library, query, limit=10, include_synthetic=False, *, mechanism=None):
     tokens = list(dict.fromkeys(re.findall(r"[^\W_]{3,}", query, re.UNICODE)))[:40]
-    if not tokens:
+    if mechanism is not None:
+        mechanism = " ".join(mechanism.casefold().split())
+    if not tokens and not mechanism:
         return []
     expression = " OR ".join('"' + t.replace('"', '""') + '"' for t in tokens)
     # Read-only SQLite URI: lookup cannot create a library or call the network.
     uri = (Path(library) / "index.sqlite").resolve().as_uri() + "?mode=ro"
     with closing(sqlite3.connect(uri, uri=True)) as db:
-        rows = db.execute("SELECT record, bm25(examples) FROM examples WHERE examples MATCH ? ORDER BY bm25(examples)",
-                          (expression,))
+        if tokens:
+            rows = db.execute("SELECT record, bm25(examples) AS rank FROM examples "
+                              "WHERE examples MATCH ? ORDER BY rank, record", (expression,))
+        else:
+            rows = db.execute("SELECT record, 0 FROM examples ORDER BY record")
         result = []
         for serialized, relevance in rows:
             record = json.loads(serialized)
             if record["kind"] == "synthetic_example" and not include_synthetic:
+                continue
+            if mechanism and (record["kind"] != "defensive_case"
+                              or mechanism not in record.get("mechanism_tags", [])):
                 continue
             result.append({"retrieval_score": -relevance, **record})
             if len(result) >= limit:
@@ -228,7 +236,8 @@ def main():
     s.add_argument("--case", required=True); s.add_argument("--library", required=True)
     s.add_argument("--deny-file", help="Private JSON array of original product/customer identifiers")
     s = sub.add_parser("search")
-    s.add_argument("--library", required=True); s.add_argument("--query", required=True)
+    s.add_argument("--library", required=True); s.add_argument("--query", default="")
+    s.add_argument("--mechanism", help="Exact tag on a reviewed defensive step")
     s.add_argument("--limit", type=int, default=10); s.add_argument("--include-synthetic", action="store_true")
     args = p.parse_args()
     if args.command == "bake":
@@ -239,7 +248,10 @@ def main():
     else:
         if not 1 <= args.limit <= 100:
             raise ValueError("limit must be between 1 and 100")
-        result = search(args.library, args.query, args.limit, args.include_synthetic)
+        if not args.query.strip() and not (args.mechanism or "").strip():
+            p.error("search requires --query or --mechanism")
+        result = search(args.library, args.query, args.limit, args.include_synthetic,
+                        mechanism=args.mechanism)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 

@@ -9,6 +9,7 @@
       "The provider supplies a stable identifier for accounts recognized through supported aliases."
     ]
   },
+  "mechanism_tags": ["account identity normalization", "rate limiting"],
   "review": {
     "invariant": "Lockout queries and failure updates use the same account identifier returned by the provider.",
     "verification": "Use fixture accounts with supported aliases. Verify shared accounting for one account and separate accounting for a second account."

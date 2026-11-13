@@ -9,6 +9,7 @@
       "The configured names act as a filter over verified membership."
     ]
   },
+  "mechanism_tags": ["claim provenance", "group authorization"],
   "review": {
     "invariant": "Configured group names may appear in a session only when the identity provider attests membership.",
     "verification": "Review the session enrichment input and output with a stub identity provider. Assert that attested groups are present and omitted groups are absent."

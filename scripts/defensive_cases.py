@@ -15,6 +15,7 @@ from offline_io import read, write
 DEFAULT_LIBRARY = Path(__file__).resolve().parents[1] / "library"
 KIND = "defensive_case"
 CONTEXT_KEYS = {"hint", "surface", "assumptions"}
+MECHANISM_TAG = re.compile(r"[a-z0-9]+(?:[ -][a-z0-9]+)*")
 
 
 def check_shape(doc, keys, where):
@@ -43,8 +44,9 @@ def load_case(path, case):
     previous = None
     for number, step_path in enumerate(paths, 1):
         step = read(step_path)
-        check_shape(step, {"schema_version", "kind", "title", "context", "review",
-                           "source_observation", "lineage"}, str(step_path))
+        required = {"schema_version", "kind", "title", "context", "review",
+                    "source_observation", "lineage"}
+        shape(step, required | {"mechanism_tags"}, required, str(step_path))
         ordinal = f"{number:04d}"
         iteration = f"iteration-{ordinal}"
         lineage = {"case_id": case_id, "iteration_id": iteration, "previous_iteration_id": previous}
@@ -60,8 +62,14 @@ def load_case(path, case):
             raise ValueError(f"Invalid source observation outcome at {step_path}")
         for field in (review["invariant"], review["verification"], observation["summary"]):
             text(field, "defensive step text")
+        tags = step.get("mechanism_tags", [])
+        if (not isinstance(tags, list)
+                or any(not isinstance(tag, str) or len(tag) > 80 or not MECHANISM_TAG.fullmatch(tag)
+                       for tag in tags)
+                or len(set(tags)) != len(tags)):
+            raise ValueError(f"Invalid or duplicate defensive mechanism tags at {step_path}")
         scan(step, ())
-        records.append({
+        record = {
             "kind": KIND, "case_id": case_id, "iteration_id": iteration,
             "title": step["title"], "case_title": case["title"], **context,
             "candidate": {"id": iteration, "text": review["invariant"]},
@@ -71,7 +79,10 @@ def load_case(path, case):
             "observation_scope": "Generalized source observation. Verify behavior in the code under review.",
             "artifact_directory": f"cases/{case_id}/iterations/{ordinal}",
             "review": review, "source_observation": observation,
-        })
+        }
+        if tags:
+            record["mechanism_tags"] = tags
+        records.append(record)
         previous = iteration
 
     manifest = {
@@ -95,7 +106,8 @@ def rows(library):
         for record in records:
             searchable = " ".join([record["case_title"], record["title"], record["hint"],
                                    record["surface"], *record["assumptions"],
-                                   record["review"]["invariant"], record["review"]["verification"]])
+                                   record["review"]["invariant"], record["review"]["verification"],
+                                   *record.get("mechanism_tags", [])])
             entries.append((searchable, json.dumps(record, ensure_ascii=False, sort_keys=True)))
     return manifests, entries
 

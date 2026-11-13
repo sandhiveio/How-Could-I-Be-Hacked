@@ -33,6 +33,36 @@ class ToolkitTests(unittest.TestCase):
         self.assertEqual(hit["source_observation"], step["source_observation"])
         self.assertIsNone(hit["historical_evaluation"])
 
+    def test_mechanism_search_filters_reviewed_steps_before_limiting(self):
+        hits = search(DEFAULT_LIBRARY, "link destination containment", 5,
+                      mechanism=" LINK  POLICY ")
+        self.assertTrue(hits)
+        self.assertEqual(hits[0]["title"], "Link and path-component boundaries")
+        for hit in hits:
+            self.assertEqual(hit["kind"], "defensive_case")
+            step = contained(DEFAULT_LIBRARY, hit["artifact_directory"] + "/step.json")
+            self.assertIn("link policy", hit["mechanism_tags"])
+            self.assertEqual(hit["mechanism_tags"], json.loads(step.read_text(encoding="utf-8"))["mechanism_tags"])
+        self.assertTrue(search(DEFAULT_LIBRARY, "", mechanism="path containment"))
+        account_hits = search(DEFAULT_LIBRARY, "normalized credential identity", 1,
+                              mechanism="account identity normalization")
+        self.assertEqual([hit["title"] for hit in account_hits], ["Canonical account identity"])
+        self.assertEqual(search(DEFAULT_LIBRARY, "containment", mechanism="unknown tag"), [])
+
+    def test_search_ties_are_independent_of_index_insertion_order(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            records = [json.dumps({"kind": "defensive_case", "title": title})
+                       for title in ("Second invariant", "First invariant")]
+            with closing(sqlite3.connect(root / "index.sqlite")) as db, db:
+                db.execute("CREATE VIRTUAL TABLE examples USING fts5(search_text, record UNINDEXED)")
+                for order in (records, records[::-1]):
+                    db.execute("DELETE FROM examples")
+                    db.executemany("INSERT INTO examples VALUES ('boundary', ?)", [(record,) for record in order])
+                    db.commit()
+                    hits = search(root, "boundary", 1)
+                    self.assertEqual([hit["title"] for hit in hits], ["First invariant"])
+
     def test_publication_audit_detects_a_missing_case_and_wrong_step_id(self):
         with tempfile.TemporaryDirectory() as directory:
             base = Path(directory)
@@ -84,6 +114,17 @@ class ToolkitTests(unittest.TestCase):
             bad = copy.deepcopy(records)
             bad[0]["evaluations"] = []
             self.assertTrue(validate(bad, base))
+            step["observation"]["checks"] = [dict(command="fixture", exit_code=0, evidence_files=["output.txt"])]
+            self.assertEqual(validate(records, base), [])
+            bad = copy.deepcopy(records)
+            bad[0]["observation"]["checks"][0]["command"] = "fixture wrapper"
+            self.assertTrue(any("must match" in error for error in validate(bad, base)))
+            (base / "other.txt").write_text("unrelated fixture output", encoding="utf-8")
+            bad = copy.deepcopy(records)
+            bad[0]["observation"]["checks"][0]["evidence_files"] = ["other.txt"]
+            self.assertTrue(any("must belong" in error for error in validate(bad, base)))
+            (base / "output.txt").write_text("", encoding="utf-8")
+            self.assertTrue(any("empty" in error for error in validate(records, base)))
             (base / "output.txt").unlink()
             self.assertTrue(validate(records, base))
 
