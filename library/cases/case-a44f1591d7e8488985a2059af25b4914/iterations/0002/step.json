@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Attribute policy respects quoted boundaries",
+  "context": {
+    "hint": "Review parser boundaries for a filter that removes disallowed active content while preserving permitted markup.",
+    "surface": "A standalone HTML filter handles element boundaries, comments, quoted attributes, and URL-valued fields in static documents.",
+    "assumptions": [
+      "The filter contract defines which elements and attributes are allowed and how permitted content is preserved.",
+      "The source evidence covers focused local fixtures. Integrated and browser-level verification remain open."
+    ]
+  },
+  "mechanism_tags": [
+    "html filtering",
+    "attribute parsing"
+  ],
+  "review": {
+    "invariant": "Attribute policy acts on parsed attribute names and normalized values. Allowed attributes and surrounding text retain their documented representation.",
+    "verification": "Check allowed and denied fixture attributes in a single document. Verify that quoted values containing punctuation remain intact and that validation receives normalized values before policy decisions."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "Nine local attribute fixtures passed after correcting handling of quoted values. The draft deliberately rejected some ambiguous values conservatively. Browser behavior, broader markup contexts and integrated verification remained open."
+  },
+  "lineage": {
+    "case_id": "case-a44f1591d7e8488985a2059af25b4914",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

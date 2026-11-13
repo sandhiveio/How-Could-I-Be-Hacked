@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Element boundary handling preserves neighboring markup",
+  "context": {
+    "hint": "Review parser boundaries for a filter that removes disallowed active content while preserving permitted markup.",
+    "surface": "A standalone HTML filter handles element boundaries, comments, quoted attributes, and URL-valued fields in static documents.",
+    "assumptions": [
+      "The filter contract defines which elements and attributes are allowed and how permitted content is preserved.",
+      "The source evidence covers focused local fixtures. Integrated and browser-level verification remain open."
+    ]
+  },
+  "mechanism_tags": [
+    "html filtering",
+    "element boundaries"
+  ],
+  "review": {
+    "invariant": "Element policy follows the tokenizer's boundaries. Surrounding allowed text and inert comments are preserved according to the filter contract.",
+    "verification": "Use inert fixtures to check removal of a disallowed element, handling of an incomplete element, and exact preservation of neighboring allowed text and comments. Include a document consisting entirely of permitted markup."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "Six local fixtures passed after a draft boundary correction. The fixtures covered element boundaries, incomplete markup and benign round trips. Combined filter behavior and the benchmark verifier remained untested in this run."
+  },
+  "lineage": {
+    "case_id": "case-a44f1591d7e8488985a2059af25b4914",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

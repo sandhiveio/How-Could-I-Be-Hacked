@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Default audit lineage is scoped to one session",
+  "context": {
+    "hint": "Review isolation of default event identifiers and audit-chain state on a shared tool server.",
+    "surface": "A tool server can serve several client sessions in one process. Event logging assigns default session identifiers and links events to prior events.",
+    "assumptions": [
+      "Multiple client sessions can share one server process.",
+      "Tests can use in-memory client and server streams with synthetic events."
+    ]
+  },
+  "mechanism_tags": [
+    "session isolation",
+    "audit lineage"
+  ],
+  "review": {
+    "invariant": "Each client session owns its default event identifiers and parent links. The first event of a new session starts an independent chain.",
+    "verification": "Connect two local fixture sessions to one server. Assert distinct default identifiers and independent first events. As a control, verify that subsequent events in a single session retain their chain."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "Direct fixture calls and connected in-memory clients showed that the original implementation shared a default identifier and audit lineage across client sessions. The repaired fixture produced independent chains."
+  },
+  "lineage": {
+    "case_id": "case-91c305520511418684a92f3ecdd93b40",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

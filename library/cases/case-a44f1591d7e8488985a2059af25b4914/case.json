@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-a44f1591d7e8488985a2059af25b4914",
+  "kind": "defensive_case",
+  "title": "HTML filter parsing boundaries",
+  "hint": "Review parser boundaries for a filter that removes disallowed active content while preserving permitted markup.",
+  "surface": "A standalone HTML filter handles element boundaries, comments, quoted attributes, and URL-valued fields in static documents.",
+  "assumptions": [
+    "The filter contract defines which elements and attributes are allowed and how permitted content is preserved.",
+    "The source evidence covers focused local fixtures. Integrated and browser-level verification remain open."
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Guardrail decisions preserve allowed operations",
+  "context": {
+    "hint": "Review a tool preflight guard that classifies version-control commands before execution.",
+    "surface": "A local command hook receives a shell command and returns a policy decision before any version-control operation is launched.",
+    "assumptions": [
+      "The command guard applies a documented policy to allowed and denied operations.",
+      "A fixture can check decisions without executing the underlying commands."
+    ]
+  },
+  "mechanism_tags": [
+    "command policy",
+    "guardrail regression"
+  ],
+  "review": {
+    "invariant": "The hook consistently denies operations covered by its policy and preserves permitted commands and inspection modes.",
+    "verification": "Assert decisions against a fixture matrix of denied and permitted operations at the hook boundary, with command execution disabled. Use a structured command interface where available."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The revised hook passed 27 policy decisions and controls under a compatibility fixture. Full shell interpretation and the production hook integration were outside the verified scope."
+  },
+  "lineage": {
+    "case_id": "case-39aef9b172ae403da6e796a4b755c352",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

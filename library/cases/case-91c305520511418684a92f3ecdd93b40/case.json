@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-91c305520511418684a92f3ecdd93b40",
+  "kind": "defensive_case",
+  "title": "Tool session state isolation",
+  "hint": "Review isolation of default event identifiers and audit-chain state on a shared tool server.",
+  "surface": "A tool server can serve several client sessions in one process. Event logging assigns default session identifiers and links events to prior events.",
+  "assumptions": [
+    "Multiple client sessions can share one server process.",
+    "Tests can use in-memory client and server streams with synthetic events."
+  ]
+}

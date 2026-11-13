@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Policy decisions follow command semantics",
+  "context": {
+    "hint": "Review a tool preflight guard that classifies version-control commands before execution.",
+    "surface": "A local command hook receives a shell command and returns a policy decision before any version-control operation is launched.",
+    "assumptions": [
+      "The command guard applies a documented policy to allowed and denied operations.",
+      "A fixture can check decisions without executing the underlying commands."
+    ]
+  },
+  "mechanism_tags": [
+    "command parsing",
+    "command policy"
+  ],
+  "review": {
+    "invariant": "The policy uses the effective operation and parsed arguments. Equivalent representations receive the same decision.",
+    "verification": "Check that equivalent representations of a fixture operation receive the same decision. Use a permitted operation containing a policy keyword as a positive control."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The original matcher returned inconsistent decisions for semantically equivalent operations. Evidence came from a compatibility harness running the original patterns because the original shell and JSON dependency were unavailable."
+  },
+  "lineage": {
+    "case_id": "case-39aef9b172ae403da6e796a4b755c352",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

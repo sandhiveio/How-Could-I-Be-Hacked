@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Write authorization requires an allowed scope",
+  "context": {
+    "hint": "Review write authorization and first-use binding for stored API credentials.",
+    "surface": "An API accepts scoped credentials and interactive sessions. A credential can become bound to a resource on first use.",
+    "assumptions": [
+      "Stored credential metadata can include values from older or manual records.",
+      "The authorization dependency and credential repository can be exercised with local fixtures."
+    ]
+  },
+  "mechanism_tags": [
+    "api key authorization",
+    "scope validation"
+  ],
+  "review": {
+    "invariant": "Write access requires an explicitly supported write scope for API credentials. Interactive session authorization follows its own policy.",
+    "verification": "Use a local authorization fixture with supported write and read scopes and an unrecognized stored scope. Assert that only the supported write scope permits writes for API credentials. Verify interactive session behavior separately."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The original dependency permitted writes for unrecognized stored scopes. The revised dependency rejected those scopes and retained the expected decisions for recognized scopes and interactive sessions. The normal credential creation path already restricted valid scope values."
+  },
+  "lineage": {
+    "case_id": "case-9f116dc1f30c4596bf3fdd822a0ea1fc",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

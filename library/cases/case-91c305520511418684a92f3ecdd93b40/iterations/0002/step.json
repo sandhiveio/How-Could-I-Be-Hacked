@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Reset affects only the requesting session",
+  "context": {
+    "hint": "Review isolation of default event identifiers and audit-chain state on a shared tool server.",
+    "surface": "A tool server can serve several client sessions in one process. Event logging assigns default session identifiers and links events to prior events.",
+    "assumptions": [
+      "Multiple client sessions can share one server process.",
+      "Tests can use in-memory client and server streams with synthetic events."
+    ]
+  },
+  "mechanism_tags": [
+    "session isolation",
+    "audit lineage"
+  ],
+  "review": {
+    "invariant": "A reset changes only the calling session's default event state. Explicit identifiers continue to follow the public contract.",
+    "verification": "Verify that a reset in one fixture session leaves another session's chain intact. Run the ordinary tool-server tests and the isolation checks against an independent copy of the repaired code."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "Isolation regressions failed on the original copy and passed on the repaired copy alongside the normal tool-server suite. The transport check used in-memory streams. Remote session teardown and state eviction remained unverified."
+  },
+  "lineage": {
+    "case_id": "case-91c305520511418684a92f3ecdd93b40",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

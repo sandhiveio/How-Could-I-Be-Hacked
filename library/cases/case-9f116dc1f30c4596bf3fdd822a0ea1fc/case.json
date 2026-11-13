@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-9f116dc1f30c4596bf3fdd822a0ea1fc",
+  "kind": "defensive_case",
+  "title": "API key scope and expiry",
+  "hint": "Review write authorization and first-use binding for stored API credentials.",
+  "surface": "An API accepts scoped credentials and interactive sessions. A credential can become bound to a resource on first use.",
+  "assumptions": [
+    "Stored credential metadata can include values from older or manual records.",
+    "The authorization dependency and credential repository can be exercised with local fixtures."
+  ]
+}

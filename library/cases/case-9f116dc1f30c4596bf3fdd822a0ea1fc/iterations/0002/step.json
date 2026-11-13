@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "First-use binding checks current credential validity",
+  "context": {
+    "hint": "Review write authorization and first-use binding for stored API credentials.",
+    "surface": "An API accepts scoped credentials and interactive sessions. A credential can become bound to a resource on first use.",
+    "assumptions": [
+      "Stored credential metadata can include values from older or manual records.",
+      "The authorization dependency and credential repository can be exercised with local fixtures."
+    ]
+  },
+  "mechanism_tags": [
+    "api key authorization",
+    "credential expiry"
+  ],
+  "review": {
+    "invariant": "First-use binding enforces credential expiry and revocation at the storage operation. A denied binding leaves credential ownership unchanged.",
+    "verification": "Use a controlled repository fixture to verify that expired and revoked credentials cannot be bound and that a valid credential can still bind. Inspect the storage operation and the fallback read for consistent validity checks."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The local repository fixture initially allowed an expired credential to bind. With the revised predicates the focused checks and ordinary unit suite passed. Real database timing and integration behavior remained unverified."
+  },
+  "lineage": {
+    "case_id": "case-9f116dc1f30c4596bf3fdd822a0ea1fc",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

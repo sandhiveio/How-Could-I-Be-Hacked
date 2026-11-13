@@ -6,7 +6,7 @@ Search for cases that match the code you are reviewing. See which hypotheses wer
 the checks showed, and which alternatives were set aside. Use that context to design local checks
 and turn confirmed findings into regression tests.
 
-**33 anonymized cases · 105 investigation and review steps · 467 search entries**
+**37 anonymized cases · 113 investigation and review steps · 475 search entries**
 
 The library and search tools run locally with Python and SQLite. No API key required.
 
@@ -76,7 +76,7 @@ steps. You can inspect their evidence and decisions with the [trajectory command
 
 ### Defensive review examples
 
-These ten indexed cases include independent steps with a security invariant, a regression
+These indexed cases include independent steps with a security invariant, a regression
 assertion, and a generalized source observation. For a compact walkthrough, open the
 [defensive review guide](library/checks/defensive-review-examples.md).
 
@@ -92,6 +92,10 @@ assertion, and a generalized source observation. For a compact walkthrough, open
 | [Archive extraction containment](library/cases/case-ce0f488a2ad64314a3eccd04cf2d7e9c/case.json) | Confine writes and link operations to the extraction root | 4 |
 | [Transcoder process arguments](library/cases/case-e09ae020c2784f2daff359ad12e026bd/case.json) | Preserve argument boundaries and documented wrapper behavior | 2 |
 | [Authorization model changes](library/cases/case-f2edf20fff384048b52a38a3e0543577/case.json) | Evaluate stored relationships under the selected model | 4 |
+| [Command guardrail policy](library/cases/case-39aef9b172ae403da6e796a4b755c352/case.json) | Classify version-control operations by parsed command and arguments | 2 |
+| [API key scope and expiry](library/cases/case-9f116dc1f30c4596bf3fdd822a0ea1fc/case.json) | Require recognized write scope and check expiry when binding a key | 2 |
+| [Tool session state isolation](library/cases/case-91c305520511418684a92f3ecdd93b40/case.json) | Keep default event identifiers, parent links, and resets session-scoped | 2 |
+| [HTML filter parsing boundaries](library/cases/case-a44f1591d7e8488985a2059af25b4914/case.json) | Preserve benign markup and enforce element and attribute policy at parser boundaries | 2 |
 
 ## How it works
 

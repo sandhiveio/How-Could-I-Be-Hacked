@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-39aef9b172ae403da6e796a4b755c352",
+  "kind": "defensive_case",
+  "title": "Command guardrail policy",
+  "hint": "Review a tool preflight guard that classifies version-control commands before execution.",
+  "surface": "A local command hook receives a shell command and returns a policy decision before any version-control operation is launched.",
+  "assumptions": [
+    "The command guard applies a documented policy to allowed and denied operations.",
+    "A fixture can check decisions without executing the underlying commands."
+  ]
+}
