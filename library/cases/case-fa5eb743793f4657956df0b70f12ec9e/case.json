@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-fa5eb743793f4657956df0b70f12ec9e",
+  "kind": "defensive_case",
+  "title": "Retention policy enforcement",
+  "hint": "Check that a background cleanup service applies the current retention policy to each unit of work.",
+  "surface": "A background job deletes expired records in batches under a configurable retention policy.",
+  "assumptions": [
+    "Authorized administrators can change or disable the effective retention policy.",
+    "Use synthetic records, a controlled clock and an in-memory storage double."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Stop cleanup without an effective policy",
+  "context": {
+    "hint": "Check that a background cleanup service applies the current retention policy to each unit of work.",
+    "surface": "A background job deletes expired records in batches under a configurable retention policy.",
+    "assumptions": [
+      "Authorized administrators can change or disable the effective retention policy.",
+      "Use synthetic records, a controlled clock and an in-memory storage double."
+    ]
+  },
+  "mechanism_tags": [
+    "retention policy",
+    "deletion guard",
+    "safe defaults"
+  ],
+  "review": {
+    "invariant": "Cleanup performs no deletion when the record owner is absent or has no effective retention policy.",
+    "verification": "Test a missing owner and a disabled policy independently with a recording storage double. Assert zero deletion calls and verify that cleanup still runs under a valid, unchanged policy."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The targeted checks for absent owners and disabled policies passed after the guard was added. The unchanged-policy control continued to pass."
+  },
+  "lineage": {
+    "case_id": "case-fa5eb743793f4657956df0b70f12ec9e",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

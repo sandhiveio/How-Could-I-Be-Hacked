@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Preserve deduplication for trusted imports",
+  "context": {
+    "hint": "Review ownership and validation of deduplication identifiers used by an import service.",
+    "surface": "An event service accepts ordinary writes and uses system-managed identifiers to make imports repeatable.",
+    "assumptions": [
+      "The application distinguishes ordinary writes from trusted import processing.",
+      "Use a disposable fixture and synthetic records to verify the storage boundary."
+    ]
+  },
+  "mechanism_tags": [
+    "import pipeline",
+    "idempotency",
+    "regression control"
+  ],
+  "review": {
+    "invariant": "The trusted import path can still use its system-managed identifiers to keep legitimate retries idempotent.",
+    "verification": "At the adapter boundary, check that a valid import retains access to its assigned deduplication identifier and uses the same identifier on a legitimate retry. Verify that ordinary writes keep their existing validation."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The targeted suite verified that trusted import processing could still supply its system-managed identifier through the application boundary. End-to-end retry behavior in a live database was outside this verification."
+  },
+  "lineage": {
+    "case_id": "case-e523aee460254c2d8137fcb125a78e6c",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

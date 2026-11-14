@@ -6,7 +6,7 @@ Search for cases that match the code you are reviewing. See which hypotheses wer
 the checks showed, and which alternatives were set aside. Use that context to design local checks
 and turn confirmed findings into regression tests.
 
-**37 anonymized cases · 113 investigation and review steps · 475 search entries**
+**39 anonymized cases · 117 investigation and review steps · 479 search entries**
 
 The library and search tools run locally with Python and SQLite. No API key required.
 
@@ -96,6 +96,8 @@ assertion, and a generalized source observation. For a compact walkthrough, open
 | [API key scope and expiry](library/cases/case-9f116dc1f30c4596bf3fdd822a0ea1fc/case.json) | Require recognized write scope and check expiry when binding a key | 2 |
 | [Tool session state isolation](library/cases/case-91c305520511418684a92f3ecdd93b40/case.json) | Keep default event identifiers, parent links, and resets session-scoped | 2 |
 | [HTML filter parsing boundaries](library/cases/case-a44f1591d7e8488985a2059af25b4914/case.json) | Preserve benign markup and enforce element and attribute policy at parser boundaries | 2 |
+| [Retention policy enforcement](library/cases/case-fa5eb743793f4657956df0b70f12ec9e/case.json) | Apply current retention settings before deleting records | 2 |
+| [Import deduplication integrity](library/cases/case-e523aee460254c2d8137fcb125a78e6c/case.json) | Separate system-managed deduplication from ordinary writes | 2 |
 
 ## How it works
 

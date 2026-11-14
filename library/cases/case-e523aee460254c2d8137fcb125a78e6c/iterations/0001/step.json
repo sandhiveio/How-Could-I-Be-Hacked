@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Protect system-managed deduplication identifiers",
+  "context": {
+    "hint": "Review ownership and validation of deduplication identifiers used by an import service.",
+    "surface": "An event service accepts ordinary writes and uses system-managed identifiers to make imports repeatable.",
+    "assumptions": [
+      "The application distinguishes ordinary writes from trusted import processing.",
+      "Use a disposable fixture and synthetic records to verify the storage boundary."
+    ]
+  },
+  "mechanism_tags": [
+    "idempotency",
+    "namespace isolation",
+    "import integrity"
+  ],
+  "review": {
+    "invariant": "Only trusted import processing can assign system-managed deduplication identifiers.",
+    "verification": "Check that ordinary writes accept valid caller-owned identifiers and reject identifiers reserved by policy before reaching the storage adapter. Use synthetic identifiers from the fixture."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "An isolated storage fixture detected that ownership checks were missing from ordinary writes. The targeted policy tests passed after validation was added. Live database behavior and existing stored identifiers were outside the review."
+  },
+  "lineage": {
+    "case_id": "case-e523aee460254c2d8137fcb125a78e6c",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}
