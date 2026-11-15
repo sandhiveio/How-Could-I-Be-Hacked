@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-a86ee97d214a4c7ba5a05d56a7e89c40",
+  "kind": "defensive_case",
+  "title": "Development API origin policy",
+  "hint": "Apply environment-specific browser origin defaults and preserve explicit settings.",
+  "surface": "A browser dashboard calls an API with environment-specific CORS configuration.",
+  "assumptions": [
+    "Use synthetic origins and an in-process API client."
+  ]
+}

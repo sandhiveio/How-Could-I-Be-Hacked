@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Preserve custom values in a tool pipeline",
+  "context": {
+    "hint": "Keep file paths and custom options intact as individual process arguments.",
+    "surface": "A desktop application runs external tools with a selected file and configurable values.",
+    "assumptions": [
+      "Use local recording stubs and benign inputs."
+    ]
+  },
+  "mechanism_tags": [
+    "process arguments",
+    "tool pipeline"
+  ],
+  "review": {
+    "invariant": "A custom option stays in the intended tool's argument vector and leaves the other tool's arguments intact.",
+    "verification": "Record both tools' argument vectors with default and custom settings. Compare exact values and counts, and verify that the pipeline still handles an ordinary file."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The stub checks confirmed that the custom value arrived as one argument and the ordinary-file control passed. Native unit tests were added but the toolchain was unavailable."
+  },
+  "lineage": {
+    "case_id": "case-ffbc48c079a64b38bc43a814a6c87632",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

@@ -98,6 +98,8 @@ assertion, and a generalized source observation. For a compact walkthrough, open
 | [HTML filter parsing boundaries](library/cases/case-a44f1591d7e8488985a2059af25b4914/case.json) | Preserve benign markup and enforce element and attribute policy at parser boundaries | 2 |
 | [Retention policy enforcement](library/cases/case-fa5eb743793f4657956df0b70f12ec9e/case.json) | Apply current retention settings before deleting records | 2 |
 | [Import deduplication integrity](library/cases/case-e523aee460254c2d8137fcb125a78e6c/case.json) | Separate system-managed deduplication from ordinary writes | 2 |
+| [Development API origin policy](library/cases/case-a86ee97d214a4c7ba5a05d56a7e89c40/case.json) | Apply environment-specific browser origin defaults and preserve explicit settings | 2 |
+| [External tool argument boundaries](library/cases/case-ffbc48c079a64b38bc43a814a6c87632/case.json) | Keep file paths and custom options intact as individual process arguments | 2 |
 
 ## How it works
 

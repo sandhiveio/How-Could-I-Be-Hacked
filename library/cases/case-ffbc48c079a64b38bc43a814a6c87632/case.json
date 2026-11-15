@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-ffbc48c079a64b38bc43a814a6c87632",
+  "kind": "defensive_case",
+  "title": "External tool argument boundaries",
+  "hint": "Keep file paths and custom options intact as individual process arguments.",
+  "surface": "A desktop application runs external tools with a selected file and configurable values.",
+  "assumptions": [
+    "Use local recording stubs and benign inputs."
+  ]
+}
