@@ -6,7 +6,7 @@ Search for cases that match the code you are reviewing. See which hypotheses wer
 the checks showed, and which alternatives were set aside. Use that context to design local checks
 and turn confirmed findings into regression tests.
 
-**39 anonymized cases · 117 investigation and review steps · 479 search entries**
+**41 anonymized cases · 121 investigation and review steps · 483 search entries**
 
 The library and search tools run locally with Python and SQLite. No API key required.
 

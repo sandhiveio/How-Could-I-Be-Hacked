@@ -76,6 +76,11 @@ and use its acceptance criteria to check the repaired behavior with ordinary inp
 deterministic fixtures. Search for the same topics in the index to find the individual
 defensive steps and generalized source observations.
 
+For a regression based on a prior run, carry over the legitimate control and the scope of
+the evidence. For example, a packet reader can pass containment checks while a byte-for-byte
+comparison separately establishes that ordinary output stayed stable. See the packet manifest
+example for how to record both results when official grading is unavailable.
+
 For parser CPU-exhaustion hypotheses, isolate each parsing stage with size-doubling probes,
 an external timeout and valid-input controls. A repaired regular expression can expose a
 second cost such as repeated array-front removal. Compare baseline and repaired structured

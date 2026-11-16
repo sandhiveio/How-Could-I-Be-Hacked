@@ -161,3 +161,59 @@ earlier model and a second relationship still valid under both versions. Verify 
 tightened model excludes the first from both permission checks and object listings while
 preserving the second. Check that explicit selection of the earlier model retains its
 documented behavior.
+
+## Packet manifest source containment
+
+**Applies when** a reader takes source-file references from an imported manifest and uses
+them to rebuild a report from files in a packet directory.
+
+**Review the file boundary.** Resolve references against the packet root and enforce
+containment on the resolved paths before opening the inputs. Apply the same rule to each
+manifest-controlled input consumed by the reader.
+
+**Regression assertions.** Use a disposable packet with a normal input and a reference
+that normalizes to another path within the packet. Verify both are accepted. Use a
+temporary fixture outside the packet to verify that denied references are rejected before
+reading. Compare the repaired reader's ordinary report and summary with the baseline bytes.
+
+**Source observation.** Five targeted checks passed after the repair. The ordinary report
+and summary matched the baseline byte for byte. Official grading was unavailable.
+
+## Retention policy changes during cleanup
+
+**Applies when** a background worker deletes records in batches while administrators can
+change a workspace's retention policy.
+
+**Review the deletion boundary.** Identify when the worker reads the policy and when it
+commits each deletion. Check that an updated or cleared policy governs later batches in
+the same cleanup pass.
+
+**Regression assertions.** Pause the worker between batches in a temporary store. Change
+or clear the policy, resume cleanup and verify that records retained by the current policy
+survive. Use an unchanged policy as a control and verify that eligible records are removed.
+
+## Import deduplication ownership
+
+**Applies when** ordinary writes and imports use the same storage layer and imports need
+stable identifiers to recognize previously imported records.
+
+**Review identifier ownership.** Trace assignment and lookup of import identities. Keep
+system-managed deduplication scoped to the import path and its owning workspace.
+
+**Regression assertions.** Import the same input twice and verify that the second import
+finds the original records. Verify that ordinary writes preserve their usual behavior and
+cannot reserve import identities. Check that independent workspaces can import the same
+input without sharing deduplication state.
+
+## Environment-specific browser origins
+
+**Applies when** an API serves a browser dashboard and uses different origin defaults for
+development and production.
+
+**Review origin configuration.** Trace how startup selects the default allowlist and how
+an explicit setting replaces it. For routes that use browser credentials, verify that
+response middleware applies the effective policy consistently.
+
+**Regression assertions.** In an in-process HTTP fixture, compare development defaults,
+production defaults and an explicit allowlist. Check the headers for allowed and denied
+origins on ordinary requests and preflight requests.
