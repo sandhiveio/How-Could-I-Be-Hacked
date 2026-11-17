@@ -81,6 +81,10 @@ the evidence. For example, a packet reader can pass containment checks while a b
 comparison separately establishes that ordinary output stayed stable. See the packet manifest
 example for how to record both results when official grading is unavailable.
 
+When one value crosses multiple boundaries, verify each boundary independently. The uploaded
+figure example checks both storage and rendering. For a workflow advertised as read-only,
+check the requests actually received by a local fixture and compare its state before and after.
+
 For parser CPU-exhaustion hypotheses, isolate each parsing stage with size-doubling probes,
 an external timeout and valid-input controls. A repaired regular expression can expose a
 second cost such as repeated array-front removal. Compare baseline and repaired structured

@@ -217,3 +217,48 @@ response middleware applies the effective policy consistently.
 **Regression assertions.** In an in-process HTTP fixture, compare development defaults,
 production defaults and an explicit allowlist. Check the headers for allowed and denied
 origins on ordinary requests and preflight requests.
+
+## Structural limits for agent findings
+
+**Applies when** a parent process accepts a JSON findings document written by a worker
+and controls how much memory may be spent validating it.
+
+**Review the parse boundary.** Check that pre-parse limits cover the total number of
+containers and object fields in addition to document size and nesting depth. Confirm that
+the validator returns a structured error when a limit is exceeded.
+
+**Regression assertions.** Use small configurable limits to check documents at and above
+each threshold. Verify that accepted findings still validate and that over-budget input is
+rejected before parsing. The source review confirmed the defect locally and both targeted
+regressions passed on the repaired copy. The observed process crash depended on a constrained
+heap.
+
+## Read-only API inspection defaults
+
+**Applies when** a tool inspects an API description and promises read-only behavior unless
+the operator explicitly enables state-changing operations.
+
+**Review the request boundary.** Check the effective policy at dispatch and trace each
+entry point that shares it. Verify that default inspection respects the read-only setting
+through both direct use and API-description processing.
+
+**Regression assertions.** Use a local fixture that records received requests and maintains
+disposable state. Run both entry points with default settings. Confirm that a permitted read
+arrives, no write is sent, and the fixture state is unchanged. Verify policy configuration
+independently of the transport. The source review confirmed the default policy defect on a
+loopback fixture and verified the repaired default through both entry points.
+
+## Uploaded figure names in storage and rendering
+
+**Applies when** an upload handler saves a figure using a client-supplied name and the UI
+later shows that name in a preview.
+
+**Review both boundaries.** Enforce a safe storage name and containment at file creation.
+Treat the displayed name as text and use the rendering framework's escaping for its output
+context. Review each boundary where it handles the value.
+
+**Regression assertions.** Save and display an ordinary figure using a temporary upload
+directory. Check that invalid storage names are handled without writing outside the upload
+root. Render a display name containing markup characters and verify that the preview shows
+literal text. The source review identified separate storage and rendering defects and
+reported seven passing regression tests on the repaired copy.
