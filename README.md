@@ -101,6 +101,20 @@ assertion, and a generalized source observation. For a compact walkthrough, open
 | [Development API origin policy](library/cases/case-a86ee97d214a4c7ba5a05d56a7e89c40/case.json) | Apply environment-specific browser origin defaults and preserve explicit settings | 2 |
 | [External tool argument boundaries](library/cases/case-ffbc48c079a64b38bc43a814a6c87632/case.json) | Keep file paths and custom options intact as individual process arguments | 2 |
 
+The guide also includes the following examples drawn from recent local reviews. Follow
+each link for applicability, regression assertions, source observations and test limitations.
+
+| Review example | Review focus |
+| --- | --- |
+| [Packet manifest source containment](library/checks/defensive-review-examples.md#packet-manifest-source-containment) | Resolve input paths within the packet and preserve ordinary output |
+| [Structural limits for agent findings](library/checks/defensive-review-examples.md#structural-limits-for-agent-findings) | Bound containers and object fields before parsing JSON |
+| [Read-only API inspection defaults](library/checks/defensive-review-examples.md#read-only-api-inspection-defaults) | Verify requests and fixture state through each inspection entry point |
+| [Uploaded figure names](library/checks/defensive-review-examples.md#uploaded-figure-names-in-storage-and-rendering) | Enforce storage containment and escape displayed names |
+| [Credentials across downloader redirects](library/checks/defensive-review-examples.md#credentials-across-downloader-redirects) | Enforce credential origin policy for each supported downloader |
+| [WebSocket serialization](library/checks/defensive-review-examples.md#serialization-after-websocket-parsing) | Keep the session server responsive when event serialization fails |
+| [Evaluation workspace ownership](library/checks/defensive-review-examples.md#evaluation-workspace-ownership) | Validate result identifiers and constrain cleanup of copied fixtures |
+| [Image embedding network addresses](library/checks/defensive-review-examples.md#network-addresses-used-by-image-embedding) | Validate resolved destinations and connect to the validated address |
+
 ## How it works
 
 1. **Search by mechanism.** The SQLite index looks for any of your query terms in case context
