@@ -1,167 +1,86 @@
 <h1><img src="assets/illustrations/sandhive-emblem.jpg" width="40" height="40" alt="SandHive" /> How Could I Be Hacked</h1>
 
-**Security checks from across GitHub for the PR you're about to ship.**
+**Security checks from across GitHub for the PR you’re about to ship.**
 
-**Bundled library · 121 investigation and review steps across 41 anonymized cases**
+Your coding agent adapts security checks from real open-source reviews to your PR diff.
+It runs them locally and shows what they covered beyond your existing tests.
 
-Search and reports run locally with Python and SQLite. **No API key required.**
+**121 investigation and review steps across 41 anonymized cases.** Local search and reports
+run with Python and SQLite. **No separate API key required.**
 
-Every day, SandHive selects recent code from public repositories across GitHub and reviews it
-with leading AI models. We turn checks and observations from that changing selection of
-projects into an anonymized library that ships with the skill.
+[**Review a PR**](#quickstart) · [**See example report**](references/example-pr-report.md)
 
-Think of it as an antivirus definition library for code review. Give your coding agent a PR
-and it can draw on security patterns seen across projects, adapt the applicable checks to your
-diff, and run them locally. Useful checks can become regression tests for your code.
+## What it adds to a PR
 
-The report shows what the library added beyond your existing tests, which risks were checked on
-the candidate commit, what needs fixing before merge, and what remains unverified.
-Use that evidence to decide whether the change is ready for production.
-
-[See an example PR report](references/example-pr-report.md) · [Review a PR](#quickstart) · [Case catalog](#case-catalog) · [Command reference](references/workflow.md)
+In ItsDangerous PR #442, a library step expanded **two text-token checks into 12 combinations**
+across serializer classes, unexpected keywords, and text and byte inputs. The reviewed code
+rejected unexpected keywords in all 12 combinations. [Read the full report](references/example-pr-report.md)
 
 ## Quickstart
 
-### Review a PR before merge
-
-Install with the [Skills CLI](https://github.com/vercel-labs/skills#install-a-skill).
+Install the PR-review version with the [Skills CLI](https://github.com/vercel-labs/skills#install-a-skill).
 
 ```sh
-npx skills add sandhiveio/How-Could-I-Be-Hacked --skill how-could-i-be-hacked
+npx skills add 'sandhiveio/How-Could-I-Be-Hacked#codex/pr-review-library-evidence' --skill how-could-i-be-hacked
 ```
 
-Open the checkout in your coding agent and provide the PR's diff base and head commits.
+Open the branch you want to review in your coding agent and paste this prompt.
 
-> Use $how-could-i-be-hacked to review the change from `<diff-base-sha>` to `<head-sha>`
-> before release. Identify the security behavior affected by the diff and run relevant local
-> checks beyond the existing suite. Explain which library steps informed those checks and
-> save the evidence privately. Include a regression test for any confirmed security defect
-> introduced by the change. Report the tested revision, fixes and tests required before merge,
-> and what still needs checking.
+> Use $how-could-i-be-hacked to review the current branch against `main` before merge.
+> Record the merge base and tested `HEAD`. Report what the library added beyond existing tests,
+> the results, any fixes or regression tests needed before merge, and what still needs checking.
 
-The report recommends **approve**, **request changes**, or **incomplete** for the tested
-revision and scope. It shows what the library added, how the checks turned out, and which
-findings the change introduced or exposed. Use it in the release review to decide what needs
-to pass before the change ships. [Example report](references/example-pr-report.md) · [Report format](references/report-format.md)
+## How it works
 
-For manual setup, copy the full repository into your agent's skills directory under
-`how-could-i-be-hacked`, or point your agent at [SKILL.md](SKILL.md).
+1. **Read the diff.** Identify the security-sensitive behavior the PR changes and record the base and head commits.
+2. **Find relevant cases.** Search the bundled library and select steps that apply to the changed behavior.
+3. **Check locally.** Adapt those steps to the PR and record what ran and what happened.
+4. **Report the results.** Show which checks the library added, what blocks merge, and what remains unchecked.
+
+SandHive uses leading AI models to review recent code selected daily from public repositories
+across GitHub. Checks and observations from those reviews become anonymized library steps.
+Newly curated steps ship in updated snapshots. Update the skill to get the latest snapshot.
+
+[Workflow diagram](assets/illustrations/investigation-workflow.svg) · [Investigation map](assets/illustrations/investigation-cover.svg)
+
+## Case catalog
+
+| Example | What the review checks |
+| --- | --- |
+| [Session revocation](library/cases/case-47e872f11dcc4421947ad049b5018bf8/case.json) | Whether existing tokens stop working after an account is disabled |
+| [Secret redaction in logs](library/cases/case-8febf1af62cd40e6ba9dfea83f4728cd/case.json) | Whether application and SDK loggers mask credentials |
+| [OIDC group membership](library/cases/case-1392ecdfbe2744d59acddd5bb54bc0d7/case.json) | Whether group membership is verified before forwarding configured groups |
+| [Upload destination containment](library/cases/case-88fc403c29eb4697adbfc2d944b682fe/case.json) | Whether uploads and direct writes stay within the allowed directory |
+| [Release artifact visibility](library/cases/case-5c4667fb970b4684ac569c5bb5a27533/case.json) | Whether shipped bundles, source maps, and provenance follow the source visibility policy |
+
+[Full case catalog](CASE-CATALOG.md) · [Published security review results](SECURITY-REVIEW-RESULTS.md)
+
+## Reference
 
 ### Review a module or repository
 
-For a broader review, give the skill a module path or the whole repository and name the
-behaviors you want assessed. The report covers the tested revision, findings, checks, and
-gaps in that scope. [Review guide](references/review.md)
-
-> Use $how-could-i-be-hacked to review this repository, focusing on how it applies its access
-> policy. Report the paths checked, applicable library examples, results, and gaps.
+Give the skill a module path or the whole repository and name the security behavior you want
+checked. The report records the revision, scope, findings, results, and gaps. [Review guide](references/review.md)
 
 ### Search the library directly
 
-Run the search from a local copy of this repository.
+Run from the skill directory with Python 3.10+ and SQLite FTS5.
 
 ```sh
 python scripts/corpus.py search --library library --query "credential masking formatter" --limit 5
 ```
 
-This search surfaces hypotheses from the log redaction case, with the context and historical
-evaluation for each match. The local tools require **Python 3.10+ with SQLite FTS5** and use the
-Python standard library. On Windows you can also run them in WSL.
+### CLI and report format
 
-## Case catalog
+Use `python scripts/toolkit.py stats` to check the installed snapshot or
+`python scripts/toolkit.py verify` to check its integrity.
+[Command reference](references/workflow.md) · [Report format](references/report-format.md) · [Library format](library/README.md)
 
-Each link opens the anonymized case context. The last column counts the recorded investigation
-steps. You can inspect their evidence and decisions with the [trajectory command](references/workflow.md).
+For manual setup, copy the full repository into your agent’s skills directory under
+`how-could-i-be-hacked`, or point your agent at [SKILL.md](SKILL.md).
 
-| Case | Review focus | Steps |
-| --- | --- | ---: |
-| [SQL injection in EXPLAIN options](library/cases/case-00bfea1eea0547a49214fd10f10b0e46/case.json) | Validation of database-specific query options | 2 |
-| [Outbound request destination](library/cases/case-4871606bc3624b0e83ffa3f6e7c95ec6/case.json) | Origin enforcement when an HTTP client resolves a request path | 4 |
-| [HTTP credentials on redirects](library/cases/case-9f9094d375ad4f4198e6a3c43257d3a5/case.json) | Credential handling across origin and protocol changes | 5 |
-| [Proxy credentials on HTTP redirects](library/cases/case-5a760d5425434351b506692f92a6ae08/case.json) | Proxy credential isolation across redirect hops | 4 |
-| [HTTP request smuggling](library/cases/case-12b764f81331452fad88878ec0ab915b/case.json) | Validation of HTTP/1.1 chunk boundaries | 4 |
-| [Static-file path traversal](library/cases/case-702a9739c1f34802a415de3b9fdc7a19/case.json) | Filesystem containment in a static-file handler | 3 |
-| [Cookie parser denial of service](library/cases/case-a15710c157ac4ca08718fbbe62bf3464/case.json) | Parsing time for malformed cookie headers | 4 |
-| [CSRF token validation](library/cases/case-848c1c44088843f38fba5e0a8b3d1514/case.json) | Token generation and validation across memory and session stores | 2 |
-| [JWT algorithm confusion](library/cases/case-a5bb55a6d823483091324c515e32ed48/case.json) | Compatibility checks between verification algorithms and key types | 4 |
-| [Streaming RPC authentication](library/cases/case-065db678c4664fbc8b35adc66a7264e0/case.json) | Consistent authentication on unary and streaming requests | 2 |
-| [Authorization cache correctness](library/cases/case-9fc62583c0044d909212d96b60979f7c/case.json) | Cache behavior in recursive permission checks | 4 |
-| [Session revocation](library/cases/case-47e872f11dcc4421947ad049b5018bf8/case.json) | Handling of existing session tokens after an account is disabled | 4 |
-| [Template autoescaping](library/cases/case-352c68ac2de543b09a2ff81f8c6e1b97/case.json) | Escaping of user data in templates and layouts | 4 |
-| [URI validation in HTML sanitizers](library/cases/case-37ac0f7032f142dcb0e40f0734eeca65/case.json) | Scheme validation for HTML attributes | 4 |
-| [Prototype pollution](library/cases/case-9eff46a29dde40eeb42ac3908df4cf0f/case.json) | Property-path validation in a JavaScript setter | 2 |
-| [Secret redaction in logs](library/cases/case-8febf1af62cd40e6ba9dfea83f4728cd/case.json) | Credential masking across application and SDK loggers | 4 |
-| [Git clone option validation](library/cases/case-948d24148ef34a42bb237bacab065fdb/case.json) | Validation of arguments passed from a library to Git | 4 |
-| [Signed YAML templates](library/cases/case-4c1b4593177d4f3289377f152128add4/case.json) | Agreement between signature verification and template parsing | 2 |
-| [Pseudonyms across linked tables](library/cases/case-21af815d7a4e4c8991c6286eb15deff9/case.json) | Consistent pseudonyms across related CSVs and historical records under a memory limit | 4 |
-| [Prompt injection in payment workflows](library/cases/case-aa4888d8314d483498a59f9167f749c5/case.json) | Transfer authorization when an assistant reads a bill | 2 |
-| [Prompt injection in travel booking](library/cases/case-3204b3a58c41492e824878008054e084/case.json) | Reservation scope when an assistant reads hotel reviews | 3 |
-| [Prompt injection in calendar workflows](library/cases/case-7e8b17932d2b4018ae2513dd56b953c4/case.json) | Calendar edit scope when an assistant reads event descriptions | 2 |
-| [Prompt injection in messaging workflows](library/cases/case-fce6af02155649cfb97771c91053dd0b/case.json) | Message-send authorization when an assistant reads a webpage | 2 |
-
-### Defensive review examples
-
-These indexed cases include independent steps with a security invariant, a regression
-assertion, and a generalized source observation. For a compact walkthrough, open the
-[defensive review guide](library/checks/defensive-review-examples.md).
-
-| Case | Review focus | Steps |
-| --- | --- | ---: |
-| [OIDC client-secret redaction](library/cases/case-04fad4b46561488bbf37094f98092b45/case.json) | Mask provider secrets in copies used by logs and management responses | 2 |
-| [OIDC group membership](library/cases/case-1392ecdfbe2744d59acddd5bb54bc0d7/case.json) | Require verified membership before forwarding configured groups | 2 |
-| [List query fields and sorting](library/cases/case-5186db661bde48a4b7b6e120c220807e/case.json) | Validate filter and sort fields and preserve bound values | 4 |
-| [Release artifact visibility](library/cases/case-5c4667fb970b4684ac569c5bb5a27533/case.json) | Apply source policy to shipped bundles, maps, and provenance | 4 |
-| [Upload destination containment](library/cases/case-88fc403c29eb4697adbfc2d944b682fe/case.json) | Enforce containment across framework uploads and direct writes | 4 |
-| [Outbound discovery requests](library/cases/case-ae1bcf4332314a34bb6b744ce76ce790/case.json) | Enforce destination policy and deadlines across redirects | 2 |
-| [Account-level sign-in limits](library/cases/case-c8fc66ccf2d440e3be2947fa8e645302/case.json) | Share the failed-sign-in budget across supported account identifiers | 2 |
-| [Archive extraction containment](library/cases/case-ce0f488a2ad64314a3eccd04cf2d7e9c/case.json) | Confine writes and link operations to the extraction root | 4 |
-| [Transcoder process arguments](library/cases/case-e09ae020c2784f2daff359ad12e026bd/case.json) | Preserve argument boundaries and documented wrapper behavior | 2 |
-| [Authorization model changes](library/cases/case-f2edf20fff384048b52a38a3e0543577/case.json) | Evaluate stored relationships under the selected model | 4 |
-| [Command guardrail policy](library/cases/case-39aef9b172ae403da6e796a4b755c352/case.json) | Classify version-control operations by parsed command and arguments | 2 |
-| [API key scope and expiry](library/cases/case-9f116dc1f30c4596bf3fdd822a0ea1fc/case.json) | Require recognized write scope and check expiry when binding a key | 2 |
-| [Tool session state isolation](library/cases/case-91c305520511418684a92f3ecdd93b40/case.json) | Keep default event identifiers, parent links, and resets session-scoped | 2 |
-| [HTML filter parsing boundaries](library/cases/case-a44f1591d7e8488985a2059af25b4914/case.json) | Preserve benign markup and enforce element and attribute policy at parser boundaries | 2 |
-| [Retention policy enforcement](library/cases/case-fa5eb743793f4657956df0b70f12ec9e/case.json) | Apply current retention settings before deleting records | 2 |
-| [Import deduplication integrity](library/cases/case-e523aee460254c2d8137fcb125a78e6c/case.json) | Separate system-managed deduplication from ordinary writes | 2 |
-| [Development API origin policy](library/cases/case-a86ee97d214a4c7ba5a05d56a7e89c40/case.json) | Apply environment-specific browser origin defaults and preserve explicit settings | 2 |
-| [External tool argument boundaries](library/cases/case-ffbc48c079a64b38bc43a814a6c87632/case.json) | Keep file paths and custom options intact as individual process arguments | 2 |
-
-## How it works
-
-1. **Scope the change.** Pin the diff base and head. Identify the affected behavior and follow
-   it into the relevant callers and tests.
-2. **Find applicable steps.** Search for that behavior in the bundled library. Check each
-   candidate's prerequisites against the current code and read its original observation.
-3. **Run additional checks.** Adapt useful assertions and controls to this PR. Record what ran,
-   what happened, and which checks still need evidence.
-4. **Report the decision.** Show blockers and required regressions, or explain the evidence for
-   accepting the change within scope. Link the library steps to checks and observed results.
-
-[![Security review workflow from library search to regression tests.](assets/illustrations/investigation-workflow.svg)](assets/illustrations/investigation-workflow.svg)
-
-[View the branching investigation map](assets/illustrations/investigation-cover.svg).
-
-## Library and tools
-
-```sh
-python scripts/toolkit.py stats
-python scripts/toolkit.py verify
-python scripts/test_toolkit.py
-```
-
-`stats` reports the contents of the installed snapshot. `verify` checks artifact hashes and SQLite
-integrity. See the [library format](library/README.md), [command reference](references/workflow.md),
-and [offline iteration protocol](references/iteration.md) for trajectory inspection and private
-assessment validation. The [security review results](SECURITY-REVIEW-RESULTS.md) describe
-earlier library work.
-Maintainers can check publication coverage with the [case audit](references/workflow.md#publication-audit).
-
-The [public corpus and its original examples](library/LICENSE) are available under the MIT License.
-The snapshot contains anonymized artifacts. Raw runs and private case mappings stay with the
-producer.
+[Offline iteration protocol](references/iteration.md) · [Library publication audit](references/workflow.md#publication-audit) · [MIT License for corpus materials](library/LICENSE)
 
 ## Contact
 
-- [SandHive on GitHub](https://github.com/sandhiveio)
-- [SandHive website](https://sandhive.io)
-- [@sandhive on Telegram](https://t.me/sandhive)
+[SandHive on GitHub](https://github.com/sandhiveio) · [SandHive website](https://sandhive.io) · [@sandhive on Telegram](https://t.me/sandhive)
