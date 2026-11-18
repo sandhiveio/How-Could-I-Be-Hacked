@@ -11,11 +11,11 @@
   },
   "review": {
     "invariant": "Published provenance paths are relative and client maps expose approved public sources.",
-    "verification": "Build the fixture and smoke-test the expected client and server outputs. Check emitted manifest references against the release inventory."
+    "verification": "Apply this check to changes that affect how a release builds or filters bundles, source maps, or provenance. Build a disposable fixture twice. Compare the emitted file hashes, assert the expected client and server output, and check that every manifest artifact reference is relative and resolves to a shipped file. Verify that source maps and provenance contain only approved source paths and that the final inventory contains no synthetic private marker."
   },
   "source_observation": {
     "outcome": "supported",
-    "summary": "Local acceptance checks passed after restricting public provenance and changing the artifact build."
+    "summary": "After the release changes, two local builds produced identical artifact hashes. Both entry points kept their expected public output and the diagnostic trace still resolved to an approved source. Manifest artifact references were relative and resolved to emitted files, provenance listed only approved sources, and the inventory scan found no synthetic private marker. These checks covered the local release fixture."
   },
   "lineage": {
     "case_id": "case-5c4667fb970b4684ac569c5bb5a27533",
