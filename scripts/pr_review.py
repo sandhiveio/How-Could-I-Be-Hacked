@@ -56,6 +56,10 @@ def validate_contract(doc, parent):
     criteria = records(contract.get("criteria"), "criteria")
     for criterion in criteria.values():
         text(criterion.get("description"), "criterion.description")
+        if "risk" in criterion:
+            text(criterion["risk"], "criterion.risk")
+        if "code_locations" in criterion:
+            string_array(criterion["code_locations"], "criterion.code_locations", nonempty=True)
         references(criterion.get("check_ids"), checks, "criterion.check_ids")
         if type(criterion.get("required")) is not bool:
             raise ValueError("criterion.required must be a boolean")
@@ -63,6 +67,13 @@ def validate_contract(doc, parent):
     for finding in findings.values():
         for key in ("title", "impact", "recommendation", "reason"):
             text(finding.get(key), "finding." + key)
+        if finding.get("kind", "security") not in {"security", "functional"}:
+            raise ValueError("finding.kind must be security or functional")
+        for key in ("preconditions", "reproduction", "severity_reason"):
+            if key in finding:
+                text(finding[key], "finding." + key)
+        if "code_locations" in finding:
+            string_array(finding["code_locations"], "finding.code_locations", nonempty=True)
         if finding.get("severity") not in {"critical", "high", "medium", "low"}:
             raise ValueError("Invalid finding severity")
         if finding.get("change_relation") not in RELATIONS:
@@ -180,6 +191,7 @@ def criterion_results(contract, checks):
         elif current and all(check["result"] == "pass" for check in current):
             status = "pass"
         results.append({"id": criterion["id"], "description": criterion["description"],
+                        **{key: criterion[key] for key in ("risk", "code_locations") if key in criterion},
                         "required": criterion["required"], "status": status, "checks": current})
     return results
 
@@ -193,7 +205,7 @@ def library_contribution(doc, sources, decisions):
     informed = []
     for finding in doc.get("merge_review", scaffold())["findings"]:
         relevant = [identity for identity in finding["check_ids"] if identity in failed]
-        if finding["change_relation"] in NEW_RELATIONS and relevant:
+        if finding.get("kind", "security") == "security" and finding["change_relation"] in NEW_RELATIONS and relevant:
             informed.append({"id": finding["id"], "title": finding["title"], "check_ids": relevant,
                              "source_ids": sorted({identity for check_id in relevant for identity in failed[check_id]["source_ids"]})})
     traces = []

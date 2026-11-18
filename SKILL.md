@@ -99,10 +99,13 @@ its actual evidence and selected sources establish that link. State measured com
 when claiming time saved or detection improvement. Tie the conclusion to each required
 criterion's result and the evidence that supports it.
 Keep the Markdown summary compact. Put the decision first and library contribution directly
-below it, then show each checked hypothesis once with its method and observed result. Write
-the value assessment and decision rationale concisely. Link detailed source history, controls,
-commands, and evidence through the assessment and search receipts. The JSON report retains
-the full trace for inspection.
+below it using the [report format](references/report-format.md). Explain the actual added
+coverage before listing retrieval counts. Show each checked invariant or hypothesis once,
+with its location, check, observed result, and evidence. Keep confirmed security findings and
+functional observations visibly identified. Give each finding sufficient conditions,
+reproduction, impact, severity or priority rationale, correction, and change attribution.
+Keep the complete source trace and commands in the evidence detail or JSON. Prepare shared
+reports with pinned source links and portable evidence paths as described in the format.
 Recommend acceptance for the reviewed scope and revision after the required checks and tests
 pass and the library has informed an additional executed check. Explain an inconclusive run
 or an applicability gap with the evidence needed to finish it.

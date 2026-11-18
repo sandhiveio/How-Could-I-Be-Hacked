@@ -110,7 +110,7 @@ class ReviewAssessmentTests(unittest.TestCase):
         self.assertEqual(report["checks"][0]["evidence"], check["evidence"])
         self.assertIn("assessment JSON", rendered)
         self.assertIn(check["evidence"][0]["interpretation"], rendered)
-        self.assertIn((self.root / "combined.txt").resolve().as_posix(), rendered)
+        self.assertIn("(<combined.txt>)", rendered)
         self.assertIn(self.base, rendered)
 
     def test_no_hits_and_local_analysis_are_valid(self):
@@ -193,6 +193,16 @@ class ReviewAssessmentTests(unittest.TestCase):
                                                      "interpretation": "Fixture"}]}]}
         self.save(doc)
         self.assertTrue(validate_assessment(self.path)["ok"])
+
+    def test_reproduction_guide_is_linked_and_hash_checked(self):
+        self.ready()
+        guide = self.root / "REPRODUCE.md"
+        guide.write_text("Replay immutable fixture outputs in a fresh directory.", encoding="utf-8")
+        self.doc["review"]["reproduction_guide"] = {"artifact": guide.name, "sha256": review.digest(guide)}
+        self.save()
+        self.assertIn("(<REPRODUCE.md>)", review.markdown(review.report(self.path)))
+        guide.write_text("Changed setup instructions", encoding="utf-8")
+        self.assertFalse(validate_assessment(self.path)["ok"])
 
     def test_normal_cli_entry_points_and_malformed_records(self):
         tool = Path(__file__).with_name("toolkit.py")

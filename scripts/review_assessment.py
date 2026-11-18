@@ -1,6 +1,7 @@
 """Record offline retrieval and report evidence-backed use in a private review."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import uuid
@@ -190,6 +191,9 @@ def validated(path):
         raise ValueError("review.mode must be repository or pr")
     for key in ("diff_base", "head", "build_id"):
         text(review.get(key), "review." + key, empty=True)
+    if "reproduction_guide" in review:
+        guide = object_value(review["reproduction_guide"], "review.reproduction_guide")
+        checked_artifact(guide, "artifact", path.parent, "reproduction guide")
     revision = text(review.get("tested_revision"), "review.tested_revision")
     if review["mode"] == "pr":
         for key in ("diff_base", "head", "tested_revision"):
@@ -307,7 +311,12 @@ def markdown(result):
         return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\r", " ").replace("\n", " ")
 
     def artifact_link(name, label=None):
-        target = (Path(result["assessment_file"]).parent / name).resolve().as_posix()
+        parent = Path(result["assessment_file"]).parent
+        absolute = (parent / name).resolve()
+        try:
+            target = Path(os.path.relpath(absolute, parent)).as_posix()
+        except ValueError:  # Separate Windows drives cannot form a relative path.
+            target = absolute.as_posix()
         display = cell(label or Path(name).name).replace("[", "\\[").replace("]", "\\]")
         return f"[{display}](<{target}>)"
 
@@ -315,24 +324,27 @@ def markdown(result):
     counts = result["counts"]
     recommendation = result["recommendation"]
     contribution = result["library_contribution"]
+    source_labels = {source["source_id"]: "S" + str(ordinal)
+                     for ordinal, source in enumerate(contribution["source_uses"], 1)}
     summary = contribution["summary"]
     inventory = result["library"]["inventory"]
-    labels = {"approve": "PR can be accepted within the reviewed scope",
+    labels = {"approve": "No merge blockers identified in the performed checks. Acceptance recommended within the reviewed scope",
               "request_changes": "Changes required before accepting the PR",
               "incomplete": "Review incomplete", "not_applicable": "Repository or module review"}
     lines = ["# Security review", "", "**" + labels[recommendation["status"]] + "**", "",
              "Tested revision — " + cell(review["tested_revision"]), "",
-             "## How the library contributed", "",
-             f"Library — {inventory['steps']} steps, {inventory['search_entries']} entries. Searches — {counts['searches']}.", "",
+             "Scope — " + cell(result["scope"]), "", "## How the library contributed", ""]
+    if contribution["reviewer_assessment"]:
+        lines += [cell(contribution["reviewer_assessment"]), ""]
+    lines += [f"Additional library-derived checks — {summary['additional_executed_checks']} executed, "
+              f"{summary['additional_passed_checks']} passed. New security findings informed — {summary['new_findings_informed']}.", "",
              "Unique entries / steps — " + ", ".join(
                  f"{stage} {counts[stage + '_entries']}/{counts[stage + '_steps']}"
                  for stage in ("retrieved", "considered", "selected", "used")) + ".", "",
-             f"Additional library-derived checks — {summary['additional_executed_checks']} executed, "
-             f"{summary['additional_passed_checks']} passed. New findings informed — {summary['new_findings_informed']}.", ""]
-    if contribution["reviewer_assessment"]:
-        lines += [cell(contribution["reviewer_assessment"]), ""]
+             f"Snapshot inventory — {inventory['steps']} steps, {inventory['search_entries']} entries. Searches — {counts['searches']}. "
+             "Retrieval counts do not measure security coverage.", ""]
     lines += ["## Checked hypotheses", "",
-              "| Hypothesis | Library contribution | How checked | Observed result / evidence |",
+              "| Risk / hypothesis / location | Library contribution | How checked | Observed result / evidence |",
               "| --- | --- | --- | --- |"]
     for check in result["checks"]:
         if check["origin"] == "local_analysis":
@@ -346,9 +358,17 @@ def markdown(result):
         if not explanation:
             explanation = " ".join(entry["interpretation"] for entry in check["evidence"])
         links = " ".join(artifact_link(entry["output_artifact"]) for entry in check["evidence"])
-        values = (check["id"] + " — " + check["hypothesis"], added, check["test"])
+        risks = list(dict.fromkeys(criterion["risk"] for criterion in result["merge_review"]["criteria"]
+                                  if check["id"] in criterion["check_ids"] and criterion.get("risk")))
+        subject = check["id"] + " — " + check["hypothesis"]
+        if risks:
+            subject += " Risk: " + " ".join(risks)
+        subject += " Location: " + ", ".join(check["code_locations"])
+        source_links = " ".join(artifact_link(result["assessment_file"], source_labels[identity])
+                                for identity in check["source_ids"])
+        contribution_cell = ((source_links + " — ") if source_links else "") + cell(added)
         outcome = cell(status + ". " + explanation)
-        lines.append("| " + " | ".join(cell(value) for value in values) + f" | {outcome} {links} |")
+        lines.append(f"| {cell(subject)} | {contribution_cell} | {cell(check['test'])} | {outcome} {links} |")
     lines += ["", "## Basis for the recommendation", ""]
     rationale = result["merge_review"]["rationale"]
     if rationale:
@@ -358,14 +378,35 @@ def markdown(result):
     for criterion in result["criterion_results"]:
         if not criterion["required"]:
             lines += ["- Optional scope — " + cell(criterion["description"]) + f" ({criterion['status']})."]
-    if result["merge_review"]["findings"]:
-        lines += ["", "## Findings and required fixes", "",
-                  "| Finding / impact | Relation | Required action | Checks |",
-                  "| --- | --- | --- | --- |"]
-        for finding in result["merge_review"]["findings"]:
-            values = (finding["severity"] + " — " + finding["title"] + ". " + finding["impact"],
-                      finding["change_relation"], finding["recommendation"], ", ".join(finding["check_ids"]))
-            lines.append("| " + " | ".join(cell(value) for value in values) + " |")
+    findings = result["merge_review"]["findings"]
+    checks_by_id = {check["id"]: check for check in result["checks"]}
+    for kind, heading in (("security", "Security findings"), ("functional", "Functional observations")):
+        group = [finding for finding in findings if finding.get("kind", "security") == kind]
+        if not group:
+            if kind == "security":
+                lines += ["", "No confirmed security vulnerabilities were identified in the performed checks."]
+            continue
+        lines += ["", "## " + heading, ""]
+        for finding in group:
+            related = [checks_by_id[identity] for identity in finding["check_ids"]]
+            locations = finding.get("code_locations") or list(dict.fromkeys(
+                location for check in related for location in check["code_locations"]))
+            rank = ("severity " if kind == "security" else "priority ") + finding["severity"]
+            reproduction = finding.get("reproduction") or " ".join(check["test"] for check in related)
+            links = list(dict.fromkeys(artifact_link(entry["output_artifact"])
+                                      for check in related for entry in check["evidence"]))
+            lines += ["### " + cell(finding["id"] + " — " + finding["title"]), "",
+                      "- Classification: " + cell(rank + "; " + finding["change_relation"]) + ".",
+                      "- Location: " + cell(", ".join(locations)) + "."]
+            if finding.get("preconditions"):
+                lines += ["- Conditions: " + cell(finding["preconditions"])]
+            lines += ["- Impact: " + cell(finding["impact"]),
+                      "- Reproduce: " + cell(reproduction),
+                      "- Rating basis: " + cell(finding.get("severity_reason", "Not recorded separately; see impact and evidence.")),
+                      "- Action: " + cell(finding["recommendation"]),
+                      "- Merge disposition: " + cell(finding["reason"]),
+                      "- Evidence: " + cell(", ".join(finding["check_ids"])) + ". " + " ".join(links),
+                      "- State: reproduced on the reviewed revision; no repaired revision is assessed by this report.", ""]
     tests = result["merge_review"]["required_tests"]
     if tests or result["missing_regression_tests"]:
         lines += ["", "## Required regression tests", "",
@@ -386,11 +427,19 @@ def markdown(result):
     if result["gaps"]:
         lines += ["", "## Review limits", ""]
         lines += ["- " + cell(gap) for gap in result["gaps"]]
-    lines += ["", "## Scope and evidence", "", cell(result["scope"]), "",
+    lines += ["", "## Revision and evidence", "",
               f"Diff base — {cell(review['diff_base']) or 'unspecified'}. Reviewed head — {cell(review['head']) or 'unspecified'}.", "",
               "Build — " + cell(review["build_id"] or "unspecified") + ".", "",
               "Full hypotheses, source decisions, controls, commands and evidence — "
               + artifact_link(result["assessment_file"], "assessment JSON") + ".", ""]
+    if review.get("reproduction_guide"):
+        lines += ["Reproduction and evidence replay — " + artifact_link(review["reproduction_guide"]["artifact"]) + ".", ""]
+    if source_labels:
+        lines += ["Library source key (details in assessment JSON):", ""]
+        lines += ["- " + cell(source_labels[source["source_id"]] + " — " + source["title"])
+                  + ". Source ID: `" + cell(source["source_id"]) + "`."
+                  for source in contribution["source_uses"]]
+        lines += [""]
     if result["searches"]:
         lines += ["Search receipts — " + ", ".join(
             artifact_link(entry["result_artifact"], entry["query"] or entry["mechanism"])

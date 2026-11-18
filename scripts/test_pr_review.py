@@ -1,5 +1,9 @@
 """Behavioral checks for scoped merge decisions and persisted regression requirements."""
 import copy
+from pathlib import Path
+import re
+import shutil
+import tempfile
 import unittest
 
 import review_assessment as review
@@ -51,7 +55,7 @@ class PRReviewTests(unittest.TestCase):
         self.assertEqual(report["recommendation"]["status"], "approve")
         self.assertEqual(report["finding_counts"]["introduced"], 0)
         markdown = review.markdown(report)
-        self.assertIn("PR can be accepted within the reviewed scope", markdown)
+        self.assertIn("Acceptance recommended within the reviewed scope", markdown)
         self.assertIn("Additional library-derived checks", markdown)
         self.assertIn(self.doc["checks"][0]["coverage_delta"], markdown)
         self.assertIn("test_regression.py", markdown)
@@ -283,6 +287,61 @@ class PRReviewTests(unittest.TestCase):
                     finding = self.finding()
                     check["result"] = "pass"
                     self.doc["merge_review"]["findings"] = [finding]
+                self.save()
+                self.assertFalse(validate_assessment(self.path)["ok"])
+
+    def test_report_retains_risk_finding_context_and_portable_evidence(self):
+        criterion = self.doc["merge_review"]["criteria"][0]
+        criterion.update(risk="A sibling actor could cross the changed restriction.",
+                         code_locations=["fixture.py:1"])
+        finding = self.finding()
+        finding.update(kind="security", preconditions="A sibling actor controls the synthetic object identifier.",
+                       reproduction="Run the persisted sibling-denial fixture on this revision.",
+                       severity_reason="The fixture demonstrates a cross-actor restriction failure.",
+                       code_locations=["fixture.py:1"])
+        self.doc["merge_review"]["findings"] = [finding]
+        self.doc["merge_review"]["required_tests"][0].update(status="added", finding_ids=[finding["id"]])
+        result = self.decision()
+        self.assertEqual(result["criterion_results"][0]["risk"], criterion["risk"])
+        rendered = review.markdown(result)
+        for value in (criterion["risk"], *finding["code_locations"], finding["preconditions"],
+                      finding["reproduction"], finding["severity_reason"]):
+            self.assertIn(value, rendered)
+        links = re.findall(r"\]\(<([^>]+)>\)", rendered)
+        self.assertTrue(links)
+        self.assertTrue(all(not Path(link).is_absolute() for link in links))
+        with tempfile.TemporaryDirectory() as destination:
+            moved = Path(destination) / "review"
+            shutil.copytree(self.root, moved)
+            for link in links:
+                self.assertEqual((moved / link).read_bytes(), (self.root / link).read_bytes())
+
+    def test_functional_finding_is_separate_without_losing_merge_block(self):
+        finding = self.finding()
+        finding["kind"] = "functional"
+        self.doc["merge_review"]["findings"] = [finding]
+        self.doc["merge_review"]["required_tests"][0].update(status="added", finding_ids=[finding["id"]])
+        result = self.decision()
+        self.assertEqual(result["recommendation"]["status"], "request_changes")
+        self.assertEqual(result["library_contribution"]["summary"]["new_findings_informed"], 0)
+        rendered = review.markdown(result)
+        self.assertIn("Functional observations", rendered)
+        self.assertIn("priority high", rendered)
+        self.assertNotIn("## Security findings", rendered)
+        finding["kind"] = "security"
+        self.assertEqual(self.decision()["library_contribution"]["summary"]["new_findings_informed"], 1)
+
+    def test_invalid_optional_risk_and_finding_context_is_rejected(self):
+        self.doc["merge_review"]["findings"] = [self.finding()]
+        self.doc["merge_review"]["required_tests"][0].update(status="added", finding_ids=["F1"])
+        original = copy.deepcopy(self.doc)
+        for section, key, bad in (("criteria", "risk", ""), ("criteria", "code_locations", []),
+                                  ("findings", "kind", "unknown"), ("findings", "preconditions", []),
+                                  ("findings", "reproduction", ""), ("findings", "severity_reason", 1),
+                                  ("findings", "code_locations", [""])):
+            with self.subTest(section=section, key=key):
+                self.doc = copy.deepcopy(original)
+                self.doc["merge_review"][section][0][key] = bad
                 self.save()
                 self.assertFalse(validate_assessment(self.path)["ok"])
 

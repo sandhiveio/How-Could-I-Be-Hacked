@@ -46,6 +46,9 @@ required fixes/tests and additional verified behavior. The [decision contract](r
 ties acceptance to the reviewed revision, completed criteria, and actual additional use of
 the library. Findings include whether the PR introduced or exposed the problem or it predates
 the change.
+The compact [report format](references/report-format.md) puts the scoped decision and actual
+library contribution first, then risk-linked checks, security findings or functional
+observations, required tests, and limits. Shared reports use portable evidence links.
 The report explains each selected source's original hypothesis, why it applies, what new
 assertion it contributed, the actual result, and how that result supports the PR decision.
 It distinguishes added test coverage, library-informed findings, and the reviewer's

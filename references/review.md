@@ -5,6 +5,8 @@ search/evidence artifacts in a private directory outside the installed skill. Co
 run from the skill directory. The agent inspects code and runs the target's normal local tools.
 PR reviews also use the [merge recommendation contract](pr-decision.md) to record required
 checks, confirmed defects, persistent regression tests, and a decision tied to this revision.
+Use the canonical [report format](report-format.md) when turning these records into a
+compact review for the developer or decision-maker.
 
 ## Establish the review scope
 
@@ -22,6 +24,11 @@ can have a different revision from the PR head. Record its build identity in `re
 when available. Updated PR commits require a new assessment of the affected checks. Preserve
 the earlier assessment and its evidence under their original revision. Separate evidence for
 different tested revisions into separate assessments.
+
+For a portable rerun recipe, optionally set `review.reproduction_guide` to
+`{"artifact": "REPRODUCE.md", "sha256": "<SHA-256 of the saved guide>"}`. The report validates
+and links this file. Include relative setup/commands and explain whether they replay saved
+results or rerun target checks. Run in a fresh directory rather than overwriting hashed evidence.
 
 ```sh
 python scripts/toolkit.py init-assessment --target /path/to/repo --out /private/review.json
@@ -115,8 +122,10 @@ python scripts/toolkit.py report-assessment --file /private/pr-review.json --for
 The report derives counts from the journal and links sources, applicability, adaptations,
 commands, and current results. Count both unique search entries and unique steps. A normal
 investigation step may have several indexed candidate hypotheses, so these totals can differ.
-For PRs, the recommendation, required fixes/tests, and additional checked behavior lead the
-report. Record `check.result` and `result_reason` for each decision-relevant check. Hypothesis
+For PRs, lead with the recommendation and pinned scope, followed immediately by the library's
+actual coverage contribution before retrieval metrics. The [report format](report-format.md)
+defines the compact checked-behavior table, finding detail, required tests, and evidence
+appendix. Record `check.result` and `result_reason` for each decision-relevant check. Hypothesis
 status describes what the experiment supports. A supported hypothesis about a defect can
 have a failing safety result. See [pr-decision.md](pr-decision.md) for the exact added fields.
 
@@ -140,3 +149,9 @@ Validation checks structure, references, hashes, evidence files, and revision co
 The agent evaluates whether the recorded commands and observations support the conclusions.
 Schema 1 assessments remain readable by `validate-assessment`. New journal/report commands
 use schema 2. The anonymous library continues to use its own corpus format.
+
+Keep the Markdown report beside its assessment so relative artifact links resolve. For an
+external delivery, bundle the linked evidence with those relative paths and provide pinned
+repository URLs or repository-relative code locations. JSON can retain private absolute
+paths, so prepare a reviewed delivery copy when sharing it. Preserve the hashed original
+evidence and apply redaction to a separate delivery copy with its own manifest.

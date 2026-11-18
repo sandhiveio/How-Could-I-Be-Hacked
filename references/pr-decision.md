@@ -67,6 +67,12 @@ these criteria so their relevance to the recommendation stays visible.
 }
 ```
 
+Optional criterion fields are `risk`, a nonempty description of the consequence being
+examined, and `code_locations`, a nonempty array of locations on the reviewed revision.
+Existing assessments can describe that risk in `description` and use their checks' code
+locations. The report can cite check IDs from a criterion to keep the current hypothesis in
+one place.
+
 Record a confirmed security finding with the following fields.
 
 ```json
@@ -90,6 +96,19 @@ evidence separately from current-head evidence. Use `unclear` when attribution i
 Confirmed new findings and findings marked `must_fix` require current executed fail-result
 evidence. An unrelated pre-existing finding can be recorded with `must_fix: false` and its
 reason, while the review evaluates the current change's required guarantees.
+
+Optional finding fields are `kind` (`security` or `functional`), `preconditions`,
+`reproduction`, `severity_reason`, and `code_locations`. The three explanatory fields use
+nonempty strings when present, and locations use a nonempty string array. Older records
+default to `kind: "security"` and can supply the explanation through their existing
+`impact`, `reason`, and referenced checks' `test` and `code_locations` fields.
+
+For a security finding, explain the actor's required access, the failing boundary, the
+smallest repeatable check, expected and observed behavior, and the impact supporting its
+severity. Functional findings use the same `severity` field as a displayed priority. Keep
+them identifiable in the report and attribute them to the change with the same evidence
+standard. Introduced/exposed findings and `must_fix` findings request changes for either
+kind. The library-informed new security-finding count includes security-kind findings.
 
 Add required regression tests using these fields. The example is an incomplete planned test.
 
@@ -116,11 +135,12 @@ missing regression requirement when a confirmed new or must-fix finding has no l
 ## Recommendation
 
 Run the normal validation and report commands. The report derives the recommendation from
-the saved records. The compact Markdown report puts the decision first, then library value
-and usage, checked hypotheses, decision rationale, findings, and required tests. Show each
-hypothesis once with its method, observed result, and evidence link. Keep `rationale` and
-`library_value` to a short paragraph each. Full source hypotheses, applicability decisions,
-history, controls, and commands are available in the JSON report and saved assessment/receipts.
+the saved records. Follow the canonical [report format](report-format.md). Put the scoped
+decision first, then the library's concrete coverage delta before corpus metrics. Show each
+checked invariant or hypothesis once with its location, method, observed result, and evidence.
+Keep `rationale` and `library_value` to a short paragraph each. Full source hypotheses,
+applicability decisions, history, controls, and commands remain in the evidence detail,
+JSON report, and saved assessment/receipts.
 
 For every selected source, the report traces its readable title and original hypothesis,
 the applicability decision, the adapted current hypothesis, the extra assertion, test,
@@ -145,6 +165,11 @@ Describe acceptance as a recommendation for the reviewed scope and revision. Lis
 what was additionally checked, how, which source helped, and the observed result. Describe
 coverage outside that scope in `gaps`. A confirmed blocker takes precedence over incomplete
 verification, so the report can request its repair while showing the remaining checks.
+
+When a fixing revision becomes available, assess that exact revision separately and link its
+reproducer and legitimate-control results to the original finding. Describe the original
+finding as open until repair and retest evidence supports closing it. An authored repair or a
+planned test alone supplies a next action. Use the pinned retest result to describe resolution.
 
 Older schema 2 PR assessments remain readable. Add and evaluate this contract to obtain a
 merge recommendation. Repository/module assessments report their checks without a PR merge
