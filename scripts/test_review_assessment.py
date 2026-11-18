@@ -103,9 +103,12 @@ class ReviewAssessmentTests(unittest.TestCase):
         self.assertIn("historical_observation", report["sources"][0])
         rendered = review.markdown(report)
         check = self.doc["checks"][0]
-        for field in ("hypothesis", "test", "expected", "falsifier", "control"):
+        for field in ("hypothesis", "test"):
             self.assertIn(check[field], rendered)
-        self.assertIn(check["evidence"][0]["command"], rendered)
+        for field in ("expected", "falsifier", "control"):
+            self.assertEqual(report["checks"][0][field], check[field])
+        self.assertEqual(report["checks"][0]["evidence"], check["evidence"])
+        self.assertIn("assessment JSON", rendered)
         self.assertIn(check["evidence"][0]["interpretation"], rendered)
         self.assertIn((self.root / "combined.txt").resolve().as_posix(), rendered)
         self.assertIn(self.base, rendered)

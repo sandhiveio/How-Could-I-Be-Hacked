@@ -116,8 +116,11 @@ missing regression requirement when a confirmed new or must-fix finding has no l
 ## Recommendation
 
 Run the normal validation and report commands. The report derives the recommendation from
-the saved records and leads with the reasons, findings, required tests, and extra verified
-behavior. Usage counts and detailed evidence follow.
+the saved records. The compact Markdown report puts the decision first, then library value
+and usage, checked hypotheses, decision rationale, findings, and required tests. Show each
+hypothesis once with its method, observed result, and evidence link. Keep `rationale` and
+`library_value` to a short paragraph each. Full source hypotheses, applicability decisions,
+history, controls, and commands are available in the JSON report and saved assessment/receipts.
 
 For every selected source, the report traces its readable title and original hypothesis,
 the applicability decision, the adapted current hypothesis, the extra assertion, test,

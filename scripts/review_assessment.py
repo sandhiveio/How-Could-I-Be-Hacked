@@ -306,129 +306,93 @@ def markdown(result):
     def cell(value):
         return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\r", " ").replace("\n", " ")
 
-    def artifact_link(name):
+    def artifact_link(name, label=None):
         target = (Path(result["assessment_file"]).parent / name).resolve().as_posix()
-        label = cell(name).replace("[", "\\[").replace("]", "\\]")
-        return f"[{label}](<{target}>)"
+        display = cell(label or Path(name).name).replace("[", "\\[").replace("]", "\\]")
+        return f"[{display}](<{target}>)"
 
-    review, counts = result["review"], result["counts"]
-    lines = ["# Security review", "", f"Target — {cell(result['target'])}", "",
-             f"Scope — {cell(result['scope'])}", "",
-             f"Mode — {review['mode']}. Diff base — {cell(review['diff_base']) or 'unspecified'}. "
-             f"Reviewed head — {cell(review['head']) or 'unspecified'}. "
-             f"Tested revision — {cell(review['tested_revision'])}. Build — {cell(review['build_id']) or 'unspecified'}.",
-             "", f"Library index SHA-256 — {result['library']['index_sha256']}", ""]
+    review = result["review"]
+    counts = result["counts"]
     recommendation = result["recommendation"]
-    labels = {"approve": "PR can be accepted within the reviewed scope", "request_changes": "Changes required before accepting the PR",
-              "incomplete": "Review incomplete", "not_applicable": "Repository or module review"}
-    lines += ["## Merge recommendation", "", labels[recommendation["status"]], ""]
-    lines += ["- " + cell(reason) for reason in recommendation["reasons"]]
-    if result["merge_review"]["rationale"]:
-        lines += ["", cell(result["merge_review"]["rationale"])]
-    lines += ["", "### Basis for the recommendation", "", "| Criterion | Scope | Result | Check observations |",
-              "| --- | --- | --- | --- |"]
-    for criterion in result["criterion_results"]:
-        reasons = " ".join(f"{check['id']} — {check['result']}. {check['reason']}" for check in criterion["checks"])
-        values = (criterion["description"], "required" if criterion["required"] else "optional", criterion["status"], reasons)
-        lines.append("| " + " | ".join(cell(value) for value in values) + " |")
     contribution = result["library_contribution"]
     summary = contribution["summary"]
-    lines += ["", "## How the library contributed", "",
-              f"Selected sources — {summary['selected_sources']}. Used sources — {summary['used_sources']}. "
-              f"Unused selections — {summary['unused_selected_sources']}.", "",
-              f"Additional executed library-derived checks — {summary['additional_executed_checks']}. "
-              f"Additional passed checks — {summary['additional_passed_checks']}. "
-              f"New or newly exposed findings informed by failing library-derived checks — {summary['new_findings_informed']}.", ""]
-    if contribution["reviewer_assessment"]:
-        lines += ["Reviewer assessment — " + cell(contribution["reviewer_assessment"]), ""]
-    for source in contribution["source_uses"]:
-        lines += ["### " + cell(source["title"]), "", "Source — " + cell(source["source_id"]), "",
-                  "Original source hypothesis — " + cell(source["source_hypothesis"]), "",
-                  "Applicability to this PR — " + cell(source["applicability"]), "",
-                  "Selection reason — " + cell(source["selection_reason"]), ""]
-        historical = source["source_observation"]
-        history_text = (historical["outcome"] + ". " + historical["summary"]) if historical else "No executed observation is recorded for this source candidate."
-        lines += ["Historical observation — " + cell(history_text), "",
-                  "Historical scope — " + cell(source["source_observation_scope"]), ""]
-        for check in source["checks"]:
-            lines += ["Current hypothesis — " + cell(check["hypothesis"]), "",
-                      "Source contribution — " + cell(check["adaptation"]), "",
-                      "Additional coverage — " + cell(check["coverage_delta"] or "No additional-coverage claim recorded."), "",
-                      "Current test — " + cell(check["test"]), "",
-                      f"Hypothesis status — {check['status']}. Safety result — {check['result']}. " + cell(check["result_reason"]), ""]
-            for evidence in check["evidence"]:
-                lines += ["Observed evidence — " + cell(evidence["interpretation"]) + " " + artifact_link(evidence["output_artifact"]), ""]
-    lines += ["", "Finding counts — " + ", ".join(f"{relation} {count}" for relation, count in result["finding_counts"].items()) + ".",
-              "", "Check results — " + ", ".join(f"{state} {count}" for state, count in result["check_results"].items()) + ".", "",
-              "## Additional library-derived checks", "", "| Check | Additional coverage | How checked | Result |", "| --- | --- | --- | --- |"]
-    for check in result["additional_checks"]:
-        values = (check["id"], check["coverage_delta"], check["test"], check.get("result", "not_assessed"))
-        lines.append("| " + " | ".join(cell(value) for value in values) + " |")
-    lines += ["", "## Findings", ""]
-    for finding in result["merge_review"]["findings"]:
-        lines += [f"### {cell(finding['id'])} — {cell(finding['title'])}", "",
-                  f"Severity — {finding['severity']}. Change relation — {finding['change_relation']}. Must fix — {finding['must_fix']}.", "",
-                  f"Impact — {cell(finding['impact'])}", "", f"Recommendation — {cell(finding['recommendation'])}", "",
-                  f"Evidence checks — {cell(', '.join(finding['check_ids']))}. {cell(finding['reason'])}", ""]
-    lines += ["## Required regression tests", "", "| Test | Requirement | State | Artifact | Checks |", "| --- | --- | --- | --- | --- |"]
-    for test in result["merge_review"]["required_tests"]:
-        artifact = artifact_link(test["artifact"]) if test["artifact"] else "pending"
-        description = test["description"] + " " + test["reason"]
-        if test["finding_ids"]:
-            description += " Findings — " + ", ".join(test["finding_ids"]) + "."
-        values = (test["id"], description, test["status"])
-        lines.append("| " + " | ".join(cell(value) for value in values) + f" | {artifact} | {cell(', '.join(test['check_ids']))} |")
-    for missing in result["missing_regression_tests"]:
-        lines.append(f"| {cell(missing['finding_id'])} | {cell(missing['description'])} | missing | pending | |")
-    lines += [""]
     inventory = result["library"]["inventory"]
-    lines += [f"Library inventory — {inventory['steps']} steps, {inventory['search_entries']} search entries.",
-              "", "| Stage | Unique entries | Unique steps |", "| --- | ---: | ---: |"]
-    for stage in ("retrieved", "considered", "selected", "used"):
-        lines.append(f"| {stage.capitalize()} | {counts[stage + '_entries']} | {counts[stage + '_steps']} |")
-    lines += ["", f"Executed checks — {counts['executed_checks']}. Pending checks — {counts['pending_checks']}. "
-              f"Executed checks from local analysis — {counts['local_analysis_checks']}.",
-              "", "Current hypothesis outcomes — " + ", ".join(
-                  f"{status} {number}" for status, number in counts["outcomes"].items()) + ".",
-              "", "Counts describe saved retrieval and execution records. Review coverage depends on the checks and gaps below.",
-              "", "| Check | Sources | Adaptation | Current outcome | Evidence |",
-              "| --- | --- | --- | --- | --- |"]
+    labels = {"approve": "PR can be accepted within the reviewed scope",
+              "request_changes": "Changes required before accepting the PR",
+              "incomplete": "Review incomplete", "not_applicable": "Repository or module review"}
+    lines = ["# Security review", "", "**" + labels[recommendation["status"]] + "**", "",
+             "Tested revision — " + cell(review["tested_revision"]), "",
+             "## How the library contributed", "",
+             f"Library — {inventory['steps']} steps, {inventory['search_entries']} entries. Searches — {counts['searches']}.", "",
+             "Unique entries / steps — " + ", ".join(
+                 f"{stage} {counts[stage + '_entries']}/{counts[stage + '_steps']}"
+                 for stage in ("retrieved", "considered", "selected", "used")) + ".", "",
+             f"Additional library-derived checks — {summary['additional_executed_checks']} executed, "
+             f"{summary['additional_passed_checks']} passed. New findings informed — {summary['new_findings_informed']}.", ""]
+    if contribution["reviewer_assessment"]:
+        lines += [cell(contribution["reviewer_assessment"]), ""]
+    lines += ["## Checked hypotheses", "",
+              "| Hypothesis | Library contribution | How checked | Observed result / evidence |",
+              "| --- | --- | --- | --- |"]
     for check in result["checks"]:
-        evidence = ", ".join(artifact_link(entry["output_artifact"]) for entry in check["evidence"])
-        outcome = check["status"]
-        if outcome == "not_executed":
-            outcome += " — " + check["reason"]
-        if "result" in check:
-            outcome = check["result"] + " — " + check["result_reason"]
-        values = [check["id"], ", ".join(check["source_ids"]) or "local analysis", check["adaptation"], outcome]
-        lines.append("| " + " | ".join(cell(value) for value in values) + f" | {evidence} |")
-    lines += ["", "## Check evidence", ""]
-    for check in result["checks"]:
-        lines += [f"### {cell(check['id'])}", "",
-                  f"Hypothesis — {cell(check['hypothesis'])}", "",
-                  f"Hypothesis status — {check['status']}. Safety result — {check.get('result', 'not_assessed')}. " + cell(check.get("result_reason", "")), "",
-                  f"Code — {cell(', '.join(check['code_locations']))}. Revision — {cell(check['revision'])}.", "",
-                  f"Test — {cell(check['test'])}", "",
-                  f"Expected supporting result — {cell(check['expected'])}", "",
-                  f"Falsifier — {cell(check['falsifier'])}", "",
-                  f"Control — {cell(check['control'])}", ""]
-        for evidence in check["evidence"]:
-            lines += ["Command", "", *["    " + line for line in evidence["command"].splitlines()], "",
-                      f"Exit code — {evidence['exit_code']}. Output — {artifact_link(evidence['output_artifact'])}.", "",
-                      f"Interpretation — {cell(evidence['interpretation'])}", ""]
-    lines += ["## Retrieval receipts", ""]
-    for entry in result["searches"]:
-        lines.append(f"- {cell(entry['id'])}. Query — {cell(entry['query']) or '(tag only)'}. "
-                     f"Mechanism — {cell(entry['mechanism'] or 'any')}. Limit — {entry['limit']}. "
-                     f"Receipt — {artifact_link(entry['result_artifact'])}.")
-    lines += ["", "## Source decisions", ""]
-    for entry in result["decisions"]:
-        state = "selected" if entry["selected"] else "set aside"
-        lines.append(f"- {cell(entry['source_id'])} — {state}. {cell(entry['applicability'])} {cell(entry['reason'])}")
-    lines += ["", "## Unchecked areas", ""]
-    lines += ["- " + cell(gap) for gap in result["gaps"]] or ["- No gaps recorded."]
-    lines += ["", "## Blockers", ""]
-    lines += [f"- {cell(item['description'])} — owner {cell(item['owner'])}." for item in result["blockers"]] or ["- No blockers recorded."]
-    lines += ["", "Supported and refuted refer to each current hypothesis. Source-case observations remain historical context.",
-              "Validation checks record consistency and artifacts. The reviewer assesses the meaning and adequacy of the evidence."]
+        if check["origin"] == "local_analysis":
+            added = "Local analysis"
+        elif check.get("additional"):
+            added = check["coverage_delta"]
+        else:
+            added = "Library-guided existing check"
+        status = check.get("result", "hypothesis " + check["status"])
+        explanation = check.get("result_reason", check.get("reason", ""))
+        if not explanation:
+            explanation = " ".join(entry["interpretation"] for entry in check["evidence"])
+        links = " ".join(artifact_link(entry["output_artifact"]) for entry in check["evidence"])
+        values = (check["id"] + " — " + check["hypothesis"], added, check["test"])
+        outcome = cell(status + ". " + explanation)
+        lines.append("| " + " | ".join(cell(value) for value in values) + f" | {outcome} {links} |")
+    lines += ["", "## Basis for the recommendation", ""]
+    rationale = result["merge_review"]["rationale"]
+    if rationale:
+        lines += [cell(rationale), ""]
+    if recommendation["status"] != "approve" or not rationale:
+        lines += ["- " + cell(reason) for reason in recommendation["reasons"]]
+    for criterion in result["criterion_results"]:
+        if not criterion["required"]:
+            lines += ["- Optional scope — " + cell(criterion["description"]) + f" ({criterion['status']})."]
+    if result["merge_review"]["findings"]:
+        lines += ["", "## Findings and required fixes", "",
+                  "| Finding / impact | Relation | Required action | Checks |",
+                  "| --- | --- | --- | --- |"]
+        for finding in result["merge_review"]["findings"]:
+            values = (finding["severity"] + " — " + finding["title"] + ". " + finding["impact"],
+                      finding["change_relation"], finding["recommendation"], ", ".join(finding["check_ids"]))
+            lines.append("| " + " | ".join(cell(value) for value in values) + " |")
+    tests = result["merge_review"]["required_tests"]
+    if tests or result["missing_regression_tests"]:
+        lines += ["", "## Required regression tests", "",
+                  "| Test | State | Artifact |", "| --- | --- | --- |"]
+        for test in tests:
+            description = test["id"] + " — " + test["description"]
+            if test["status"] != "passed":
+                description += " " + test["reason"]
+            artifact = artifact_link(test["artifact"]) if test["artifact"] else "pending"
+            lines.append(f"| {cell(description)} | {test['status']} | {artifact} |")
+        for missing in result["missing_regression_tests"]:
+            lines.append(f"| {cell(missing['finding_id'] + ' — ' + missing['description'])} | missing | pending |")
+    elif recommendation["status"] == "approve":
+        lines += ["", "No additional mandatory regression tests were identified for this scoped review."]
+    if result["blockers"]:
+        lines += ["", "## Blockers", ""]
+        lines += [f"- {cell(item['description'])} — owner {cell(item['owner'])}." for item in result["blockers"]]
+    if result["gaps"]:
+        lines += ["", "## Review limits", ""]
+        lines += ["- " + cell(gap) for gap in result["gaps"]]
+    lines += ["", "## Scope and evidence", "", cell(result["scope"]), "",
+              f"Diff base — {cell(review['diff_base']) or 'unspecified'}. Reviewed head — {cell(review['head']) or 'unspecified'}.", "",
+              "Build — " + cell(review["build_id"] or "unspecified") + ".", "",
+              "Full hypotheses, source decisions, controls, commands and evidence — "
+              + artifact_link(result["assessment_file"], "assessment JSON") + ".", ""]
+    if result["searches"]:
+        lines += ["Search receipts — " + ", ".join(
+            artifact_link(entry["result_artifact"], entry["query"] or entry["mechanism"])
+            for entry in result["searches"]) + ".", ""]
     return "\n".join(lines) + "\n"

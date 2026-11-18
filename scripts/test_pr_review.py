@@ -181,11 +181,14 @@ class PRReviewTests(unittest.TestCase):
         self.assertEqual(trace["checks"][0]["result_reason"], self.doc["checks"][0]["result_reason"])
         self.assertEqual(trace["checks"][0]["evidence"], self.doc["checks"][0]["evidence"])
         markdown = review.markdown(report)
-        for expected in ("How the library contributed", "Original source hypothesis", "Applicability to this PR",
-                         "Current hypothesis", "Source contribution", "No executed observation is recorded",
+        for expected in ("How the library contributed", "Checked hypotheses",
                          "The prior step supplied an additional denial control", "Basis for the recommendation",
-                         self.doc["checks"][0]["result_reason"], "Hypothesis status — supported. Safety result — pass"):
+                         self.doc["checks"][0]["result_reason"], "assessment JSON"):
             self.assertIn(expected, markdown)
+        self.assertLess(markdown.index("How the library contributed"), markdown.index("Basis for the recommendation"))
+        self.assertEqual(markdown.count(self.doc["checks"][0]["hypothesis"]), 1)
+        self.assertEqual(report["checks"][0]["status"], "supported")
+        self.assertEqual(report["checks"][0]["evidence"], self.doc["checks"][0]["evidence"])
         self.assertEqual(report["criterion_results"][0]["status"], "pass")
         self.doc["merge_review"]["library_value"] = []
         self.save()

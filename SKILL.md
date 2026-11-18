@@ -98,6 +98,11 @@ matching vulnerability mechanism. Attribute a finding to library-informed checks
 its actual evidence and selected sources establish that link. State measured comparisons
 when claiming time saved or detection improvement. Tie the conclusion to each required
 criterion's result and the evidence that supports it.
+Keep the Markdown summary compact. Put the decision first and library contribution directly
+below it, then show each checked hypothesis once with its method and observed result. Write
+the value assessment and decision rationale concisely. Link detailed source history, controls,
+commands, and evidence through the assessment and search receipts. The JSON report retains
+the full trace for inspection.
 Recommend acceptance for the reviewed scope and revision after the required checks and tests
 pass and the library has informed an additional executed check. Explain an inconclusive run
 or an applicability gap with the evidence needed to finish it.
