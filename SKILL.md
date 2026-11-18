@@ -85,6 +85,10 @@ When one value crosses multiple boundaries, verify each boundary independently. 
 figure example checks both storage and rendering. For a workflow advertised as read-only,
 check the requests actually received by a local fixture and compare its state before and after.
 
+For network checks, inspect the transport that actually runs, its redirect behavior and
+the address used by the socket. For evaluation runners, check both result-path construction
+and fixture cleanup. The defensive examples include controls for each of these boundaries.
+
 For parser CPU-exhaustion hypotheses, isolate each parsing stage with size-doubling probes,
 an external timeout and valid-input controls. A repaired regular expression can expose a
 second cost such as repeated array-front removal. Compare baseline and repaired structured
