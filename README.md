@@ -2,6 +2,10 @@
 
 **Security checks from across GitHub for the PR you're about to ship.**
 
+**Bundled library · 121 investigation and review steps across 41 anonymized cases**
+
+Search and reports run locally with Python and SQLite. **No API key required.**
+
 Every day, SandHive selects recent code from public repositories across GitHub and reviews it
 with leading AI models. We turn checks and observations from that changing selection of
 projects into an anonymized library that ships with the skill.
@@ -15,9 +19,6 @@ the candidate commit, what needs fixing before merge, and what remains unverifie
 Use that evidence to decide whether the change is ready for production.
 
 [See an example PR report](references/example-pr-report.md) · [Review a PR](#quickstart) · [Case catalog](#case-catalog) · [Command reference](references/workflow.md)
-
-The bundled library contains 121 investigation and review steps across 41 anonymized cases.
-Search and report generation run locally with Python and SQLite and require no service API key.
 
 ## Quickstart
 
