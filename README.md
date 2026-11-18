@@ -32,12 +32,24 @@ For a specific PR, provide its resolved diff base and head commits.
 
 > Use $how-could-i-be-hacked to review the change from <diff-base-sha> to <head-sha>.
 > Read the surrounding code needed to check the changed behavior. Record which library steps
-> were considered, which informed the checks, and what the checks found. Save commands,
-> evidence, tested revision, and untested areas in a private assessment and generate its report.
+> were considered and use the applicable steps to add targeted assertions beyond the existing
+> tests. For a confirmed PR security defect, add a failing regression test and explain the
+> fix required before merge. Otherwise report what was additionally checked, how, and the
+> results supporting acceptance. Save commands, test artifacts, tested revision, and gaps
+> privately and generate the merge recommendation report.
 
 The [review guide](references/review.md) covers repository/module and PR scope, saved searches,
 and the source-to-check report. Each review reports the library snapshot, unique steps and
 hypotheses retrieved, considered, selected, and used, plus actual checks and their results.
+PR reports lead with **request changes**, **approve**, or **incomplete**, followed by the
+required fixes/tests and additional verified behavior. The [decision contract](references/pr-decision.md)
+ties acceptance to the reviewed revision, completed criteria, and actual additional use of
+the library. Findings include whether the PR introduced or exposed the problem or it predates
+the change.
+The report explains each selected source's original hypothesis, why it applies, what new
+assertion it contributed, the actual result, and how that result supports the PR decision.
+It distinguishes added test coverage, library-informed findings, and the reviewer's
+assessment of value and remaining limits.
 
 For manual setup, copy the full repository into your agent's skills directory under
 `how-could-i-be-hacked`, or point your agent at [SKILL.md](SKILL.md).

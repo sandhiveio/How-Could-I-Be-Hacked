@@ -27,6 +27,10 @@ mode needs resolved diff-base and head commit IDs. Read the [review guide](revie
 exact fields, evidence hashes, source/check relationships, count definitions, and revision
 rules. `report-assessment --format json` provides a structured report. A review with no
 applicable sources can record checks originating in local analysis and the remaining gaps.
+PR initialization also scaffolds `merge_review`. Fill its scoped criteria, finding attribution,
+and required regression tests using the [merge recommendation contract](pr-decision.md).
+The report derives an acceptance, change-request, or incomplete recommendation from these
+records. Older PR assessments can add this section after evaluating their evidence and scope.
 
 Legacy schema 1 assessments use hypothesis records with source references, applicability,
 test, expected result, falsifier, control, status, and evidence. `validate-assessment` continues

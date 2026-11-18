@@ -3,6 +3,8 @@
 Use this workflow for a repository, a module, or a specific PR. Keep the assessment and its
 search/evidence artifacts in a private directory outside the installed skill. Commands below
 run from the skill directory. The agent inspects code and runs the target's normal local tools.
+PR reviews also use the [merge recommendation contract](pr-decision.md) to record required
+checks, confirmed defects, persistent regression tests, and a decision tied to this revision.
 
 ## Establish the review scope
 
@@ -113,6 +115,10 @@ python scripts/toolkit.py report-assessment --file /private/pr-review.json --for
 The report derives counts from the journal and links sources, applicability, adaptations,
 commands, and current results. Count both unique search entries and unique steps. A normal
 investigation step may have several indexed candidate hypotheses, so these totals can differ.
+For PRs, the recommendation, required fixes/tests, and additional checked behavior lead the
+report. Record `check.result` and `result_reason` for each decision-relevant check. Hypothesis
+status describes what the experiment supports. A supported hypothesis about a defect can
+have a failing safety result. See [pr-decision.md](pr-decision.md) for the exact added fields.
 
 | Count | Meaning |
 | --- | --- |
