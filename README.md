@@ -138,9 +138,15 @@ and [offline iteration protocol](references/iteration.md) for trajectory inspect
 assessment validation.
 Maintainers can check publication coverage with the [case audit](references/workflow.md#publication-audit).
 
-The [public corpus and its original examples](library/LICENSE) are available under the MIT License.
 The snapshot contains anonymized artifacts. Raw runs and private case mappings stay with the
 producer.
+
+## Security and license
+
+Report security or privacy issues through the channel described in the [security policy](SECURITY.md).
+
+SandHive’s original skill, scripts, documentation, and library materials are available under the
+[MIT License](LICENSE). Third-party materials remain subject to their original license terms.
 
 ## Contact
 
