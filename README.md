@@ -2,7 +2,7 @@
 
 **Give your coding agent real security investigations to draw on during code review.**
 
-Search for cases that match the code you are reviewing. See which hypotheses were tried, what
+Search for investigation steps that match the code you are reviewing. See which hypotheses were tried, what
 the checks showed, and which alternatives were set aside. Use that context to design local checks
 and turn confirmed findings into regression tests.
 
@@ -27,6 +27,17 @@ Paste this prompt into your agent from the repository you are authorized to revi
 > Use $how-could-i-be-hacked to review this repository. Find cases that match the code,
 > explain which checks apply, and add regression tests for any findings you confirm locally.
 > Save review notes and evidence privately.
+
+For a specific PR, provide its resolved diff base and head commits.
+
+> Use $how-could-i-be-hacked to review the change from <diff-base-sha> to <head-sha>.
+> Read the surrounding code needed to check the changed behavior. Record which library steps
+> were considered, which informed the checks, and what the checks found. Save commands,
+> evidence, tested revision, and untested areas in a private assessment and generate its report.
+
+The [review guide](references/review.md) covers repository/module and PR scope, saved searches,
+and the source-to-check report. Each review reports the library snapshot, unique steps and
+hypotheses retrieved, considered, selected, and used, plus actual checks and their results.
 
 For manual setup, copy the full repository into your agent's skills directory under
 `how-could-i-be-hacked`, or point your agent at [SKILL.md](SKILL.md).
@@ -111,6 +122,10 @@ assertion, and a generalized source observation. For a compact walkthrough, open
 3. **Apply the relevant checks.** Compare the case's assumptions with your own code and collect
    fresh evidence before reporting a finding. Keep assessments private and work within the
    repository's authorized scope.
+4. **Show how the library contributed.** Link the selected steps to their adaptations and
+   executed checks. Report the tested revision, results, untested areas, and blockers together
+   with the usage counts. The [report command](references/review.md) derives counts from the
+   private review journal.
 
 [![Security review workflow from library search to regression tests.](assets/illustrations/investigation-workflow.svg)](assets/illustrations/investigation-workflow.svg)
 

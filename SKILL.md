@@ -1,6 +1,6 @@
 ---
 name: how-could-i-be-hacked
-description: Explore how your code could be attacked using real security investigation trajectories. Find applicable hypotheses, run targeted checks, and turn verified findings into regression tests locally, without API access.
+description: Review a repository, module, or specific PR using reusable security investigation steps. Find applicable hypotheses, run local checks, and report which library steps informed the checks and their results, without API access.
 ---
 
 # How Could I Be Hacked
@@ -27,6 +27,19 @@ reset, overwrite, or merge unrelated histories to update. Treat new library reco
 hypotheses requiring current-target validation. Updates do not grant extra target permissions.
 
 ## Retrieve and inspect
+
+Choose repository/module review or PR review from the user's requested scope. For a PR,
+resolve its actual diff base and reviewed head to full commit IDs, identify the tested
+revision/build, and follow [review scope and evidence reporting](references/review.md).
+Read the changed code and the callers, policy, storage, and tests needed to establish its
+behavior. Track how each finding relates to the change, including pre-existing issues.
+
+Create a private assessment with `scripts/toolkit.py init-assessment`. Use
+`search-assessment --file <assessment.json> --query "mechanism terms"` to save actual search
+results and their library snapshot. Record applicability decisions for the returned source
+IDs and connect selected sources to the checks they inform. Searches can be repeated as
+observations change the next question. Several sources may inform one check, and a source
+may inform several checks. Label checks originating in local analysis explicitly.
 
 1. Establish the authorized repository, execution environment, attacker capabilities and trust
    boundary. Read relevant code and current tests before proposing a finding.
@@ -60,6 +73,11 @@ code to force success. Actual scope and permissions govern every action.
 
 Record actual commands, outputs, source locations and artifact paths in a private assessment.
 Use `init-assessment` for a structured starting file and `validate-assessment` before reporting.
+For new assessments, follow the schema and commands in [review.md](references/review.md).
+Generate the final report with `report-assessment --file <assessment.json>`. It derives unique
+retrieved, considered, selected, and used source counts plus executed checks from the journal.
+Explain the adaptation, current result, untested areas, and known blockers alongside the counts.
+Use historical source observations to design checks and record fresh evidence for this review.
 Retest with updated context over multiple retrieval/check iterations; retain failed branches.
 Distinguish supported, refuted, inconclusive and not_executed hypotheses. Report a vulnerability
 only with current-target evidence and explain impact under the stated attacker permissions.

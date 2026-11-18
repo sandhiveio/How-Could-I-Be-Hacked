@@ -9,7 +9,10 @@ python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py verify
 python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py trajectory --case case-ID
 python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py show --step cases/case-ID/iterations/0001/step.json
 python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py init-assessment --target C:/path/to/authorized/repo --out C:/private/review.json
+python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py init-assessment --target C:/path/to/authorized/repo --mode pr --base <diff-base-sha> --head <head-sha> --out C:/private/pr-review.json
+python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py search-assessment --file C:/private/review.json --query "session revocation authorization" --limit 8
 python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py validate-assessment --file C:/private/review.json
+python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py report-assessment --file C:/private/review.json
 ```
 
 `verify` checks case manifest SHA-256 entries, SQLite integrity, and whether the indexed defensive
@@ -18,13 +21,20 @@ accidental corruption, not authenticity, anonymity or scientific validity. It do
 or rebuild the index. `trajectory` preserves chronological order; branch parents are in lineage.
 `show` and `trajectory` accept only paths contained in the selected library.
 
-An initialized assessment is deliberately incomplete. Fill scope and hypothesis records before
-validation. Each record needs an id, English hypothesis, source references (case/step/candidate),
-code locations, applicability, bounded test, expected result, falsifier, control, status and
-actual evidence. Evidence for executed checks contains command, output artifact and interpretation.
-Evidence paths are private local references; the validator checks existence, not evidential truth.
-Validation is structural; the agent must assess relevance, accuracy, language and completeness.
-An assessment is not the corpus export schema and cannot be passed directly to corpus.py bake.
+Initialization creates a schema 2 assessment with a library snapshot, review scope, retrieval
+receipts, source decisions, and checks. Fill scope and review records before validation. PR
+mode needs resolved diff-base and head commit IDs. Read the [review guide](review.md) for the
+exact fields, evidence hashes, source/check relationships, count definitions, and revision
+rules. `report-assessment --format json` provides a structured report. A review with no
+applicable sources can record checks originating in local analysis and the remaining gaps.
+
+Legacy schema 1 assessments use hypothesis records with source references, applicability,
+test, expected result, falsifier, control, status, and evidence. `validate-assessment` continues
+to check them. The report and saved-search workflow use schema 2.
+
+Validation checks the recorded structure and artifacts. The agent assesses relevance,
+accuracy, language, and whether outputs support the conclusions. Keep the private assessment
+separate from the anonymous corpus export described below.
 
 The package is portable: copy this entire folder and point an agent at SKILL.md. To make it
 skill-discoverable, place the folder in that agent's configured skills directory. No global
