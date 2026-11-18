@@ -79,7 +79,14 @@ Use `python scripts/toolkit.py stats` to check the installed snapshot or
 For manual setup, copy the full repository into your agent’s skills directory under
 `how-could-i-be-hacked`, or point your agent at [SKILL.md](SKILL.md).
 
-[Offline iteration protocol](references/iteration.md) · [Library publication audit](references/workflow.md#publication-audit) · [MIT License for corpus materials](library/LICENSE)
+[Offline iteration protocol](references/iteration.md) · [Library publication audit](references/workflow.md#publication-audit)
+
+## Security and license
+
+Report security or privacy issues through the channel described in the [security policy](SECURITY.md).
+
+SandHive’s original skill, scripts, documentation, and library materials are available under the
+[MIT License](LICENSE). Third-party materials remain subject to their original license terms.
 
 ## Contact
 
