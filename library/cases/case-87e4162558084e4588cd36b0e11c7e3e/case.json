@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-87e4162558084e4588cd36b0e11c7e3e",
+  "kind": "defensive_case",
+  "title": "Structural budgets for findings JSON",
+  "hint": "Bound structural expansion of worker-produced findings before JSON parsing.",
+  "surface": "A parent process validates findings documents supplied by a lower-trust worker.",
+  "assumptions": [
+    "The parent controls parsing budgets.",
+    "Run resource probes in disposable subprocesses with an external timeout."
+  ]
+}

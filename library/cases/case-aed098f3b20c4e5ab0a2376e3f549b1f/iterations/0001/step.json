@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Check alternate downloader redirect credentials",
+  "context": {
+    "hint": "Check redirect credential handling separately for each selected downloader.",
+    "surface": "A shell tool selects a downloader to fetch artifacts from a configured authenticated mirror.",
+    "assumptions": [
+      "Mirror responses can redirect requests.",
+      "Use synthetic credentials and two disposable local HTTP fixtures."
+    ]
+  },
+  "mechanism_tags": [
+    "credential forwarding",
+    "redirect origin"
+  ],
+  "review": {
+    "invariant": "A credential attached for the configured mirror cannot reach another origin through an alternate downloader.",
+    "verification": "Use local fixtures to record credential receipt across an origin-changing redirect. Require the downloader to enforce the boundary or deny the unsupported authenticated configuration."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The real alternate downloader forwarded the synthetic credential on baseline. The repaired branch denied the unsupported authenticated request and the second fixture received no credential."
+  },
+  "lineage": {
+    "case_id": "case-aed098f3b20c4e5ab0a2376e3f549b1f",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Preserve unauthenticated downloads and report test limits",
+  "context": {
+    "hint": "Check redirect credential handling separately for each selected downloader.",
+    "surface": "A shell tool selects a downloader to fetch artifacts from a configured authenticated mirror.",
+    "assumptions": [
+      "Mirror responses can redirect requests.",
+      "Use synthetic credentials and two disposable local HTTP fixtures."
+    ]
+  },
+  "mechanism_tags": [
+    "downloader compatibility",
+    "regression controls"
+  ],
+  "review": {
+    "invariant": "Credential-policy enforcement preserves ordinary unauthenticated download behavior.",
+    "verification": "Repeat the local redirect control without a credential and verify body delivery. Run related downloader regressions and compare any environmental failure with baseline."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The unauthenticated local control succeeded after repair. Thirteen related tests passed. A file-permission assertion failed identically on baseline and repaired copies. Other downloader implementations used stubs rather than real end-to-end transport checks."
+  },
+  "lineage": {
+    "case_id": "case-aed098f3b20c4e5ab0a2376e3f549b1f",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

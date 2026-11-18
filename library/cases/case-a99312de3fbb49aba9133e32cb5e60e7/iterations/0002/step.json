@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Preserve event logging and protocol behavior",
+  "context": {
+    "hint": "Handle serialization failures after client JSON parsing without losing the session server.",
+    "surface": "An authenticated session server serializes client events for logs and local event storage.",
+    "assumptions": [
+      "A client must hold the session credential.",
+      "Use a disposable local authenticated session and bounded test inputs."
+    ]
+  },
+  "mechanism_tags": [
+    "event persistence",
+    "regression controls"
+  ],
+  "review": {
+    "invariant": "Serialization failure handling preserves valid event records and ordinary session protocol behavior.",
+    "verification": "Check that ordinary events still serialize and that a failed serialization cannot append malformed event data. Run the authentication, server and WebSocket protocol suites."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The repair used a bounded log marker and skipped unserializable persisted records. The three targeted suites passed with 86 tests in total. Results cover the local session fixture."
+  },
+  "lineage": {
+    "case_id": "case-a99312de3fbb49aba9133e32cb5e60e7",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

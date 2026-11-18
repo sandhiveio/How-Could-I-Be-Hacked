@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Check linked inputs and ordinary output parity",
+  "context": {
+    "hint": "Keep manifest-controlled input reads within the resolved packet root.",
+    "surface": "A local report rebuilder opens data files named by an imported packet manifest.",
+    "assumptions": [
+      "The manifest may be supplied by another party.",
+      "Use disposable packet roots and synthetic data."
+    ]
+  },
+  "mechanism_tags": [
+    "symlink containment",
+    "output parity"
+  ],
+  "review": {
+    "invariant": "Resolved link targets obey packet containment and accepted inputs retain their documented output.",
+    "verification": "In a temporary packet, compare an in-root normalized reference with a link to outside fixture data. Deny the outside target and compare ordinary report and summary bytes against baseline output."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The repaired reader denied the outside link and accepted the in-root normalized reference. Five targeted checks passed and ordinary report and summary bytes matched baseline. Scorer reconstruction was outside this review."
+  },
+  "lineage": {
+    "case_id": "case-9188d8e64cc3477d9dd4e0de19623ca1",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

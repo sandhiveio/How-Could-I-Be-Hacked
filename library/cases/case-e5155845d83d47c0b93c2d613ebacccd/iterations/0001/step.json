@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Validate result identifiers before filesystem operations",
+  "context": {
+    "hint": "Constrain result paths and cleanup operations derived from contributed evaluation inputs.",
+    "surface": "An opt-in local evaluation runner reads case identifiers and copies contributed fixtures into a workspace.",
+    "assumptions": [
+      "A contributor can modify evaluation data or fixtures.",
+      "Use disposable roots and outside sentinel fixtures."
+    ]
+  },
+  "mechanism_tags": [
+    "path containment",
+    "identifier validation"
+  ],
+  "review": {
+    "invariant": "Every evaluation result identifier has the required type and its derived path stays within the result root.",
+    "verification": "Use an invalid identifier and verify rejection before executor invocation or filesystem mutation. Preserve an outside sentinel and verify normal integer identifiers as controls."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The baseline modified result-related files outside its result root. The repair rejected the invalid identifier before execution and preserved the sentinel. Exposure requires an opt-in behavioral evaluation and is bounded by the runner result suffixes."
+  },
+  "lineage": {
+    "case_id": "case-e5155845d83d47c0b93c2d613ebacccd",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Constrain the final figure storage destination",
+  "context": {
+    "hint": "Check the upload filename independently at file creation and HTML rendering.",
+    "surface": "A local document UI stores uploaded figures and displays their supplied names in a gallery.",
+    "assumptions": [
+      "A client can supply a crafted upload name.",
+      "Use temporary upload roots and inert markup text."
+    ]
+  },
+  "mechanism_tags": [
+    "upload containment",
+    "path containment"
+  ],
+  "review": {
+    "invariant": "A supplied figure name cannot cause writes outside the intended figure directory.",
+    "verification": "Exercise the final storage seam with ordinary and invalid names in a temporary root. Check written bytes and verify that outside sentinel files remain intact."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The source path expression allowed an outside write in a disposable harness. The repaired storage checks passed as part of seven regressions. The complete UI dependency stack was unavailable."
+  },
+  "lineage": {
+    "case_id": "case-34aa202643cc46f683d56cbeb98877a5",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-43ef20b41f424007a7da056226ccf9f5",
+  "kind": "defensive_case",
+  "title": "Read-only API inspection defaults",
+  "hint": "Enforce the configured request policy through every API inspection entry point.",
+  "surface": "An API inspection engine can probe operations directly or through an API description.",
+  "assumptions": [
+    "Default inspection promises read-only behavior.",
+    "Use a disposable local HTTP server with synthetic state."
+  ]
+}

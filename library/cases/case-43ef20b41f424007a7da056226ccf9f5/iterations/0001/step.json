@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Verify the direct inspection request policy",
+  "context": {
+    "hint": "Enforce the configured request policy through every API inspection entry point.",
+    "surface": "An API inspection engine can probe operations directly or through an API description.",
+    "assumptions": [
+      "Default inspection promises read-only behavior.",
+      "Use a disposable local HTTP server with synthetic state."
+    ]
+  },
+  "mechanism_tags": [
+    "http method policy",
+    "read only defaults"
+  ],
+  "review": {
+    "invariant": "Default direct inspection sends only operations permitted by the read-only policy.",
+    "verification": "Record requests and state on a local fixture during default inspection. Confirm that a read succeeds, disallowed operations are absent, and state survives. Compare an explicitly enabled state-changing mode."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The original direct sweep changed local fixture state. The repair preserved state by default while retaining explicitly enabled operations. The fixture used real local HTTP requests."
+  },
+  "lineage": {
+    "case_id": "case-43ef20b41f424007a7da056226ccf9f5",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

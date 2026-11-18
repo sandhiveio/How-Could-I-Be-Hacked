@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Escape figure names at the gallery boundary",
+  "context": {
+    "hint": "Check the upload filename independently at file creation and HTML rendering.",
+    "surface": "A local document UI stores uploaded figures and displays their supplied names in a gallery.",
+    "assumptions": [
+      "A client can supply a crafted upload name.",
+      "Use temporary upload roots and inert markup text."
+    ]
+  },
+  "mechanism_tags": [
+    "html escaping",
+    "untrusted display text"
+  ],
+  "review": {
+    "invariant": "The gallery treats a supplied figure name as text in its HTML output context.",
+    "verification": "Render an ordinary name and a name containing inert markup characters. Verify text escaping in the resulting fragment and preserve ordinary display behavior."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "Source and fragment checks confirmed unescaped name interpolation. The repaired fragment was covered by the seven passing regressions. Browser execution and deployment CSP behavior were not tested, so the evidence establishes an HTML injection sink."
+  },
+  "lineage": {
+    "case_id": "case-34aa202643cc46f683d56cbeb98877a5",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-9188d8e64cc3477d9dd4e0de19623ca1",
+  "kind": "defensive_case",
+  "title": "Packet manifest source containment",
+  "hint": "Keep manifest-controlled input reads within the resolved packet root.",
+  "surface": "A local report rebuilder opens data files named by an imported packet manifest.",
+  "assumptions": [
+    "The manifest may be supplied by another party.",
+    "Use disposable packet roots and synthetic data."
+  ]
+}
