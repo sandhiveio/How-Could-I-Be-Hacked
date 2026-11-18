@@ -1,10 +1,18 @@
 <h1><img src="assets/illustrations/sandhive-emblem.jpg" width="40" height="40" alt="SandHive" /> How Could I Be Hacked</h1>
 
-**Review a pull request for security before it ships.**
+**Security checks from daily open-source reviews for the PR you're about to ship.**
 
-Give your coding agent the PR diff. It draws on a bundled library of past security reviews to
-design targeted checks beyond the existing test suite. The report shows which library steps
-informed the checks, what ran on the tested revision, and what needs to happen before merge.
+SandHive uses leading AI models to review recent code from different open-source repositories
+every day. We turn the checks and observations from those reviews into an anonymized library
+that ships with the skill.
+
+Think of it as an antivirus definition library for code review. Give your coding agent a PR
+and it can draw on security patterns seen across projects, adapt the applicable checks to your
+diff, and run them locally. Useful checks can become regression tests for your code.
+
+The report shows what the library added beyond your existing tests, which risks were checked on
+the candidate commit, what needs fixing before merge, and what remains unverified.
+Use that evidence to decide whether the change is ready for production.
 
 [See an example PR report](references/example-pr-report.md) · [Review a PR](#quickstart) · [Case catalog](#case-catalog) · [Command reference](references/workflow.md)
 
@@ -32,8 +40,8 @@ Open the checkout in your coding agent and provide the PR's diff base and head c
 
 The report recommends **approve**, **request changes**, or **incomplete** for the tested
 revision and scope. It shows what the library added, how the checks turned out, and which
-findings the change introduced or exposed. The recommendation gives the reviewer evidence
-for the merge decision. [Example report](references/example-pr-report.md) · [Report format](references/report-format.md)
+findings the change introduced or exposed. Use it in the release review to decide what needs
+to pass before the change ships. [Example report](references/example-pr-report.md) · [Report format](references/report-format.md)
 
 For manual setup, copy the full repository into your agent's skills directory under
 `how-could-i-be-hacked`, or point your agent at [SKILL.md](SKILL.md).

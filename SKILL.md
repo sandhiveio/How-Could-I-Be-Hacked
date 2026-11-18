@@ -1,6 +1,6 @@
 ---
 name: how-could-i-be-hacked
-description: Review a pull request for security before release. Use relevant steps from past reviews to design additional local checks, record what they show, and report merge blockers or evidence supporting acceptance for the tested revision. Also use for a scoped module or repository review. Library lookup and reporting run locally.
+description: Review a pull request for security before release with checks curated from SandHive's daily reviews of recent open-source code. Adapt relevant checks to the diff and report results, release blockers, required tests, and gaps for the tested revision. Also use for scoped module or repository reviews. Library lookup and reporting run locally.
 ---
 
 # How Could I Be Hacked
@@ -11,8 +11,9 @@ Use module or repository scope when the user requests a broader review.
 
 Resolve all toolkit paths relative to this SKILL.md, regardless of the target repository.
 Python 3.10+ with SQLite FTS5 is sufficient; no packages, credentials or API are needed.
-The bundled library is a snapshot of opencode-near/workspace/library. Run `scripts/toolkit.py stats`
-for the bundled case, step and search-entry counts.
+The bundled library is a snapshot of anonymized checks and observations from SandHive's reviews
+of open-source projects. Run `scripts/toolkit.py stats` for the bundled case, step and search-entry
+counts.
 
 Use this toolkit for local library consumption. It does not generate new corpus trajectories:
 that separate workflow requires the project's benchmark-creative-search skill and mandatory
