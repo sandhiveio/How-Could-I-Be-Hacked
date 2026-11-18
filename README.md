@@ -1,10 +1,10 @@
 <h1><img src="assets/illustrations/sandhive-emblem.jpg" width="40" height="40" alt="SandHive" /> How Could I Be Hacked</h1>
 
-**Security checks from daily open-source reviews for the PR you're about to ship.**
+**Security checks from across GitHub for the PR you're about to ship.**
 
-SandHive uses leading AI models to review recent code from different open-source repositories
-every day. We turn the checks and observations from those reviews into an anonymized library
-that ships with the skill.
+Every day, SandHive selects recent code from public repositories across GitHub and reviews it
+with leading AI models. We turn checks and observations from that changing selection of
+projects into an anonymized library that ships with the skill.
 
 Think of it as an antivirus definition library for code review. Give your coding agent a PR
 and it can draw on security patterns seen across projects, adapt the applicable checks to your
