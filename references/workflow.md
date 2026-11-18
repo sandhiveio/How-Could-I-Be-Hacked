@@ -1,18 +1,19 @@
 # Commands and assessment workflow
 
-Commands work from any directory when invoked with absolute script paths. `toolkit.py` defaults
-to the sibling library; `--library PATH` before the subcommand selects another library.
+Run these commands from the root of the skill. Replace the example target and output paths with
+your own. `toolkit.py` uses the bundled library by default. Pass `--library PATH` before the
+subcommand to select another library.
 
 ```powershell
-python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py stats
-python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py verify
-python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py trajectory --case case-ID
-python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py show --step cases/case-ID/iterations/0001/step.json
-python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py init-assessment --target C:/path/to/authorized/repo --out C:/private/review.json
-python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py init-assessment --target C:/path/to/authorized/repo --mode pr --base <diff-base-sha> --head <head-sha> --out C:/private/pr-review.json
-python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py search-assessment --file C:/private/review.json --query "session revocation authorization" --limit 8
-python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py validate-assessment --file C:/private/review.json
-python C:/workdir/sec/how-could-i-be-hacked/scripts/toolkit.py report-assessment --file C:/private/review.json
+python scripts/toolkit.py stats
+python scripts/toolkit.py verify
+python scripts/toolkit.py trajectory --case case-ID
+python scripts/toolkit.py show --step cases/case-ID/iterations/0001/step.json
+python scripts/toolkit.py init-assessment --target ../target-repo --out ../private/review.json
+python scripts/toolkit.py init-assessment --target ../target-repo --mode pr --base DIFF_BASE_SHA --head HEAD_SHA --out ../private/pr-review.json
+python scripts/toolkit.py search-assessment --file ../private/review.json --query "session revocation authorization" --limit 8
+python scripts/toolkit.py validate-assessment --file ../private/review.json
+python scripts/toolkit.py report-assessment --file ../private/review.json
 ```
 
 `verify` checks case manifest SHA-256 entries, SQLite integrity, and whether the indexed defensive
