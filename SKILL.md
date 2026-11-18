@@ -1,9 +1,13 @@
 ---
 name: how-could-i-be-hacked
-description: Review a repository, module, or PR using reusable security investigation steps. Add targeted security checks and regression tests, identify fixes required before merge, or recommend accepting the reviewed PR with evidence from the additional checks. Library use runs locally without API access.
+description: Review a pull request for security before release. Use relevant steps from past reviews to design additional local checks, record what they show, and report merge blockers or evidence supporting acceptance for the tested revision. Also use for a scoped module or repository review. Library lookup and reporting run locally.
 ---
 
 # How Could I Be Hacked
+
+Start with a specific PR when the user wants to check a change before release. Follow the
+[example PR report](references/example-pr-report.md) for the level of evidence and explanation.
+Use module or repository scope when the user requests a broader review.
 
 Resolve all toolkit paths relative to this SKILL.md, regardless of the target repository.
 Python 3.10+ with SQLite FTS5 is sufficient; no packages, credentials or API are needed.

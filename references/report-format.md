@@ -4,6 +4,7 @@ Use this format for the report a developer reads to decide what happens to the r
 change. The [review guide](review.md) defines evidence capture, and the
 [merge contract](pr-decision.md) defines schema fields and recommendation prerequisites.
 Keep the main report compact, with the full trace in an evidence appendix or JSON report.
+See the [example PR report](example-pr-report.md) for a public excerpt from an actual run.
 
 ## Main report order
 

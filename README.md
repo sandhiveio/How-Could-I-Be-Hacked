@@ -1,20 +1,19 @@
 <h1><img src="assets/illustrations/sandhive-emblem.jpg" width="40" height="40" alt="SandHive" /> How Could I Be Hacked</h1>
 
-**Give your coding agent real security investigations to draw on during code review.**
+**Review a pull request for security before it ships.**
 
-Search for investigation steps that match the code you are reviewing. See which hypotheses were tried, what
-the checks showed, and which alternatives were set aside. Use that context to design local checks
-and turn confirmed findings into regression tests.
+Give your coding agent the PR diff. It draws on a bundled library of past security reviews to
+design targeted checks beyond the existing test suite. The report shows which library steps
+informed the checks, what ran on the tested revision, and what needs to happen before merge.
 
-**41 anonymized cases · 121 investigation and review steps · 483 search entries**
+[See an example PR report](references/example-pr-report.md) · [Review a PR](#quickstart) · [Case catalog](#case-catalog) · [Command reference](references/workflow.md)
 
-The library and search tools run locally with Python and SQLite. No API key required.
-
-[Quickstart](#quickstart) · [Case catalog](#case-catalog) · [How it works](#how-it-works) · [Command reference](references/workflow.md) · [Security review results](SECURITY-REVIEW-RESULTS.md)
+The bundled library contains 121 investigation and review steps across 41 anonymized cases.
+Search and report generation run locally with Python and SQLite and require no service API key.
 
 ## Quickstart
 
-### Use with a coding agent
+### Review a PR before merge
 
 Install with the [Skills CLI](https://github.com/vercel-labs/skills#install-a-skill).
 
@@ -22,40 +21,31 @@ Install with the [Skills CLI](https://github.com/vercel-labs/skills#install-a-sk
 npx skills add sandhiveio/How-Could-I-Be-Hacked --skill how-could-i-be-hacked
 ```
 
-Paste this prompt into your agent from the repository you are authorized to review.
+Open the checkout in your coding agent and provide the PR's diff base and head commits.
 
-> Use $how-could-i-be-hacked to review this repository. Find cases that match the code,
-> explain which checks apply, and add regression tests for any findings you confirm locally.
-> Save review notes and evidence privately.
+> Use $how-could-i-be-hacked to review the change from `<diff-base-sha>` to `<head-sha>`
+> before release. Identify the security behavior affected by the diff and run relevant local
+> checks beyond the existing suite. Explain which library steps informed those checks and
+> save the evidence privately. Include a regression test for any confirmed security defect
+> introduced by the change. Report the tested revision, fixes and tests required before merge,
+> and what still needs checking.
 
-For a specific PR, provide its resolved diff base and head commits.
-
-> Use $how-could-i-be-hacked to review the change from <diff-base-sha> to <head-sha>.
-> Read the surrounding code needed to check the changed behavior. Record which library steps
-> were considered and use the applicable steps to add targeted assertions beyond the existing
-> tests. For a confirmed PR security defect, add a failing regression test and explain the
-> fix required before merge. Otherwise report what was additionally checked, how, and the
-> results supporting acceptance. Save commands, test artifacts, tested revision, and gaps
-> privately and generate the merge recommendation report.
-
-The [review guide](references/review.md) covers repository/module and PR scope, saved searches,
-and the source-to-check report. Each review reports the library snapshot, unique steps and
-hypotheses retrieved, considered, selected, and used, plus actual checks and their results.
-PR reports lead with **request changes**, **approve**, or **incomplete**, followed by the
-required fixes/tests and additional verified behavior. The [decision contract](references/pr-decision.md)
-ties acceptance to the reviewed revision, completed criteria, and actual additional use of
-the library. Findings include whether the PR introduced or exposed the problem or it predates
-the change.
-The compact [report format](references/report-format.md) puts the scoped decision and actual
-library contribution first, then risk-linked checks, security findings or functional
-observations, required tests, and limits. Shared reports use portable evidence links.
-The report explains each selected source's original hypothesis, why it applies, what new
-assertion it contributed, the actual result, and how that result supports the PR decision.
-It distinguishes added test coverage, library-informed findings, and the reviewer's
-assessment of value and remaining limits.
+The report recommends **approve**, **request changes**, or **incomplete** for the tested
+revision and scope. It shows what the library added, how the checks turned out, and which
+findings the change introduced or exposed. The recommendation gives the reviewer evidence
+for the merge decision. [Example report](references/example-pr-report.md) · [Report format](references/report-format.md)
 
 For manual setup, copy the full repository into your agent's skills directory under
 `how-could-i-be-hacked`, or point your agent at [SKILL.md](SKILL.md).
+
+### Review a module or repository
+
+For a broader review, give the skill a module path or the whole repository and name the
+behaviors you want assessed. The report covers the tested revision, findings, checks, and
+gaps in that scope. [Review guide](references/review.md)
+
+> Use $how-could-i-be-hacked to review this repository, focusing on how it applies its access
+> policy. Report the paths checked, applicable library examples, results, and gaps.
 
 ### Search the library directly
 
@@ -129,18 +119,14 @@ assertion, and a generalized source observation. For a compact walkthrough, open
 
 ## How it works
 
-1. **Search by mechanism.** The SQLite index looks for any of your query terms in case context
-   and candidate hypotheses. Try synonyms when a query misses the terms used in the corpus.
-2. **Read the evidence.** Investigation steps include candidate evaluations and the observation
-   for the selected check. Defensive review steps include an invariant, a regression assertion,
-   and a generalized source observation. Use the trajectory command to read the steps in order.
-3. **Apply the relevant checks.** Compare the case's assumptions with your own code and collect
-   fresh evidence before reporting a finding. Keep assessments private and work within the
-   repository's authorized scope.
-4. **Show how the library contributed.** Link the selected steps to their adaptations and
-   executed checks. Report the tested revision, results, untested areas, and blockers together
-   with the usage counts. The [report command](references/review.md) derives counts from the
-   private review journal.
+1. **Scope the change.** Pin the diff base and head. Identify the affected behavior and follow
+   it into the relevant callers and tests.
+2. **Find applicable steps.** Search for that behavior in the bundled library. Check each
+   candidate's prerequisites against the current code and read its original observation.
+3. **Run additional checks.** Adapt useful assertions and controls to this PR. Record what ran,
+   what happened, and which checks still need evidence.
+4. **Report the decision.** Show blockers and required regressions, or explain the evidence for
+   accepting the change within scope. Link the library steps to checks and observed results.
 
 [![Security review workflow from library search to regression tests.](assets/illustrations/investigation-workflow.svg)](assets/illustrations/investigation-workflow.svg)
 
@@ -157,7 +143,8 @@ python scripts/test_toolkit.py
 `stats` reports the contents of the installed snapshot. `verify` checks artifact hashes and SQLite
 integrity. See the [library format](library/README.md), [command reference](references/workflow.md),
 and [offline iteration protocol](references/iteration.md) for trajectory inspection and private
-assessment validation.
+assessment validation. The [security review results](SECURITY-REVIEW-RESULTS.md) describe
+earlier library work.
 Maintainers can check publication coverage with the [case audit](references/workflow.md#publication-audit).
 
 The [public corpus and its original examples](library/LICENSE) are available under the MIT License.
