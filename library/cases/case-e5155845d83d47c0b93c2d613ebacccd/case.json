@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-e5155845d83d47c0b93c2d613ebacccd",
+  "kind": "defensive_case",
+  "title": "Evaluation result and fixture containment",
+  "hint": "Constrain result paths and cleanup operations derived from contributed evaluation inputs.",
+  "surface": "An opt-in local evaluation runner reads case identifiers and copies contributed fixtures into a workspace.",
+  "assumptions": [
+    "A contributor can modify evaluation data or fixtures.",
+    "Use disposable roots and outside sentinel fixtures."
+  ]
+}

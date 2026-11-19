@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Check copied fixture ownership before cleanup",
+  "context": {
+    "hint": "Constrain result paths and cleanup operations derived from contributed evaluation inputs.",
+    "surface": "An opt-in local evaluation runner reads case identifiers and copies contributed fixtures into a workspace.",
+    "assumptions": [
+      "A contributor can modify evaluation data or fixtures.",
+      "Use disposable roots and outside sentinel fixtures."
+    ]
+  },
+  "mechanism_tags": [
+    "symlink containment",
+    "workspace cleanup"
+  ],
+  "review": {
+    "invariant": "Workspace setup cleanup operates only on directories owned by the temporary workspace.",
+    "verification": "Copy a fixture with a link to an outside temporary sentinel directory. Verify cleanup preserves the outside marker and ordinary fixture initialization still succeeds."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The baseline cleanup removed the outside setup marker through a copied link. The repaired entry inspection preserved it. The focused suite passed 90 tests; the wider suite passed 289 with one shell-dependent skip."
+  },
+  "lineage": {
+    "case_id": "case-e5155845d83d47c0b93c2d613ebacccd",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

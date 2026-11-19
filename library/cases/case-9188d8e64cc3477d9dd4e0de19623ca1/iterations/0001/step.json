@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Check resolved manifest input containment",
+  "context": {
+    "hint": "Keep manifest-controlled input reads within the resolved packet root.",
+    "surface": "A local report rebuilder opens data files named by an imported packet manifest.",
+    "assumptions": [
+      "The manifest may be supplied by another party.",
+      "Use disposable packet roots and synthetic data."
+    ]
+  },
+  "mechanism_tags": [
+    "path containment",
+    "manifest inputs"
+  ],
+  "review": {
+    "invariant": "Every manifest-controlled input resolves within the packet root before it is opened.",
+    "verification": "Use a temporary packet and outside sentinel data. Verify that denied input references are rejected before reading and that an ordinary input remains readable."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The original reader consumed outside fixture data. The repaired reader rejected out-of-root references. The review used local fixtures and did not run official grading."
+  },
+  "lineage": {
+    "case_id": "case-9188d8e64cc3477d9dd4e0de19623ca1",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

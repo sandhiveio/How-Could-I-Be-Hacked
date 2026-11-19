@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Verify policy propagation from API descriptions",
+  "context": {
+    "hint": "Enforce the configured request policy through every API inspection entry point.",
+    "surface": "An API inspection engine can probe operations directly or through an API description.",
+    "assumptions": [
+      "Default inspection promises read-only behavior.",
+      "Use a disposable local HTTP server with synthetic state."
+    ]
+  },
+  "mechanism_tags": [
+    "http method policy",
+    "entry point consistency"
+  ],
+  "review": {
+    "invariant": "Inspection initiated from an API description enforces the same effective request policy as direct inspection.",
+    "verification": "Run API-description inspection against a local fixture with recorded requests. Check state preservation by default and the explicit opt-in control."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The repaired API-description entry preserved fixture state and the opt-in control exercised the enabled operation. The surrounding probe was stubbed because one transport executable was unavailable. Redirect scope enforcement remained a separate unconfirmed observation."
+  },
+  "lineage": {
+    "case_id": "case-43ef20b41f424007a7da056226ccf9f5",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

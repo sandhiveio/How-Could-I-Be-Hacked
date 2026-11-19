@@ -164,6 +164,8 @@ documented behavior.
 
 ## Packet manifest source containment
 
+[Inspect the two indexed review steps](../cases/case-9188d8e64cc3477d9dd4e0de19623ca1/case.json).
+
 **Applies when** a reader takes source-file references from an imported manifest and uses
 them to rebuild a report from files in a packet directory.
 
@@ -220,6 +222,8 @@ origins on ordinary requests and preflight requests.
 
 ## Structural limits for agent findings
 
+[Inspect the two indexed review steps](../cases/case-87e4162558084e4588cd36b0e11c7e3e/case.json).
+
 **Applies when** a parent process accepts a JSON findings document written by a worker
 and controls how much memory may be spent validating it.
 
@@ -234,6 +238,8 @@ regressions passed on the repaired copy. The observed process crash depended on 
 heap.
 
 ## Read-only API inspection defaults
+
+[Inspect the two indexed review steps](../cases/case-43ef20b41f424007a7da056226ccf9f5/case.json).
 
 **Applies when** a tool inspects an API description and promises read-only behavior unless
 the operator explicitly enables state-changing operations.
@@ -250,6 +256,8 @@ loopback fixture and verified the repaired default through both entry points.
 
 ## Uploaded figure names in storage and rendering
 
+[Inspect the two indexed review steps](../cases/case-34aa202643cc46f683d56cbeb98877a5/case.json).
+
 **Applies when** an upload handler saves a figure using a client-supplied name and the UI
 later shows that name in a preview.
 
@@ -262,3 +270,71 @@ directory. Check that invalid storage names are handled without writing outside 
 root. Render a display name containing markup characters and verify that the preview shows
 literal text. The source review identified separate storage and rendering defects and
 reported seven passing regression tests on the repaired copy.
+
+## Credentials across downloader redirects
+
+[Inspect the two indexed review steps](../cases/case-aed098f3b20c4e5ab0a2376e3f549b1f/case.json).
+
+**Applies when** a downloader attaches a credential to requests for a configured mirror
+and supports several transport implementations.
+
+**Review redirect handling.** Check credential forwarding separately for every transport.
+Require the selected transport to enforce the intended origin boundary before attaching
+credentials. Report unsupported authenticated configurations clearly.
+
+**Regression assertions.** Use two disposable local HTTP fixtures and a synthetic token.
+Verify that a redirect cannot deliver the token to the second origin. Check that ordinary
+unauthenticated downloads still work. The source review reproduced the leak with a real
+alternate downloader and verified the repaired denial and unauthenticated control. A file
+permission assertion failed on both baseline and repaired copies in that environment.
+
+## Serialization after WebSocket parsing
+
+[Inspect the two indexed review steps](../cases/case-a99312de3fbb49aba9133e32cb5e60e7/case.json).
+
+**Applies when** a session server parses client JSON and serializes the resulting value
+again for logging or event persistence.
+
+**Review serialization boundaries.** Account for failures in serialization even after
+parsing succeeds. Handle logging and persistence failures without terminating the session
+server or writing malformed records.
+
+**Regression assertions.** In a disposable authenticated session, submit a bounded value
+that exercises serialization failure. Verify that the server remains responsive and that
+ordinary events still produce valid records. The source review reproduced a process exit
+on the baseline and verified continued HTTP service after the repair. The three existing
+targeted suites passed with 86 tests in total.
+
+## Evaluation workspace ownership
+
+[Inspect the two indexed review steps](../cases/case-e5155845d83d47c0b93c2d613ebacccd/case.json).
+
+**Applies when** a local evaluation runner derives result paths from contributed case
+identifiers and copies fixtures before cleaning setup directories.
+
+**Review path construction and cleanup.** Validate identifier types before constructing
+result paths and enforce result-root containment. Inspect copied directory entries without
+following links before adding them to recursive cleanup operations.
+
+**Regression assertions.** Use temporary result and fixture roots with outside sentinel
+files. Verify that an invalid identifier is rejected before execution and leaves outside
+files intact. Verify that cleanup of a copied fixture preserves the sentinel behind a
+directory link. Use an ordinary fixture and valid identifier as controls. The source review
+confirmed both boundary failures locally and verified sentinel preservation after repair.
+
+## Network addresses used by image embedding
+
+[Inspect the two indexed review steps](../cases/case-0d34116e46c14e2d98cc41d617d17ab6/case.json).
+
+**Applies when** an HTML extraction tool fetches images from supplied URLs and intends
+to permit public network destinations only.
+
+**Review the connection boundary.** Classify resolved addresses, including mapped address
+forms, and ensure that the connection uses an address that passed validation. Apply the
+same policy to every destination reached during fetching.
+
+**Regression assertions.** Use controlled resolution and disposable HTTP fixtures to
+verify denied-address handling and the documented fallback image. Confirm that an allowed
+image remains embeddable. Check that a second resolution cannot change the destination
+between validation and connection. The source review confirmed two address-validation
+gaps through the real CLI and tested a repair that pins the validated socket address.

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Check resolved image destination classification",
+  "context": {
+    "hint": "Validate resolved image destinations and connect using the validated address.",
+    "surface": "An HTML extraction CLI fetches supplied image URLs under a public-destination-only policy.",
+    "assumptions": [
+      "Image URLs may be untrusted.",
+      "Use controlled resolution and disposable network fixtures."
+    ]
+  },
+  "mechanism_tags": [
+    "ssrf",
+    "dns address validation"
+  ],
+  "review": {
+    "invariant": "An image hostname is accepted only when its resolved addresses satisfy the configured destination policy.",
+    "verification": "Use controlled resolution for allowed and denied fixture destinations. Check request receipt and fallback output, then verify ordinary image embedding through the normal CLI."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The real CLI fetched a denied local fixture through a hostname on baseline. The repaired resolved-address check blocked the request and retained the public-image control. Results concern the reviewed CLI runtime."
+  },
+  "lineage": {
+    "case_id": "case-0d34116e46c14e2d98cc41d617d17ab6",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

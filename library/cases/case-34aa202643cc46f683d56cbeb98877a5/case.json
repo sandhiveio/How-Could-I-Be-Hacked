@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-34aa202643cc46f683d56cbeb98877a5",
+  "kind": "defensive_case",
+  "title": "Uploaded figure storage and rendering",
+  "hint": "Check the upload filename independently at file creation and HTML rendering.",
+  "surface": "A local document UI stores uploaded figures and displays their supplied names in a gallery.",
+  "assumptions": [
+    "A client can supply a crafted upload name.",
+    "Use temporary upload roots and inert markup text."
+  ]
+}

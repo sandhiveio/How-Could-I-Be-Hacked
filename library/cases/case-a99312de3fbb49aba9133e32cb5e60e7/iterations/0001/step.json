@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Keep service available after serialization failure",
+  "context": {
+    "hint": "Handle serialization failures after client JSON parsing without losing the session server.",
+    "surface": "An authenticated session server serializes client events for logs and local event storage.",
+    "assumptions": [
+      "A client must hold the session credential.",
+      "Use a disposable local authenticated session and bounded test inputs."
+    ]
+  },
+  "mechanism_tags": [
+    "json serialization",
+    "service availability"
+  ],
+  "review": {
+    "invariant": "A parsed client event that cannot be serialized does not terminate the session process.",
+    "verification": "Submit a bounded event that exercises the serialization error path in a disposable authenticated session. Verify that the process survives and serves a subsequent authenticated HTTP request."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The baseline session process exited on an uncaught serialization error. After repair, the same regression completed and the server continued serving authenticated HTTP. This is a session availability finding."
+  },
+  "lineage": {
+    "case_id": "case-a99312de3fbb49aba9133e32cb5e60e7",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

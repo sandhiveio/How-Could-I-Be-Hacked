@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-aed098f3b20c4e5ab0a2376e3f549b1f",
+  "kind": "defensive_case",
+  "title": "Downloader credential origin enforcement",
+  "hint": "Check redirect credential handling separately for each selected downloader.",
+  "surface": "A shell tool selects a downloader to fetch artifacts from a configured authenticated mirror.",
+  "assumptions": [
+    "Mirror responses can redirect requests.",
+    "Use synthetic credentials and two disposable local HTTP fixtures."
+  ]
+}

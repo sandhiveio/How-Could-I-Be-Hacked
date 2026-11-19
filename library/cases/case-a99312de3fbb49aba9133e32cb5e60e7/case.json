@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-a99312de3fbb49aba9133e32cb5e60e7",
+  "kind": "defensive_case",
+  "title": "WebSocket event serialization resilience",
+  "hint": "Handle serialization failures after client JSON parsing without losing the session server.",
+  "surface": "An authenticated session server serializes client events for logs and local event storage.",
+  "assumptions": [
+    "A client must hold the session credential.",
+    "Use a disposable local authenticated session and bounded test inputs."
+  ]
+}

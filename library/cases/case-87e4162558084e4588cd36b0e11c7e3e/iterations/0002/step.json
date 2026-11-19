@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Bound object fields and retain accepted findings",
+  "context": {
+    "hint": "Bound structural expansion of worker-produced findings before JSON parsing.",
+    "surface": "A parent process validates findings documents supplied by a lower-trust worker.",
+    "assumptions": [
+      "The parent controls parsing budgets.",
+      "Run resource probes in disposable subprocesses with an external timeout."
+    ]
+  },
+  "mechanism_tags": [
+    "json structural limits",
+    "parser compatibility"
+  ],
+  "review": {
+    "invariant": "Pre-parse field budgets reject excess object fields while accepting ordinary worker findings.",
+    "verification": "Check field counts at and above the configured limit and compare accepted ordinary and empty findings through the normal CLI."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The field limit was absent on the baseline. Both new regressions and the full 67-test repaired suite passed. Ordinary and empty CLI output controls passed. Only the tested runtime and operating system were covered."
+  },
+  "lineage": {
+    "case_id": "case-87e4162558084e4588cd36b0e11c7e3e",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

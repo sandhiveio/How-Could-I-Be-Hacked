@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-0d34116e46c14e2d98cc41d617d17ab6",
+  "kind": "defensive_case",
+  "title": "Image fetch destination address policy",
+  "hint": "Validate resolved image destinations and connect using the validated address.",
+  "surface": "An HTML extraction CLI fetches supplied image URLs under a public-destination-only policy.",
+  "assumptions": [
+    "Image URLs may be untrusted.",
+    "Use controlled resolution and disposable network fixtures."
+  ]
+}

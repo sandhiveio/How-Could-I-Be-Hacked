@@ -57,3 +57,11 @@ assertion, and a generalized source observation. For a compact walkthrough, open
 | [Import deduplication integrity](library/cases/case-e523aee460254c2d8137fcb125a78e6c/case.json) | Separate system-managed deduplication from ordinary writes | 2 |
 | [Development API origin policy](library/cases/case-a86ee97d214a4c7ba5a05d56a7e89c40/case.json) | Apply environment-specific browser origin defaults and preserve explicit settings | 2 |
 | [External tool argument boundaries](library/cases/case-ffbc48c079a64b38bc43a814a6c87632/case.json) | Keep file paths and custom options intact as individual process arguments | 2 |
+| [Packet manifest source containment](library/cases/case-9188d8e64cc3477d9dd4e0de19623ca1/case.json) | Keep manifest-controlled input reads within the resolved packet root. | 2 |
+| [Uploaded figure storage and rendering](library/cases/case-34aa202643cc46f683d56cbeb98877a5/case.json) | Check the upload filename independently at file creation and HTML rendering. | 2 |
+| [Read-only API inspection defaults](library/cases/case-43ef20b41f424007a7da056226ccf9f5/case.json) | Enforce the configured request policy through every API inspection entry point. | 2 |
+| [Structural budgets for findings JSON](library/cases/case-87e4162558084e4588cd36b0e11c7e3e/case.json) | Bound structural expansion of worker-produced findings before JSON parsing. | 2 |
+| [Downloader credential origin enforcement](library/cases/case-aed098f3b20c4e5ab0a2376e3f549b1f/case.json) | Check redirect credential handling separately for each selected downloader. | 2 |
+| [WebSocket event serialization resilience](library/cases/case-a99312de3fbb49aba9133e32cb5e60e7/case.json) | Handle serialization failures after client JSON parsing without losing the session server. | 2 |
+| [Evaluation result and fixture containment](library/cases/case-e5155845d83d47c0b93c2d613ebacccd/case.json) | Constrain result paths and cleanup operations derived from contributed evaluation inputs. | 2 |
+| [Image fetch destination address policy](library/cases/case-0d34116e46c14e2d98cc41d617d17ab6/case.json) | Validate resolved image destinations and connect using the validated address. | 2 |

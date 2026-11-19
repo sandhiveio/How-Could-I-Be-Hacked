@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Bound total JSON containers before parsing",
+  "context": {
+    "hint": "Bound structural expansion of worker-produced findings before JSON parsing.",
+    "surface": "A parent process validates findings documents supplied by a lower-trust worker.",
+    "assumptions": [
+      "The parent controls parsing budgets.",
+      "Run resource probes in disposable subprocesses with an external timeout."
+    ]
+  },
+  "mechanism_tags": [
+    "json structural limits",
+    "memory exhaustion"
+  ],
+  "review": {
+    "invariant": "A findings document cannot exceed the configured total container budget before parsing allocates its objects.",
+    "verification": "Use a configurable small budget and inputs below and above it. Require a bounded validation error above the limit. Run any larger resource probe under an explicit process limit."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "A baseline document within byte and depth limits exhausted the constrained process heap. The repaired validator rejected excessive structure cleanly. The observed crash depended on a constrained heap."
+  },
+  "lineage": {
+    "case_id": "case-87e4162558084e4588cd36b0e11c7e3e",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

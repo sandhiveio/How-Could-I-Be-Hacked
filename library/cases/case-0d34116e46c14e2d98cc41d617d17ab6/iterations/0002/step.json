@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Check address forms and socket destination consistency",
+  "context": {
+    "hint": "Validate resolved image destinations and connect using the validated address.",
+    "surface": "An HTML extraction CLI fetches supplied image URLs under a public-destination-only policy.",
+    "assumptions": [
+      "Image URLs may be untrusted.",
+      "Use controlled resolution and disposable network fixtures."
+    ]
+  },
+  "mechanism_tags": [
+    "ssrf",
+    "address pinning"
+  ],
+  "review": {
+    "invariant": "Address classification handles mapped forms and the socket uses a validated address.",
+    "verification": "Check equivalent address forms and instrument connection lookup so a second resolution cannot substitute a denied destination. Inspect the returned fallback and retain an allowed-image control."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The baseline accepted a mapped address leading to the local fixture. The repaired CLI blocked it and used a pinned lookup in its regression matrix. Redirect revalidation was source-reviewed; the end-to-end redirect check remained inconclusive because the external control denied that redirect."
+  },
+  "lineage": {
+    "case_id": "case-0d34116e46c14e2d98cc41d617d17ab6",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}
