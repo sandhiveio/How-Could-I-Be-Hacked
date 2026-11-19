@@ -2,19 +2,21 @@
 
 **Security checks from across GitHub for the PR you’re about to ship.**
 
-Your coding agent adapts security checks from real open-source reviews to your PR diff.
-It runs them locally and shows what they covered beyond your existing tests.
+Your coding agent adapts security checks from real open-source reviews to your PR diff and runs
+them locally. The report shows what those checks covered beyond your test suite, what passed,
+and what still needs checking.
 
 **121 investigation and review steps across 41 anonymized cases.** Local search and reports
 run with Python and SQLite. **No separate API key required.**
 
 [**Review a PR**](#quickstart) · [**See example report**](references/example-pr-report.md)
 
-## What it adds to a PR
+## What it added on a real PR
 
-In ItsDangerous PR #442, a library step expanded **two text-token checks into 12 combinations**
-across serializer classes, unexpected keywords, and text and byte inputs. The reviewed code
-rejected unexpected keywords in all 12 combinations. [Read the full report](references/example-pr-report.md)
+ItsDangerous PR #442 added two tests for unexpected keyword arguments. A case from the library
+prompted the agent to compare the base and head commits across **12 combinations** of serializer,
+keyword, and input type. The base accepted the arguments in all 12 cases. The PR rejected them
+in all 12. [Read the full report](references/example-pr-report.md)
 
 ## Quickstart
 
@@ -26,9 +28,8 @@ npx skills add 'sandhiveio/How-Could-I-Be-Hacked#codex/pr-review-library-evidenc
 
 Open the branch you want to review in your coding agent and paste this prompt.
 
-> Use $how-could-i-be-hacked to review the current branch against `main` before merge.
-> Record the merge base and tested `HEAD`. Report what the library added beyond existing tests,
-> the results, any fixes or regression tests needed before merge, and what still needs checking.
+> Use $how-could-i-be-hacked to review this branch against `main`. Show what you checked beyond
+> the existing tests, what needs fixing before merge, and what’s still unverified.
 
 ## How it works
 
@@ -37,9 +38,8 @@ Open the branch you want to review in your coding agent and paste this prompt.
 3. **Check locally.** Adapt those steps to the PR and record what ran and what happened.
 4. **Report the results.** Show which checks the library added, what blocks merge, and what remains unchecked.
 
-SandHive uses leading AI models to review recent code selected daily from public repositories
-across GitHub. Checks and observations from those reviews become anonymized library steps.
-Newly curated steps ship in updated snapshots. Update the skill to get the latest snapshot.
+SandHive reviews a daily selection of public GitHub code and turns useful checks into anonymized
+cases. Update the skill to get the latest library snapshot.
 
 [Workflow diagram](assets/illustrations/investigation-workflow.svg) · [Investigation map](assets/illustrations/investigation-cover.svg)
 
