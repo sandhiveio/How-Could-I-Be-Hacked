@@ -22,4 +22,8 @@ Recent review examples and their regression assertions are linked from the
 local fixtures. Their results describe the reviewed revisions. The downloader review retained
 a file-permission assertion failure reproduced on both baseline and repaired copies.
 
+Two additional anonymized cases cover equivalent payment destinations and how helper processes
+receive imported data. The payment review includes regression results on a local working copy.
+The helper-process review records results from an isolated harness.
+
 [Back to How Could I Be Hacked](README.md)

@@ -65,3 +65,5 @@ assertion, and a generalized source observation. For a compact walkthrough, open
 | [WebSocket event serialization resilience](library/cases/case-a99312de3fbb49aba9133e32cb5e60e7/case.json) | Handle serialization failures after client JSON parsing without losing the session server. | 2 |
 | [Evaluation result and fixture containment](library/cases/case-e5155845d83d47c0b93c2d613ebacccd/case.json) | Constrain result paths and cleanup operations derived from contributed evaluation inputs. | 2 |
 | [Image fetch destination address policy](library/cases/case-0d34116e46c14e2d98cc41d617d17ab6/case.json) | Validate resolved image destinations and connect using the validated address. | 2 |
+| [Equivalent payment destinations](library/cases/case-3fdbd0cc764643b388578af1d2e8b617/case.json) | Apply the same reuse warning to equivalent destinations from local records and reconstructed history | 2 |
+| [Process argument boundaries for imported data](library/cases/case-ee8c9b69d2cc4a35947e46c75a87cf53/case.json) | Keep imported metadata and configurable values separate from instructions when launching a helper | 2 |
