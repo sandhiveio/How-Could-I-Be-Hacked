@@ -4,6 +4,12 @@ This adapts planning, candidate evaluation, selection, observations and backtrac
 benchmark-creative-search/references/protocol.md. It is a consumer workflow, not a replacement
 for the producer's mandatory API generation. The current agent performs reasoning and execution.
 
+Use the [review assessment](review.md) to capture scope, saved retrievals, applicability
+decisions, checks, and the report across all rounds. Keep the round capsules below for the
+iteration-level decisions and branch history. Repeated retrievals count once per unique source
+in the assessment report. A source becomes used when it informs an executed check with saved
+evidence. Record checks from local analysis even when the library returns no relevant steps.
+
 1. Save objective, scope, attacker permissions, current source facts and a finite budget (default
    five rounds). Form at least three materially different overall plans; compare prerequisites,
    discriminating tests and a path to the success criterion. Keep rejected plans with reasons.

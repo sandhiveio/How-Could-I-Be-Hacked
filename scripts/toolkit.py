@@ -9,6 +9,7 @@ import sqlite3
 import sys
 from defensive_cases import index_errors
 from offline_io import read
+import review_assessment
 
 DEFAULT_LIBRARY = Path(__file__).resolve().parents[1] / "library"
 
@@ -53,6 +54,12 @@ def verify(root):
 
 def validate_assessment(path):
     doc = read(path)
+    if not isinstance(doc, dict):
+        return {"ok": False, "errors": ["assessment: object required"]}
+    if doc.get("schema_version") == 2:
+        return review_assessment.validate(path)
+    if doc.get("schema_version", 1) != 1:
+        return {"ok": False, "errors": ["Unsupported assessment schema_version"]}
     errors = []
     for key in ("target", "scope"):
         if not isinstance(doc.get(key), str) or not doc[key].strip():
@@ -116,8 +123,19 @@ def main():
     s = sub.add_parser("init-assessment")
     s.add_argument("--target", required=True)
     s.add_argument("--out", type=Path, required=True)
+    s.add_argument("--mode", choices=("repository", "pr"), default="repository")
+    s.add_argument("--base", help="Full diff-base commit ID for PR mode")
+    s.add_argument("--head", help="Full reviewed head commit ID")
     s = sub.add_parser("validate-assessment")
     s.add_argument("--file", type=Path, required=True)
+    s = sub.add_parser("search-assessment")
+    s.add_argument("--file", type=Path, required=True)
+    s.add_argument("--query", default="")
+    s.add_argument("--mechanism")
+    s.add_argument("--limit", type=int, default=5)
+    s = sub.add_parser("report-assessment")
+    s.add_argument("--file", type=Path, required=True)
+    s.add_argument("--format", choices=("json", "markdown"), default="markdown")
     args = p.parse_args()
     root = args.library.resolve()
     if args.command == "stats":
@@ -133,11 +151,18 @@ def main():
             raise ValueError("No trajectory steps found")
         result = [read(contained(root, str(path))) for path in paths]
     elif args.command == "init-assessment":
-        result = {"schema_version": 1, "target": args.target, "scope": "", "hypotheses": []}
+        result = review_assessment.scaffold(args.target, args.mode, args.base, args.head, root, inventory(root))
         args.out.parent.mkdir(parents=True, exist_ok=True)
         with args.out.open("x", encoding="utf-8") as stream:
             json.dump(result, stream, indent=2)
             stream.write("\n")
+    elif args.command == "search-assessment":
+        result = review_assessment.record_search(args.file, root, args.query, args.mechanism, args.limit)
+    elif args.command == "report-assessment":
+        result = review_assessment.report(args.file)
+        if args.format == "markdown":
+            print(review_assessment.markdown(result), end="")
+            return 0
     else:
         result = validate_assessment(args.file.resolve())
     print(json.dumps(result, ensure_ascii=False, indent=2))

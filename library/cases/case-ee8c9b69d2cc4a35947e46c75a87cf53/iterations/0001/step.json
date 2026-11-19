@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Imported metadata stays data at the process boundary",
+  "context": {
+    "hint": "Check that a tool passes external values as data when it starts a helper process.",
+    "surface": "A desktop analysis tool starts a helper using values derived from a supplied file and user-configured options.",
+    "assumptions": [
+      "Imported metadata and configured option values can vary independently.",
+      "The helper interface has a defined argument boundary."
+    ]
+  },
+  "mechanism_tags": [
+    "argument boundaries",
+    "process invocation"
+  ],
+  "review": {
+    "invariant": "Metadata read from input files remains data when passed to a helper process.",
+    "verification": "Assert that the helper interface receives imported metadata as a value and that an ordinary input keeps its expected behavior."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The old construction produced an unintended side effect in an isolated harness. The revised construction avoided that side effect in the harness, and the ordinary input still completed. The source-project tests were not run."
+  },
+  "lineage": {
+    "case_id": "case-ee8c9b69d2cc4a35947e46c75a87cf53",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

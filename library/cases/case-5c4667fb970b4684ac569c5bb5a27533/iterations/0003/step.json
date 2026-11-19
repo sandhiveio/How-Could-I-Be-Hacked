@@ -11,11 +11,11 @@
   },
   "review": {
     "invariant": "Removing private source metadata preserves the mapping of approved public sources.",
-    "verification": "Build a fixture with both public and private source classifications. Verify that public source indices and rendered outputs remain stable."
+    "verification": "Apply this check when a source map contains both approved and private sources. Build a disposable mixed-visibility fixture and verify that redaction preserves source indices. Assert that the map omits private names and contents. Compare the expected client and server output and use a diagnostic trace to confirm that an approved source location still resolves."
   },
   "source_observation": {
     "outcome": "supported",
-    "summary": "The mixed-map fixture retained public source mappings and runtime behavior while removing private source metadata."
+    "summary": "On the local mixed-visibility fixture, redaction preserved source indices, both entry points kept their expected output, and the diagnostic trace still resolved to the approved renderer. The map omitted the private name and source content, and the manifest listed only approved sources. The ordinary staged fixture also passed its local acceptance checks after the change."
   },
   "lineage": {
     "case_id": "case-5c4667fb970b4684ac569c5bb5a27533",

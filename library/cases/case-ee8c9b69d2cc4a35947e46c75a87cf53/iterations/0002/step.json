@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Configured option values stay data at the process boundary",
+  "context": {
+    "hint": "Check that a tool passes external values as data when it starts a helper process.",
+    "surface": "A desktop analysis tool starts a helper using values derived from a supplied file and user-configured options.",
+    "assumptions": [
+      "Imported metadata and configured option values can vary independently.",
+      "The helper interface has a defined argument boundary."
+    ]
+  },
+  "mechanism_tags": [
+    "argument boundaries",
+    "process invocation"
+  ],
+  "review": {
+    "invariant": "Configurable values cannot change how the helper invocation is interpreted.",
+    "verification": "Assert separately that user-configured option values remain data and that a supported configuration can still launch the intended helper."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "A separate option-value check produced an unintended side effect with the old construction in the harness. The revised construction avoided it, and the ordinary control still completed. The source-project tests were not run."
+  },
+  "lineage": {
+    "case_id": "case-ee8c9b69d2cc4a35947e46c75a87cf53",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

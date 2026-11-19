@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-ee8c9b69d2cc4a35947e46c75a87cf53",
+  "kind": "defensive_case",
+  "title": "Process argument boundaries for imported data",
+  "hint": "Check that a tool passes external values as data when it starts a helper process.",
+  "surface": "A desktop analysis tool starts a helper using values derived from a supplied file and user-configured options.",
+  "assumptions": [
+    "Imported metadata and configured option values can vary independently.",
+    "The helper interface has a defined argument boundary."
+  ]
+}

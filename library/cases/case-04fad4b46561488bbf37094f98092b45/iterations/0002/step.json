@@ -11,11 +11,11 @@
   },
   "review": {
     "invariant": "Provider iteration preserves identifiers, issuer, scopes, and empty values while masking populated secrets.",
-    "verification": "Exercise multiple providers with populated, empty, and whitespace-only secrets. Check that startup, reload, and management output consume the sanitized copy."
+    "verification": "Apply this check when multiple providers share a configuration sanitizer. Use three fixture providers with a populated, empty, and whitespace-only synthetic value. Assert that each nonempty value is masked, that the empty value stays empty, and that public identifiers and scopes are unchanged. If the PR touches output wiring, verify separately that startup, reload, and management paths consume the sanitized copy."
   },
   "source_observation": {
     "outcome": "supported",
-    "summary": "The focused regression confirmed masking for populated and whitespace-only secrets, with empty secrets and public fields preserved."
+    "summary": "After the sanitizer change, the focused regression masked populated and whitespace-only values and preserved the empty value, provider fields, and scopes. The configuration package suite passed and the dependent packages compiled. The saved checks establish sanitizer behavior and compilation. End-to-end output behavior remains outside this evidence."
   },
   "lineage": {
     "case_id": "case-04fad4b46561488bbf37094f98092b45",

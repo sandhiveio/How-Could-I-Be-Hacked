@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-3fdbd0cc764643b388578af1d2e8b617",
+  "kind": "defensive_case",
+  "title": "Equivalent payment destinations",
+  "hint": "Check that a payment privacy rule compares destination identity consistently across supported address representations.",
+  "surface": "A payment preview warns when a proposed destination matches a destination used previously.",
+  "assumptions": [
+    "The same destination can have multiple supported forms.",
+    "Prior destinations may come from local records or reconstructed transaction history."
+  ]
+}

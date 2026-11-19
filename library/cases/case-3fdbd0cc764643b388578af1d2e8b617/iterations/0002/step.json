@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Reuse warning from reconstructed history",
+  "context": {
+    "hint": "Check that a payment privacy rule compares destination identity consistently across supported address representations.",
+    "surface": "A payment preview warns when a proposed destination matches a destination used previously.",
+    "assumptions": [
+      "The same destination can have multiple supported forms.",
+      "Prior destinations may come from local records or reconstructed transaction history."
+    ]
+  },
+  "mechanism_tags": [
+    "destination identity",
+    "history consistency"
+  ],
+  "review": {
+    "invariant": "A destination restored from transaction history receives the same reuse decision as the equivalent destination in local records.",
+    "verification": "Compare reuse decisions for the same destination when the prior record comes from local storage and when it comes from reconstructed history."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The history-based regression missed the warning before the repair and passed after it. The targeted suite passed all 21 checks on the repaired working copy."
+  },
+  "lineage": {
+    "case_id": "case-3fdbd0cc764643b388578af1d2e8b617",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

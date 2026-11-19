@@ -12,11 +12,11 @@
   "mechanism_tags": ["credential redaction"],
   "review": {
     "invariant": "The sanitized copy masks every nonempty OIDC client secret and preserves the active configuration.",
-    "verification": "Inspect the sanitized object with a fake secret. Verify that changing the original provider entry does not change the copy."
+    "verification": "Apply this check when a configuration copy crosses a logging or management output boundary. Give a fixture provider a synthetic secret and inspect the sanitized object. Assert that the copy masks the secret, that the active provider retains its configured value, and that public fields stay intact. Mutate the original provider after copying and confirm that the sanitized object remains independent."
   },
   "source_observation": {
     "outcome": "supported",
-    "summary": "A focused test found the fake secret in the sanitized copy. The copy was independent of subsequent changes to the original provider entry."
+    "summary": "The pre-repair sanitizer test failed its masking assertion because the synthetic secret remained in the copy. Public provider fields stayed unchanged and the copy remained independent of later changes to the original provider entry. The observation was made directly on the sanitizer output."
   },
   "lineage": {
     "case_id": "case-04fad4b46561488bbf37094f98092b45",
