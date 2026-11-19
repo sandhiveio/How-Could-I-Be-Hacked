@@ -11,12 +11,15 @@ run with Python and SQLite. **No API key required.**
 
 [**Review a PR**](#quickstart) · [**See example report**](references/example-pr-report.md)
 
-## What it added on a real PR
+## Example PR review
 
-ItsDangerous PR #442 added two tests for unexpected keyword arguments. A case from the library
-prompted the agent to compare the base and head commits across **12 combinations** of serializer,
-keyword, and input type. The base accepted the arguments in all 12 cases. The PR rejected them
-in all 12. [Read the full report](references/example-pr-report.md)
+ItsDangerous PR #442 added two tests for a change that rejects unexpected keyword arguments. A case from the library prompted the agent to compare the original code with the proposed fix across 12 combinations of serializer, keyword, and input type.
+
+The original code accepted the unexpected arguments in all 12 combinations. The fix rejected them in all 12.
+
+The library helped the reviewer verify that the fix held beyond the two examples in the PR, including when callers passed bytes instead of text.
+
+[Read the full review](references/example-pr-report.md)
 
 ## Quickstart
 
