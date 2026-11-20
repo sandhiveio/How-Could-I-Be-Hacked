@@ -338,3 +338,24 @@ verify denied-address handling and the documented fallback image. Confirm that a
 image remains embeddable. Check that a second resolution cannot change the destination
 between validation and connection. The source review confirmed two address-validation
 gaps through the real CLI and tested a repair that pins the validated socket address.
+
+## Agent hook write policy and audit integrity
+
+[Inspect the two indexed review steps](../cases/case-02f334389f374041a4f294bb3cab066f/case.json).
+
+**Applies when** agent hooks classify proposed writes by directory and record agent metadata
+in a line-oriented audit log.
+
+**Review the write policy.** Normalize path components before applying directory rules,
+including for new files whose intermediate directories do not exist. Trace the normalized
+path through the actual hook entry point to the warning shown to the user.
+
+**Review the logging sink.** Keep supplied agent and session values from creating additional
+records or fields. Check invocation and completion hooks with each supported input parser.
+
+**Regression assertions.** Use a temporary project to compare equivalent path spellings,
+protected configuration paths and allowed new artifacts. In a temporary audit log, compare
+record and field counts for separator-bearing metadata and ordinary names. The source
+review reproduced both defects before repair. Fourteen repaired checks passed with the
+primary and fallback parsers. The path repair covers lexical normalization in an advisory
+guard. Symlink handling and absolute paths outside the project remain unresolved.

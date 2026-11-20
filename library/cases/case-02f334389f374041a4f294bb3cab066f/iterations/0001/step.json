@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "context": {
+    "hint": "Normalize write targets before advisory policy checks and preserve audit record boundaries at the logging sink.",
+    "surface": "Local agent hooks classify proposed writes by directory and append agent metadata to a line-oriented audit log.",
+    "assumptions": [
+      "The write guard is advisory and emits warnings before a tool writes.",
+      "Paths and agent metadata can contain untrusted text.",
+      "Use disposable project directories and synthetic audit records."
+    ]
+  },
+  "title": "Normalize write paths before directory policy checks",
+  "mechanism_tags": [
+    "path normalization",
+    "advisory write policy"
+  ],
+  "review": {
+    "invariant": "Advisory directory rules classify the normalized target before deciding whether to warn about a source, configuration or existing-file write.",
+    "verification": "In a disposable project, compare equivalent relative paths through the normal hook entry point, including a path with a nonexistent leading directory. Confirm that paths resolving to protected areas warn, while allowed new artifacts and ordinary outside-path controls retain their expected behavior."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The baseline misclassified parent-component paths and suppressed warnings. After lexical normalization, the real hook warned for the protected target and configuration rules saw the normalized path. Ordinary controls passed. Symlink escapes and absolute paths outside the project remained unresolved; the guard is advisory."
+  },
+  "lineage": {
+    "case_id": "case-02f334389f374041a4f294bb3cab066f",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

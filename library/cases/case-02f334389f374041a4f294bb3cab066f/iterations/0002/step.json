@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "context": {
+    "hint": "Normalize write targets before advisory policy checks and preserve audit record boundaries at the logging sink.",
+    "surface": "Local agent hooks classify proposed writes by directory and append agent metadata to a line-oriented audit log.",
+    "assumptions": [
+      "The write guard is advisory and emits warnings before a tool writes.",
+      "Paths and agent metadata can contain untrusted text.",
+      "Use disposable project directories and synthetic audit records."
+    ]
+  },
+  "title": "Preserve audit line and field boundaries",
+  "mechanism_tags": [
+    "log injection",
+    "audit record integrity"
+  ],
+  "review": {
+    "invariant": "Each invocation or completion hook appends exactly one audit record with its fixed field structure, regardless of line or field separators in supplied agent metadata.",
+    "verification": "Use synthetic agent and session values containing line and field separators in a temporary log. Check record and field counts for both invocation and completion hooks, compare an ordinary metadata control, and exercise the primary and fallback input parsers."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The baseline primary parser allowed one invocation to append a forged second record. Sink-side sanitization preserved one three-field record for invocation and completion hooks. Fourteen repaired regression checks passed with both primary and fallback parser configurations, and shell syntax checks passed. The repair neutralizes separators and control characters without defining a structured log format."
+  },
+  "lineage": {
+    "case_id": "case-02f334389f374041a4f294bb3cab066f",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

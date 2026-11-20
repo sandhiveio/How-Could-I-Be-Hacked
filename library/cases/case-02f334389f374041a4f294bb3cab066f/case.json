@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "case-02f334389f374041a4f294bb3cab066f",
+  "kind": "defensive_case",
+  "title": "Agent hook write policy and audit integrity",
+  "hint": "Normalize write targets before advisory policy checks and preserve audit record boundaries at the logging sink.",
+  "surface": "Local agent hooks classify proposed writes by directory and append agent metadata to a line-oriented audit log.",
+  "assumptions": [
+    "The write guard is advisory and emits warnings before a tool writes.",
+    "Paths and agent metadata can contain untrusted text.",
+    "Use disposable project directories and synthetic audit records."
+  ]
+}
