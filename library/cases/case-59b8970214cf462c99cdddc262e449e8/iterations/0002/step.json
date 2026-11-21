@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Keep recursive reads within the mount",
+  "context": {
+    "hint": "Apply one read boundary to direct operations and recursive filesystem browsing.",
+    "surface": "A read-only filesystem browser offers direct file operations, directory listing and content search under a configured mount.",
+    "assumptions": [
+      "The configured mount is the read boundary.",
+      "Use disposable directories and synthetic files to check the policy."
+    ]
+  },
+  "mechanism_tags": [
+    "symlink containment",
+    "recursive search"
+  ],
+  "review": {
+    "invariant": "Directory listings and content search avoid reading or descending into entries whose resolved targets lie outside the configured mount.",
+    "verification": "Use disposable file and directory links alongside ordinary files. Verify the documented handling of denied targets and confirm that ordinary listing and search still return expected results."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The working copy skipped outside links and preserved in-root results. Five targeted tests and all sixteen module tests passed, including on a fresh copy after applying the repair. The generated scripts were exercised locally. Live remote transport and the separate bridge service were outside the executed checks."
+  },
+  "lineage": {
+    "case_id": "case-59b8970214cf462c99cdddc262e449e8",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

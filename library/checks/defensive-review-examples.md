@@ -359,3 +359,13 @@ record and field counts for separator-bearing metadata and ordinary names. The s
 review reproduced both defects before repair. Fourteen repaired checks passed with the
 primary and fallback parsers. The path repair covers lexical normalization in an advisory
 guard. Symlink handling and absolute paths outside the project remain unresolved.
+
+## Read-only filesystem browser containment
+
+Use identical mount boundary checks for direct file access, directory listings and content
+search. Check resolved entry targets during recursive walks, and use ordinary in-mount
+files as controls for each operation. The source review ran the generated scripts locally.
+The repaired module passed all 16 tests on a fresh working copy. The separate bridge
+service and live remote transport were outside the executed checks.
+
+[Inspect the two indexed review steps](../cases/case-59b8970214cf462c99cdddc262e449e8/case.json).

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Apply mount containment to each operation",
+  "context": {
+    "hint": "Apply one read boundary to direct operations and recursive filesystem browsing.",
+    "surface": "A read-only filesystem browser offers direct file operations, directory listing and content search under a configured mount.",
+    "assumptions": [
+      "The configured mount is the read boundary.",
+      "Use disposable directories and synthetic files to check the policy."
+    ]
+  },
+  "mechanism_tags": [
+    "path containment",
+    "filesystem browsing"
+  ],
+  "review": {
+    "invariant": "Direct operations and recursive operations enforce the same resolved mount boundary before accessing files.",
+    "verification": "Check allowed and denied paths through each public operation in a disposable filesystem. Compare the direct read and metadata checks with directory listing and content search."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "In the local baseline fixture, recursive operations accessed outside fixture content while direct operations denied access. After repair, the recursive operations denied outside paths and ordinary in-root controls passed."
+  },
+  "lineage": {
+    "case_id": "case-59b8970214cf462c99cdddc262e449e8",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

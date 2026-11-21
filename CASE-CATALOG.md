@@ -68,3 +68,4 @@ assertion, and a generalized source observation. For a compact walkthrough, open
 | [Equivalent payment destinations](library/cases/case-3fdbd0cc764643b388578af1d2e8b617/case.json) | Apply the same reuse warning to equivalent destinations from local records and reconstructed history | 2 |
 | [Process argument boundaries for imported data](library/cases/case-ee8c9b69d2cc4a35947e46c75a87cf53/case.json) | Keep imported metadata and configurable values separate from instructions when launching a helper | 2 |
 | [Agent hook write policy and audit integrity](library/cases/case-02f334389f374041a4f294bb3cab066f/case.json) | Normalize write targets before advisory checks and preserve audit record boundaries | 2 |
+| [Read-only filesystem browser containment](library/cases/case-59b8970214cf462c99cdddc262e449e8/case.json) | Apply the same mount boundary to direct reads, directory listings and recursive search | 2 |

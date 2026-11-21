@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "case-59b8970214cf462c99cdddc262e449e8",
+  "kind": "defensive_case",
+  "title": "Read-only filesystem browser containment",
+  "hint": "Apply one read boundary to direct operations and recursive filesystem browsing.",
+  "surface": "A read-only filesystem browser offers direct file operations, directory listing and content search under a configured mount.",
+  "assumptions": [
+    "The configured mount is the read boundary.",
+    "Use disposable directories and synthetic files to check the policy."
+  ]
+}
