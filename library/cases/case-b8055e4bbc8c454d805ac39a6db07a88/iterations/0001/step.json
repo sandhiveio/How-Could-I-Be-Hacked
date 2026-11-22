@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Clear stale output on parse failure",
+  "context": {
+    "hint": "Make failure outputs deterministic in a recovery parser and verify successful parsing at input boundaries.",
+    "surface": "A C recovery helper parses a bounded list and returns a presence flag through an output parameter.",
+    "assumptions": [
+      "Use synthetic inputs and a local parser harness."
+    ]
+  },
+  "mechanism_tags": [
+    "parser output state",
+    "fail closed"
+  ],
+  "review": {
+    "invariant": "Every rejected input leaves the presence flag false when an output parameter is provided.",
+    "verification": "Prefill the output flag with true, submit malformed data and assert that parsing fails and clears the flag. Verify valid inputs still report their expected presence state."
+  },
+  "source_observation": {
+    "summary": "The baseline retained the caller-supplied true flag on failure. The repaired boundary test passed, including under sanitizers. The existing application caller initialized the flag to false, so the finding concerns the helper contract.",
+    "outcome": "supported"
+  },
+  "lineage": {
+    "case_id": "case-b8055e4bbc8c454d805ac39a6db07a88",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

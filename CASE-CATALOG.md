@@ -69,3 +69,4 @@ assertion, and a generalized source observation. For a compact walkthrough, open
 | [Process argument boundaries for imported data](library/cases/case-ee8c9b69d2cc4a35947e46c75a87cf53/case.json) | Keep imported metadata and configurable values separate from instructions when launching a helper | 2 |
 | [Agent hook write policy and audit integrity](library/cases/case-02f334389f374041a4f294bb3cab066f/case.json) | Normalize write targets before advisory checks and preserve audit record boundaries | 2 |
 | [Read-only filesystem browser containment](library/cases/case-59b8970214cf462c99cdddc262e449e8/case.json) | Apply the same mount boundary to direct reads, directory listings and recursive search | 2 |
+| [Recovery parser output and bounds](library/cases/case-b8055e4bbc8c454d805ac39a6db07a88/case.json) | Clear output state on failure and verify parser boundaries against an independent reference | 2 |

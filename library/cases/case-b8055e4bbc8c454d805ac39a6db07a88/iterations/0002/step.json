@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Verify recovery parser boundaries",
+  "context": {
+    "hint": "Make failure outputs deterministic in a recovery parser and verify successful parsing at input boundaries.",
+    "surface": "A C recovery helper parses a bounded list and returns a presence flag through an output parameter.",
+    "assumptions": [
+      "Use synthetic inputs and a local parser harness."
+    ]
+  },
+  "mechanism_tags": [
+    "parser bounds",
+    "differential testing"
+  ],
+  "review": {
+    "invariant": "Recovery parsing and lookup helpers agree with the expected result for valid and rejected inputs within the reviewed format.",
+    "verification": "Run a bounded synthetic input matrix under address and undefined behavior sanitizers and compare parser and lookup results against an independent reference. Retain ordinary valid cases as controls."
+  },
+  "source_observation": {
+    "summary": "The local sanitizer harness passed and the helpers agreed with an independent reference across 20,000 randomized checks. The review exercised the C helpers locally. Full device integration remained outside these checks.",
+    "outcome": "supported"
+  },
+  "lineage": {
+    "case_id": "case-b8055e4bbc8c454d805ac39a6db07a88",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

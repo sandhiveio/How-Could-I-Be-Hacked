@@ -13,6 +13,7 @@
 | google-labs-code/stitch-skills | 1 finding | SSRF through incomplete destination address validation |
 | Donchitos/Claude-Code-Game-Studios | 2 findings | Advisory write policy bypass through path normalization gaps, audit-log record injection |
 | Read-only filesystem browser | 2 findings | Mount containment across operations and link handling during recursive reads |
+| Recovery validation helper | 1 finding | Stale output on parse failure |
 | PatchEval-Verified | 27 cases | Injection, authentication and authorization flaws, credential exposure, SSRF, request smuggling, path traversal, denial of service, signature validation flaws |
 | AgentDojo | 4 cases | Indirect prompt injection |
 | Terminal-Bench | 3 cases | Information exposure, anonymization consistency, HTML sanitization |

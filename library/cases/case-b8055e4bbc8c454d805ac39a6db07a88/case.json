@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-b8055e4bbc8c454d805ac39a6db07a88",
+  "kind": "defensive_case",
+  "title": "Recovery parser output and bounds",
+  "hint": "Make failure outputs deterministic in a recovery parser and verify successful parsing at input boundaries.",
+  "surface": "A C recovery helper parses a bounded list and returns a presence flag through an output parameter.",
+  "assumptions": [
+    "Use synthetic inputs and a local parser harness."
+  ]
+}
