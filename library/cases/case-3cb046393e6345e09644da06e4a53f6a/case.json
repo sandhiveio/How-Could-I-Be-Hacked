@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-3cb046393e6345e09644da06e4a53f6a",
+  "kind": "defensive_case",
+  "title": "Text cleanup and detection consistency",
+  "hint": "Text cleanup and detection consistency.",
+  "surface": "A text cleanup tool and a reporting tool apply a policy for invisible characters.",
+  "assumptions": [
+    "Use synthetic inputs in a local test harness."
+  ]
+}

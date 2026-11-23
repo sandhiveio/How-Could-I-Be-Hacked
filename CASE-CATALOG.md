@@ -70,3 +70,5 @@ assertion, and a generalized source observation. For a compact walkthrough, open
 | [Agent hook write policy and audit integrity](library/cases/case-02f334389f374041a4f294bb3cab066f/case.json) | Normalize write targets before advisory checks and preserve audit record boundaries | 2 |
 | [Read-only filesystem browser containment](library/cases/case-59b8970214cf462c99cdddc262e449e8/case.json) | Apply the same mount boundary to direct reads, directory listings and recursive search | 2 |
 | [Recovery parser output and bounds](library/cases/case-b8055e4bbc8c454d805ac39a6db07a88/case.json) | Clear output state on failure and verify parser boundaries against an independent reference | 2 |
+| [Text cleanup and detection consistency](library/cases/case-3cb046393e6345e09644da06e4a53f6a/case.json) | A text cleanup tool and a reporting tool apply a policy for invisible characters. | 2 |
+| [Key derivation parameter coverage](library/cases/case-a9ab74342af64519a8192570be8d072e/case.json) | An experimental cipher derives keys from a caller-supplied scalar and ancillary attributes. | 2 |

@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Preserve cleanup through URL formatting",
+  "context": {
+    "hint": "Text cleanup and detection consistency.",
+    "surface": "A text cleanup tool and a reporting tool apply a policy for invisible characters.",
+    "assumptions": [
+      "Use synthetic inputs in a local test harness."
+    ]
+  },
+  "mechanism_tags": [
+    "url text cleanup"
+  ],
+  "review": {
+    "invariant": "URL formatting preserves the result of the documented character cleanup policy.",
+    "verification": "Compare a plain URL control with synthetic text containing characters the policy requires removing. Check the final output and report."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The baseline URL handling preserved characters targeted by cleanup. The repaired pipeline passed the local URL regression."
+  },
+  "lineage": {
+    "case_id": "case-3cb046393e6345e09644da06e4a53f6a",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

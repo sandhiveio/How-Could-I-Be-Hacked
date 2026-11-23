@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Preserve cipher API regression controls",
+  "context": {
+    "hint": "Key derivation parameter coverage.",
+    "surface": "An experimental cipher derives keys from a caller-supplied scalar and ancillary attributes.",
+    "assumptions": [
+      "Use synthetic inputs in a local test harness."
+    ]
+  },
+  "mechanism_tags": [
+    "round trip testing"
+  ],
+  "review": {
+    "invariant": "The key derivation repair preserves round-trip behavior and documented ancillary input handling.",
+    "verification": "Check encryption and decryption with synthetic inputs and compare repeatability and ancillary input controls. Treat these checks as local API evidence."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "All five local regression tests passed on the repaired copy. Official grading and the original solver runtime were outside the executed checks."
+  },
+  "lineage": {
+    "case_id": "case-a9ab74342af64519a8192570be8d072e",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

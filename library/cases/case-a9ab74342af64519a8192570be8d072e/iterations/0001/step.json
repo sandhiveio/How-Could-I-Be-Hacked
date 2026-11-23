@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Verify key parameter sensitivity",
+  "context": {
+    "hint": "Key derivation parameter coverage.",
+    "surface": "An experimental cipher derives keys from a caller-supplied scalar and ancillary attributes.",
+    "assumptions": [
+      "Use synthetic inputs in a local test harness."
+    ]
+  },
+  "mechanism_tags": [
+    "key derivation"
+  ],
+  "review": {
+    "invariant": "Changing a documented key input changes the derived key in the reviewed fixtures.",
+    "verification": "Compare derived keys for distinct synthetic key inputs while holding ancillary attributes fixed. Retain a repeatability control."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The baseline returned the same key for distinct scalar inputs in the reviewed fixtures. The repaired local regression passed."
+  },
+  "lineage": {
+    "case_id": "case-a9ab74342af64519a8192570be8d072e",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Align detection and cleanup policy",
+  "context": {
+    "hint": "Text cleanup and detection consistency.",
+    "surface": "A text cleanup tool and a reporting tool apply a policy for invisible characters.",
+    "assumptions": [
+      "Use synthetic inputs in a local test harness."
+    ]
+  },
+  "mechanism_tags": [
+    "text normalization"
+  ],
+  "review": {
+    "invariant": "Both tools apply the same documented character policy.",
+    "verification": "Compare the detector and cleaner on synthetic text drawn from the policy classes. Include ordinary multilingual text as a preservation control."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The local review found inconsistent coverage. The repaired cleanup and detector passed the targeted policy regression."
+  },
+  "lineage": {
+    "case_id": "case-3cb046393e6345e09644da06e4a53f6a",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

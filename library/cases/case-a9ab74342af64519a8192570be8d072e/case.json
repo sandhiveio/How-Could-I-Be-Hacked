@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-a9ab74342af64519a8192570be8d072e",
+  "kind": "defensive_case",
+  "title": "Key derivation parameter coverage",
+  "hint": "Key derivation parameter coverage.",
+  "surface": "An experimental cipher derives keys from a caller-supplied scalar and ancillary attributes.",
+  "assumptions": [
+    "Use synthetic inputs in a local test harness."
+  ]
+}
