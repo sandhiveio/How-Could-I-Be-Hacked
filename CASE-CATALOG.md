@@ -3,72 +3,72 @@
 [Back to README](README.md) · [Published security review results](SECURITY-REVIEW-RESULTS.md)
 
 Each link opens the anonymized case context. The last column counts the recorded investigation
-steps. You can inspect their evidence and decisions with the [trajectory command](references/workflow.md).
+steps. You can inspect their evidence and decisions with the [trajectory command](skills/how-could-i-be-hacked/references/workflow.md).
 
 | Case | Review focus | Steps |
 | --- | --- | ---: |
-| [SQL injection in EXPLAIN options](library/cases/case-00bfea1eea0547a49214fd10f10b0e46/case.json) | Validation of database-specific query options | 2 |
-| [Outbound request destination](library/cases/case-4871606bc3624b0e83ffa3f6e7c95ec6/case.json) | Origin enforcement when an HTTP client resolves a request path | 4 |
-| [HTTP credentials on redirects](library/cases/case-9f9094d375ad4f4198e6a3c43257d3a5/case.json) | Credential handling across origin and protocol changes | 5 |
-| [Proxy credentials on HTTP redirects](library/cases/case-5a760d5425434351b506692f92a6ae08/case.json) | Proxy credential isolation across redirect hops | 4 |
-| [HTTP request smuggling](library/cases/case-12b764f81331452fad88878ec0ab915b/case.json) | Validation of HTTP/1.1 chunk boundaries | 4 |
-| [Static-file path traversal](library/cases/case-702a9739c1f34802a415de3b9fdc7a19/case.json) | Filesystem containment in a static-file handler | 3 |
-| [Cookie parser denial of service](library/cases/case-a15710c157ac4ca08718fbbe62bf3464/case.json) | Parsing time for malformed cookie headers | 4 |
-| [CSRF token validation](library/cases/case-848c1c44088843f38fba5e0a8b3d1514/case.json) | Token generation and validation across memory and session stores | 2 |
-| [JWT algorithm confusion](library/cases/case-a5bb55a6d823483091324c515e32ed48/case.json) | Compatibility checks between verification algorithms and key types | 4 |
-| [Streaming RPC authentication](library/cases/case-065db678c4664fbc8b35adc66a7264e0/case.json) | Consistent authentication on unary and streaming requests | 2 |
-| [Authorization cache correctness](library/cases/case-9fc62583c0044d909212d96b60979f7c/case.json) | Cache behavior in recursive permission checks | 4 |
-| [Session revocation](library/cases/case-47e872f11dcc4421947ad049b5018bf8/case.json) | Handling of existing session tokens after an account is disabled | 4 |
-| [Template autoescaping](library/cases/case-352c68ac2de543b09a2ff81f8c6e1b97/case.json) | Escaping of user data in templates and layouts | 4 |
-| [URI validation in HTML sanitizers](library/cases/case-37ac0f7032f142dcb0e40f0734eeca65/case.json) | Scheme validation for HTML attributes | 4 |
-| [Prototype pollution](library/cases/case-9eff46a29dde40eeb42ac3908df4cf0f/case.json) | Property-path validation in a JavaScript setter | 2 |
-| [Secret redaction in logs](library/cases/case-8febf1af62cd40e6ba9dfea83f4728cd/case.json) | Credential masking across application and SDK loggers | 4 |
-| [Git clone option validation](library/cases/case-948d24148ef34a42bb237bacab065fdb/case.json) | Validation of arguments passed from a library to Git | 4 |
-| [Signed YAML templates](library/cases/case-4c1b4593177d4f3289377f152128add4/case.json) | Agreement between signature verification and template parsing | 2 |
-| [Pseudonyms across linked tables](library/cases/case-21af815d7a4e4c8991c6286eb15deff9/case.json) | Consistent pseudonyms across related CSVs and historical records under a memory limit | 4 |
-| [Prompt injection in payment workflows](library/cases/case-aa4888d8314d483498a59f9167f749c5/case.json) | Transfer authorization when an assistant reads a bill | 2 |
-| [Prompt injection in travel booking](library/cases/case-3204b3a58c41492e824878008054e084/case.json) | Reservation scope when an assistant reads hotel reviews | 3 |
-| [Prompt injection in calendar workflows](library/cases/case-7e8b17932d2b4018ae2513dd56b953c4/case.json) | Calendar edit scope when an assistant reads event descriptions | 2 |
-| [Prompt injection in messaging workflows](library/cases/case-fce6af02155649cfb97771c91053dd0b/case.json) | Message-send authorization when an assistant reads a webpage | 2 |
+| [SQL injection in EXPLAIN options](skills/how-could-i-be-hacked/library/cases/case-00bfea1eea0547a49214fd10f10b0e46/case.json) | Validation of database-specific query options | 2 |
+| [Outbound request destination](skills/how-could-i-be-hacked/library/cases/case-4871606bc3624b0e83ffa3f6e7c95ec6/case.json) | Origin enforcement when an HTTP client resolves a request path | 4 |
+| [HTTP credentials on redirects](skills/how-could-i-be-hacked/library/cases/case-9f9094d375ad4f4198e6a3c43257d3a5/case.json) | Credential handling across origin and protocol changes | 5 |
+| [Proxy credentials on HTTP redirects](skills/how-could-i-be-hacked/library/cases/case-5a760d5425434351b506692f92a6ae08/case.json) | Proxy credential isolation across redirect hops | 4 |
+| [HTTP request smuggling](skills/how-could-i-be-hacked/library/cases/case-12b764f81331452fad88878ec0ab915b/case.json) | Validation of HTTP/1.1 chunk boundaries | 4 |
+| [Static-file path traversal](skills/how-could-i-be-hacked/library/cases/case-702a9739c1f34802a415de3b9fdc7a19/case.json) | Filesystem containment in a static-file handler | 3 |
+| [Cookie parser denial of service](skills/how-could-i-be-hacked/library/cases/case-a15710c157ac4ca08718fbbe62bf3464/case.json) | Parsing time for malformed cookie headers | 4 |
+| [CSRF token validation](skills/how-could-i-be-hacked/library/cases/case-848c1c44088843f38fba5e0a8b3d1514/case.json) | Token generation and validation across memory and session stores | 2 |
+| [JWT algorithm confusion](skills/how-could-i-be-hacked/library/cases/case-a5bb55a6d823483091324c515e32ed48/case.json) | Compatibility checks between verification algorithms and key types | 4 |
+| [Streaming RPC authentication](skills/how-could-i-be-hacked/library/cases/case-065db678c4664fbc8b35adc66a7264e0/case.json) | Consistent authentication on unary and streaming requests | 2 |
+| [Authorization cache correctness](skills/how-could-i-be-hacked/library/cases/case-9fc62583c0044d909212d96b60979f7c/case.json) | Cache behavior in recursive permission checks | 4 |
+| [Session revocation](skills/how-could-i-be-hacked/library/cases/case-47e872f11dcc4421947ad049b5018bf8/case.json) | Handling of existing session tokens after an account is disabled | 4 |
+| [Template autoescaping](skills/how-could-i-be-hacked/library/cases/case-352c68ac2de543b09a2ff81f8c6e1b97/case.json) | Escaping of user data in templates and layouts | 4 |
+| [URI validation in HTML sanitizers](skills/how-could-i-be-hacked/library/cases/case-37ac0f7032f142dcb0e40f0734eeca65/case.json) | Scheme validation for HTML attributes | 4 |
+| [Prototype pollution](skills/how-could-i-be-hacked/library/cases/case-9eff46a29dde40eeb42ac3908df4cf0f/case.json) | Property-path validation in a JavaScript setter | 2 |
+| [Secret redaction in logs](skills/how-could-i-be-hacked/library/cases/case-8febf1af62cd40e6ba9dfea83f4728cd/case.json) | Credential masking across application and SDK loggers | 4 |
+| [Git clone option validation](skills/how-could-i-be-hacked/library/cases/case-948d24148ef34a42bb237bacab065fdb/case.json) | Validation of arguments passed from a library to Git | 4 |
+| [Signed YAML templates](skills/how-could-i-be-hacked/library/cases/case-4c1b4593177d4f3289377f152128add4/case.json) | Agreement between signature verification and template parsing | 2 |
+| [Pseudonyms across linked tables](skills/how-could-i-be-hacked/library/cases/case-21af815d7a4e4c8991c6286eb15deff9/case.json) | Consistent pseudonyms across related CSVs and historical records under a memory limit | 4 |
+| [Prompt injection in payment workflows](skills/how-could-i-be-hacked/library/cases/case-aa4888d8314d483498a59f9167f749c5/case.json) | Transfer authorization when an assistant reads a bill | 2 |
+| [Prompt injection in travel booking](skills/how-could-i-be-hacked/library/cases/case-3204b3a58c41492e824878008054e084/case.json) | Reservation scope when an assistant reads hotel reviews | 3 |
+| [Prompt injection in calendar workflows](skills/how-could-i-be-hacked/library/cases/case-7e8b17932d2b4018ae2513dd56b953c4/case.json) | Calendar edit scope when an assistant reads event descriptions | 2 |
+| [Prompt injection in messaging workflows](skills/how-could-i-be-hacked/library/cases/case-fce6af02155649cfb97771c91053dd0b/case.json) | Message-send authorization when an assistant reads a webpage | 2 |
 
 ### Defensive review examples
 
 These indexed cases include independent steps with a security invariant, a regression
 assertion, and a generalized source observation. For a compact walkthrough, open the
-[defensive review guide](library/checks/defensive-review-examples.md).
+[defensive review guide](skills/how-could-i-be-hacked/library/checks/defensive-review-examples.md).
 
 | Case | Review focus | Steps |
 | --- | --- | ---: |
-| [OIDC client-secret redaction](library/cases/case-04fad4b46561488bbf37094f98092b45/case.json) | Mask provider secrets in copies used by logs and management responses | 2 |
-| [OIDC group membership](library/cases/case-1392ecdfbe2744d59acddd5bb54bc0d7/case.json) | Require verified membership before forwarding configured groups | 2 |
-| [List query fields and sorting](library/cases/case-5186db661bde48a4b7b6e120c220807e/case.json) | Validate filter and sort fields and preserve bound values | 4 |
-| [Release artifact visibility](library/cases/case-5c4667fb970b4684ac569c5bb5a27533/case.json) | Apply source policy to shipped bundles, maps, and provenance | 4 |
-| [Upload destination containment](library/cases/case-88fc403c29eb4697adbfc2d944b682fe/case.json) | Enforce containment across framework uploads and direct writes | 4 |
-| [Outbound discovery requests](library/cases/case-ae1bcf4332314a34bb6b744ce76ce790/case.json) | Enforce destination policy and deadlines across redirects | 2 |
-| [Account-level sign-in limits](library/cases/case-c8fc66ccf2d440e3be2947fa8e645302/case.json) | Share the failed-sign-in budget across supported account identifiers | 2 |
-| [Archive extraction containment](library/cases/case-ce0f488a2ad64314a3eccd04cf2d7e9c/case.json) | Confine writes and link operations to the extraction root | 4 |
-| [Transcoder process arguments](library/cases/case-e09ae020c2784f2daff359ad12e026bd/case.json) | Preserve argument boundaries and documented wrapper behavior | 2 |
-| [Authorization model changes](library/cases/case-f2edf20fff384048b52a38a3e0543577/case.json) | Evaluate stored relationships under the selected model | 4 |
-| [Command guardrail policy](library/cases/case-39aef9b172ae403da6e796a4b755c352/case.json) | Classify version-control operations by parsed command and arguments | 2 |
-| [API key scope and expiry](library/cases/case-9f116dc1f30c4596bf3fdd822a0ea1fc/case.json) | Require recognized write scope and check expiry when binding a key | 2 |
-| [Tool session state isolation](library/cases/case-91c305520511418684a92f3ecdd93b40/case.json) | Keep default event identifiers, parent links, and resets session-scoped | 2 |
-| [HTML filter parsing boundaries](library/cases/case-a44f1591d7e8488985a2059af25b4914/case.json) | Preserve benign markup and enforce element and attribute policy at parser boundaries | 2 |
-| [Retention policy enforcement](library/cases/case-fa5eb743793f4657956df0b70f12ec9e/case.json) | Apply current retention settings before deleting records | 2 |
-| [Import deduplication integrity](library/cases/case-e523aee460254c2d8137fcb125a78e6c/case.json) | Separate system-managed deduplication from ordinary writes | 2 |
-| [Development API origin policy](library/cases/case-a86ee97d214a4c7ba5a05d56a7e89c40/case.json) | Apply environment-specific browser origin defaults and preserve explicit settings | 2 |
-| [External tool argument boundaries](library/cases/case-ffbc48c079a64b38bc43a814a6c87632/case.json) | Keep file paths and custom options intact as individual process arguments | 2 |
-| [Packet manifest source containment](library/cases/case-9188d8e64cc3477d9dd4e0de19623ca1/case.json) | Keep manifest-controlled input reads within the resolved packet root. | 2 |
-| [Uploaded figure storage and rendering](library/cases/case-34aa202643cc46f683d56cbeb98877a5/case.json) | Check the upload filename independently at file creation and HTML rendering. | 2 |
-| [Read-only API inspection defaults](library/cases/case-43ef20b41f424007a7da056226ccf9f5/case.json) | Enforce the configured request policy through every API inspection entry point. | 2 |
-| [Structural budgets for findings JSON](library/cases/case-87e4162558084e4588cd36b0e11c7e3e/case.json) | Bound structural expansion of worker-produced findings before JSON parsing. | 2 |
-| [Downloader credential origin enforcement](library/cases/case-aed098f3b20c4e5ab0a2376e3f549b1f/case.json) | Check redirect credential handling separately for each selected downloader. | 2 |
-| [WebSocket event serialization resilience](library/cases/case-a99312de3fbb49aba9133e32cb5e60e7/case.json) | Handle serialization failures after client JSON parsing without losing the session server. | 2 |
-| [Evaluation result and fixture containment](library/cases/case-e5155845d83d47c0b93c2d613ebacccd/case.json) | Constrain result paths and cleanup operations derived from contributed evaluation inputs. | 2 |
-| [Image fetch destination address policy](library/cases/case-0d34116e46c14e2d98cc41d617d17ab6/case.json) | Validate resolved image destinations and connect using the validated address. | 2 |
-| [Equivalent payment destinations](library/cases/case-3fdbd0cc764643b388578af1d2e8b617/case.json) | Apply the same reuse warning to equivalent destinations from local records and reconstructed history | 2 |
-| [Process argument boundaries for imported data](library/cases/case-ee8c9b69d2cc4a35947e46c75a87cf53/case.json) | Keep imported metadata and configurable values separate from instructions when launching a helper | 2 |
-| [Agent hook write policy and audit integrity](library/cases/case-02f334389f374041a4f294bb3cab066f/case.json) | Normalize write targets before advisory checks and preserve audit record boundaries | 2 |
-| [Read-only filesystem browser containment](library/cases/case-59b8970214cf462c99cdddc262e449e8/case.json) | Apply the same mount boundary to direct reads, directory listings and recursive search | 2 |
-| [Recovery parser output and bounds](library/cases/case-b8055e4bbc8c454d805ac39a6db07a88/case.json) | Clear output state on failure and verify parser boundaries against an independent reference | 2 |
-| [Text cleanup and detection consistency](library/cases/case-3cb046393e6345e09644da06e4a53f6a/case.json) | A text cleanup tool and a reporting tool apply a policy for invisible characters. | 2 |
-| [Key derivation parameter coverage](library/cases/case-a9ab74342af64519a8192570be8d072e/case.json) | An experimental cipher derives keys from a caller-supplied scalar and ancillary attributes. | 2 |
+| [OIDC client-secret redaction](skills/how-could-i-be-hacked/library/cases/case-04fad4b46561488bbf37094f98092b45/case.json) | Mask provider secrets in copies used by logs and management responses | 2 |
+| [OIDC group membership](skills/how-could-i-be-hacked/library/cases/case-1392ecdfbe2744d59acddd5bb54bc0d7/case.json) | Require verified membership before forwarding configured groups | 2 |
+| [List query fields and sorting](skills/how-could-i-be-hacked/library/cases/case-5186db661bde48a4b7b6e120c220807e/case.json) | Validate filter and sort fields and preserve bound values | 4 |
+| [Release artifact visibility](skills/how-could-i-be-hacked/library/cases/case-5c4667fb970b4684ac569c5bb5a27533/case.json) | Apply source policy to shipped bundles, maps, and provenance | 4 |
+| [Upload destination containment](skills/how-could-i-be-hacked/library/cases/case-88fc403c29eb4697adbfc2d944b682fe/case.json) | Enforce containment across framework uploads and direct writes | 4 |
+| [Outbound discovery requests](skills/how-could-i-be-hacked/library/cases/case-ae1bcf4332314a34bb6b744ce76ce790/case.json) | Enforce destination policy and deadlines across redirects | 2 |
+| [Account-level sign-in limits](skills/how-could-i-be-hacked/library/cases/case-c8fc66ccf2d440e3be2947fa8e645302/case.json) | Share the failed-sign-in budget across supported account identifiers | 2 |
+| [Archive extraction containment](skills/how-could-i-be-hacked/library/cases/case-ce0f488a2ad64314a3eccd04cf2d7e9c/case.json) | Confine writes and link operations to the extraction root | 4 |
+| [Transcoder process arguments](skills/how-could-i-be-hacked/library/cases/case-e09ae020c2784f2daff359ad12e026bd/case.json) | Preserve argument boundaries and documented wrapper behavior | 2 |
+| [Authorization model changes](skills/how-could-i-be-hacked/library/cases/case-f2edf20fff384048b52a38a3e0543577/case.json) | Evaluate stored relationships under the selected model | 4 |
+| [Command guardrail policy](skills/how-could-i-be-hacked/library/cases/case-39aef9b172ae403da6e796a4b755c352/case.json) | Classify version-control operations by parsed command and arguments | 2 |
+| [API key scope and expiry](skills/how-could-i-be-hacked/library/cases/case-9f116dc1f30c4596bf3fdd822a0ea1fc/case.json) | Require recognized write scope and check expiry when binding a key | 2 |
+| [Tool session state isolation](skills/how-could-i-be-hacked/library/cases/case-91c305520511418684a92f3ecdd93b40/case.json) | Keep default event identifiers, parent links, and resets session-scoped | 2 |
+| [HTML filter parsing boundaries](skills/how-could-i-be-hacked/library/cases/case-a44f1591d7e8488985a2059af25b4914/case.json) | Preserve benign markup and enforce element and attribute policy at parser boundaries | 2 |
+| [Retention policy enforcement](skills/how-could-i-be-hacked/library/cases/case-fa5eb743793f4657956df0b70f12ec9e/case.json) | Apply current retention settings before deleting records | 2 |
+| [Import deduplication integrity](skills/how-could-i-be-hacked/library/cases/case-e523aee460254c2d8137fcb125a78e6c/case.json) | Separate system-managed deduplication from ordinary writes | 2 |
+| [Development API origin policy](skills/how-could-i-be-hacked/library/cases/case-a86ee97d214a4c7ba5a05d56a7e89c40/case.json) | Apply environment-specific browser origin defaults and preserve explicit settings | 2 |
+| [External tool argument boundaries](skills/how-could-i-be-hacked/library/cases/case-ffbc48c079a64b38bc43a814a6c87632/case.json) | Keep file paths and custom options intact as individual process arguments | 2 |
+| [Packet manifest source containment](skills/how-could-i-be-hacked/library/cases/case-9188d8e64cc3477d9dd4e0de19623ca1/case.json) | Keep manifest-controlled input reads within the resolved packet root. | 2 |
+| [Uploaded figure storage and rendering](skills/how-could-i-be-hacked/library/cases/case-34aa202643cc46f683d56cbeb98877a5/case.json) | Check the upload filename independently at file creation and HTML rendering. | 2 |
+| [Read-only API inspection defaults](skills/how-could-i-be-hacked/library/cases/case-43ef20b41f424007a7da056226ccf9f5/case.json) | Enforce the configured request policy through every API inspection entry point. | 2 |
+| [Structural budgets for findings JSON](skills/how-could-i-be-hacked/library/cases/case-87e4162558084e4588cd36b0e11c7e3e/case.json) | Bound structural expansion of worker-produced findings before JSON parsing. | 2 |
+| [Downloader credential origin enforcement](skills/how-could-i-be-hacked/library/cases/case-aed098f3b20c4e5ab0a2376e3f549b1f/case.json) | Check redirect credential handling separately for each selected downloader. | 2 |
+| [WebSocket event serialization resilience](skills/how-could-i-be-hacked/library/cases/case-a99312de3fbb49aba9133e32cb5e60e7/case.json) | Handle serialization failures after client JSON parsing without losing the session server. | 2 |
+| [Evaluation result and fixture containment](skills/how-could-i-be-hacked/library/cases/case-e5155845d83d47c0b93c2d613ebacccd/case.json) | Constrain result paths and cleanup operations derived from contributed evaluation inputs. | 2 |
+| [Image fetch destination address policy](skills/how-could-i-be-hacked/library/cases/case-0d34116e46c14e2d98cc41d617d17ab6/case.json) | Validate resolved image destinations and connect using the validated address. | 2 |
+| [Equivalent payment destinations](skills/how-could-i-be-hacked/library/cases/case-3fdbd0cc764643b388578af1d2e8b617/case.json) | Apply the same reuse warning to equivalent destinations from local records and reconstructed history | 2 |
+| [Process argument boundaries for imported data](skills/how-could-i-be-hacked/library/cases/case-ee8c9b69d2cc4a35947e46c75a87cf53/case.json) | Keep imported metadata and configurable values separate from instructions when launching a helper | 2 |
+| [Agent hook write policy and audit integrity](skills/how-could-i-be-hacked/library/cases/case-02f334389f374041a4f294bb3cab066f/case.json) | Normalize write targets before advisory checks and preserve audit record boundaries | 2 |
+| [Read-only filesystem browser containment](skills/how-could-i-be-hacked/library/cases/case-59b8970214cf462c99cdddc262e449e8/case.json) | Apply the same mount boundary to direct reads, directory listings and recursive search | 2 |
+| [Recovery parser output and bounds](skills/how-could-i-be-hacked/library/cases/case-b8055e4bbc8c454d805ac39a6db07a88/case.json) | Clear output state on failure and verify parser boundaries against an independent reference | 2 |
+| [Text cleanup and detection consistency](skills/how-could-i-be-hacked/library/cases/case-3cb046393e6345e09644da06e4a53f6a/case.json) | A text cleanup tool and a reporting tool apply a policy for invisible characters. | 2 |
+| [Key derivation parameter coverage](skills/how-could-i-be-hacked/library/cases/case-a9ab74342af64519a8192570be8d072e/case.json) | An experimental cipher derives keys from a caller-supplied scalar and ancillary attributes. | 2 |

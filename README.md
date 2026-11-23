@@ -9,7 +9,7 @@ and what still needs checking.
 **151 investigation and review steps across 56 anonymized cases.** Local search and reports
 run with Python and SQLite. **No API key required.**
 
-[**Review a PR**](#quickstart) · [**See example report**](references/example-pr-report.md)
+[**Review a PR**](#quickstart) · [**See example report**](skills/how-could-i-be-hacked/references/example-pr-report.md)
 
 ## Example PR review
 
@@ -19,7 +19,7 @@ The original code accepted the unexpected arguments in all 12 combinations. The 
 
 The library helped the reviewer verify that the fix held beyond the two examples in the PR, including when callers passed bytes instead of text.
 
-[Read the full review](references/example-pr-report.md)
+[Read the full review](skills/how-could-i-be-hacked/references/example-pr-report.md)
 
 ## Quickstart
 
@@ -50,11 +50,11 @@ cases. Update the skill to get the latest library snapshot.
 
 | Example | What the review checks |
 | --- | --- |
-| [Session revocation](library/cases/case-47e872f11dcc4421947ad049b5018bf8/case.json) | Whether existing tokens stop working after an account is disabled |
-| [Secret redaction in logs](library/cases/case-8febf1af62cd40e6ba9dfea83f4728cd/case.json) | Whether application and SDK loggers mask credentials |
-| [OIDC group membership](library/cases/case-1392ecdfbe2744d59acddd5bb54bc0d7/case.json) | Whether group membership is verified before forwarding configured groups |
-| [Upload destination containment](library/cases/case-88fc403c29eb4697adbfc2d944b682fe/case.json) | Whether uploads and direct writes stay within the allowed directory |
-| [Release artifact visibility](library/cases/case-5c4667fb970b4684ac569c5bb5a27533/case.json) | Whether shipped bundles, source maps, and provenance follow the source visibility policy |
+| [Session revocation](skills/how-could-i-be-hacked/library/cases/case-47e872f11dcc4421947ad049b5018bf8/case.json) | Whether existing tokens stop working after an account is disabled |
+| [Secret redaction in logs](skills/how-could-i-be-hacked/library/cases/case-8febf1af62cd40e6ba9dfea83f4728cd/case.json) | Whether application and SDK loggers mask credentials |
+| [OIDC group membership](skills/how-could-i-be-hacked/library/cases/case-1392ecdfbe2744d59acddd5bb54bc0d7/case.json) | Whether group membership is verified before forwarding configured groups |
+| [Upload destination containment](skills/how-could-i-be-hacked/library/cases/case-88fc403c29eb4697adbfc2d944b682fe/case.json) | Whether uploads and direct writes stay within the allowed directory |
+| [Release artifact visibility](skills/how-could-i-be-hacked/library/cases/case-5c4667fb970b4684ac569c5bb5a27533/case.json) | Whether shipped bundles, source maps, and provenance follow the source visibility policy |
 
 [Full case catalog](CASE-CATALOG.md) · [Published security review results](SECURITY-REVIEW-RESULTS.md)
 
@@ -63,26 +63,26 @@ cases. Update the skill to get the latest library snapshot.
 ### Review a module or repository
 
 Give the skill a module path or the whole repository and name the security behavior you want
-checked. The report records the revision, scope, findings, results, and gaps. [Review guide](references/review.md)
+checked. The report records the revision, scope, findings, results, and gaps. [Review guide](skills/how-could-i-be-hacked/references/review.md)
 
 ### Search the library directly
 
-Run from the skill directory with Python 3.10+ and SQLite FTS5.
+Run from the repository root with Python 3.10+ and SQLite FTS5.
 
 ```sh
-python scripts/corpus.py search --library library --query "credential masking formatter" --limit 5
+python skills/how-could-i-be-hacked/scripts/corpus.py search --library skills/how-could-i-be-hacked/library --query "credential masking formatter" --limit 5
 ```
 
 ### CLI and report format
 
 Use `python scripts/toolkit.py stats` to check the installed snapshot or
 `python scripts/toolkit.py verify` to check its integrity.
-[Command reference](references/workflow.md) · [Report format](references/report-format.md) · [Library format](library/README.md)
+[Command reference](skills/how-could-i-be-hacked/references/workflow.md) · [Report format](skills/how-could-i-be-hacked/references/report-format.md) · [Library format](skills/how-could-i-be-hacked/library/README.md)
 
 For manual setup, copy the full repository into your agent’s skills directory under
-`how-could-i-be-hacked`, or point your agent at [SKILL.md](SKILL.md).
+`how-could-i-be-hacked`, or point your agent at [SKILL.md](skills/how-could-i-be-hacked/SKILL.md).
 
-[Offline iteration protocol](references/iteration.md) · [Library publication audit](references/workflow.md#publication-audit)
+[Offline iteration protocol](skills/how-could-i-be-hacked/references/iteration.md) · [Library publication audit](skills/how-could-i-be-hacked/references/workflow.md#publication-audit)
 
 ## Security and license
 

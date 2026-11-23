@@ -1,3 +1,3 @@
 * text=auto eol=lf
-library/cases/** -text
-library/index.sqlite -text
+skills/how-could-i-be-hacked/library/cases/** -text
+skills/how-could-i-be-hacked/library/index.sqlite -text
