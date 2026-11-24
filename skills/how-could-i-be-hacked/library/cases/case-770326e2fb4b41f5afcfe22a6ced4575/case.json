@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-770326e2fb4b41f5afcfe22a6ced4575",
+  "kind": "defensive_case",
+  "title": "Structured JSON embedding in HTML",
+  "hint": "Verify the HTML embedding boundary and preserve structured data round trips.",
+  "surface": "A generator emits structured JSON data as either standalone JSON or embedded HTML.",
+  "assumptions": [
+    "Use synthetic values and a local HTML parser."
+  ]
+}

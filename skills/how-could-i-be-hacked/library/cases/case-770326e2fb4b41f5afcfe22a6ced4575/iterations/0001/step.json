@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Verify the HTML embedding boundary",
+  "context": {
+    "hint": "Verify the HTML embedding boundary and preserve structured data round trips.",
+    "surface": "A generator emits structured JSON data as either standalone JSON or embedded HTML.",
+    "assumptions": [
+      "Use synthetic values and a local HTML parser."
+    ]
+  },
+  "mechanism_tags": [
+    "json html embedding"
+  ],
+  "review": {
+    "invariant": "Embedded JSON remains within its designated data element.",
+    "verification": "Parse generated HTML from benign fixtures containing punctuation and verify the expected element structure."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The local review identified a boundary failure in embedded mode. The repaired output passed the parser structure regression."
+  },
+  "lineage": {
+    "case_id": "case-770326e2fb4b41f5afcfe22a6ced4575",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

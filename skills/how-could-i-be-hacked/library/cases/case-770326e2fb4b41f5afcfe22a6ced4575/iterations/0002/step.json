@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Preserve data round trips across output modes",
+  "context": {
+    "hint": "Verify the HTML embedding boundary and preserve structured data round trips.",
+    "surface": "A generator emits structured JSON data as either standalone JSON or embedded HTML.",
+    "assumptions": [
+      "Use synthetic values and a local HTML parser."
+    ]
+  },
+  "mechanism_tags": [
+    "json round trip"
+  ],
+  "review": {
+    "invariant": "Context-appropriate encoding preserves the decoded data and standalone JSON behavior.",
+    "verification": "Compare the JSON decoded from the HTML element with the original fixture. Verify the standalone format separately and include a Unicode control."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "All three targeted tests passed on the repaired copy and after a fresh patch application. The related suites passed 159 tests. The full suite still reported 10 failures."
+  },
+  "lineage": {
+    "case_id": "case-770326e2fb4b41f5afcfe22a6ced4575",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}
