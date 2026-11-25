@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Enforce request policy on local server controls",
+  "context": {
+    "hint": "Local server control request authorization.",
+    "surface": "A local editor server exposes a state-changing control operation for its own interface.",
+    "assumptions": [
+      "Use disposable local fixtures and synthetic inputs."
+    ]
+  },
+  "mechanism_tags": [
+    "local request authorization"
+  ],
+  "review": {
+    "invariant": "State-changing controls reject requests that fail the browser request policy before changing server state.",
+    "verification": "Use a disposable local server to verify the policy denial and check that the server remains responsive."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The targeted control regression failed on the baseline and passed on the repaired working copy."
+  },
+  "lineage": {
+    "case_id": "case-16301ed486cf47d4b397ad55332cb707",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

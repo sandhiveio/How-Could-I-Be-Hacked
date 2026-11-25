@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Preserve authorized local control behavior",
+  "context": {
+    "hint": "Local server control request authorization.",
+    "surface": "A local editor server exposes a state-changing control operation for its own interface.",
+    "assumptions": [
+      "Use disposable local fixtures and synthetic inputs."
+    ]
+  },
+  "mechanism_tags": [
+    "local control compatibility"
+  ],
+  "review": {
+    "invariant": "The same request policy allows the intended control operation from an authorized local client.",
+    "verification": "Check that the normal local control still succeeds after the policy rejection test. Run the server suite to verify ordinary request behavior."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The intended control passed within the targeted regression. The full recorded run reported 321 passes across its suites and two ignored tests. The served editor asset was a build placeholder."
+  },
+  "lineage": {
+    "case_id": "case-16301ed486cf47d4b397ad55332cb707",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

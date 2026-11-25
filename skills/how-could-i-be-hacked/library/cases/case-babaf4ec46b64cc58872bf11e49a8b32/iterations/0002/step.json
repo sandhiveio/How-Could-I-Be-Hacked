@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Constrain generated identity configuration paths",
+  "context": {
+    "hint": "Installer names and generated output.",
+    "surface": "An installation CLI uses configured names when generating local files and cluster configuration.",
+    "assumptions": [
+      "Use disposable local fixtures and synthetic inputs."
+    ]
+  },
+  "mechanism_tags": [
+    "identity configuration paths"
+  ],
+  "review": {
+    "invariant": "Identity configuration output remains within its assigned working directory.",
+    "verification": "Check that valid identity names produce expected paths and that invalid names are rejected before files are written."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The repaired unit checks passed for both accepted and rejected inputs. A live identity service was outside the executed scope."
+  },
+  "lineage": {
+    "case_id": "case-babaf4ec46b64cc58872bf11e49a8b32",
+    "iteration_id": "iteration-0002",
+    "previous_iteration_id": "iteration-0001"
+  }
+}

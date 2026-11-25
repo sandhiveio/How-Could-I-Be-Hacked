@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Validate generated resource basenames",
+  "context": {
+    "hint": "Installer names and generated output.",
+    "surface": "An installation CLI uses configured names when generating local files and cluster configuration.",
+    "assumptions": [
+      "Use disposable local fixtures and synthetic inputs."
+    ]
+  },
+  "mechanism_tags": [
+    "generated file basenames"
+  ],
+  "review": {
+    "invariant": "Generated resource filenames use validated basenames within the output directory.",
+    "verification": "Exercise the configuration validation for accepted resource names and values rejected by the basename policy."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The baseline accepted names outside the file naming policy. The repaired checks rejected them and preserved the ordinary resource control."
+  },
+  "lineage": {
+    "case_id": "case-babaf4ec46b64cc58872bf11e49a8b32",
+    "iteration_id": "iteration-0003",
+    "previous_iteration_id": "iteration-0002"
+  }
+}

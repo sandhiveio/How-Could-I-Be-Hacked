@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "defensive_case",
+  "title": "Keep per-instance output within its directory",
+  "context": {
+    "hint": "Installer names and generated output.",
+    "surface": "An installation CLI uses configured names when generating local files and cluster configuration.",
+    "assumptions": [
+      "Use disposable local fixtures and synthetic inputs."
+    ]
+  },
+  "mechanism_tags": [
+    "instance output containment"
+  ],
+  "review": {
+    "invariant": "Instance identifiers are validated as names before the installer derives output directories.",
+    "verification": "Check approved and rejected synthetic names, including normal names containing dots. Verify that generated paths stay in the instance directory."
+  },
+  "source_observation": {
+    "outcome": "supported",
+    "summary": "The baseline failed the new rejection assertions. The repaired installer preserved accepted names and kept generated output in its intended directory."
+  },
+  "lineage": {
+    "case_id": "case-babaf4ec46b64cc58872bf11e49a8b32",
+    "iteration_id": "iteration-0001",
+    "previous_iteration_id": null
+  }
+}

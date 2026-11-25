@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-16301ed486cf47d4b397ad55332cb707",
+  "kind": "defensive_case",
+  "title": "Local server control request authorization",
+  "hint": "Local server control request authorization.",
+  "surface": "A local editor server exposes a state-changing control operation for its own interface.",
+  "assumptions": [
+    "Use disposable local fixtures and synthetic inputs."
+  ]
+}

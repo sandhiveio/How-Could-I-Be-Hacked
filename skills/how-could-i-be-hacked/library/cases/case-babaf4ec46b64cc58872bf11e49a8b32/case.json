@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "case-babaf4ec46b64cc58872bf11e49a8b32",
+  "kind": "defensive_case",
+  "title": "Installer names and generated output",
+  "hint": "Installer names and generated output.",
+  "surface": "An installation CLI uses configured names when generating local files and cluster configuration.",
+  "assumptions": [
+    "Use disposable local fixtures and synthetic inputs."
+  ]
+}

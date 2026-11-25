@@ -6,7 +6,7 @@ Your coding agent adapts security checks from real open-source reviews to your P
 them locally. The report shows what those checks covered beyond your test suite, what passed,
 and what still needs checking.
 
-**153 investigation and review steps across 57 anonymized cases.** Local search and reports
+**159 investigation and review steps across 59 anonymized cases.** Local search and reports
 run with Python and SQLite. **No API key required.**
 
 [**Review a PR**](#quickstart) · [**See example report**](skills/how-could-i-be-hacked/references/example-pr-report.md)
