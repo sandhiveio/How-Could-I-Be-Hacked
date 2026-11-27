@@ -153,3 +153,24 @@ evidence unchanged and redact a separate delivery copy with its own manifest whe
 Describe inaccessible evidence, unavailable runtimes, untested paths, and scope restrictions
 as explicit limits of the conclusion. The JSON report can retain private workspace paths
 and should receive the same delivery review before external sharing.
+
+## Examples from completed reviews
+
+### Compatibility evidence from a base/head comparison
+
+A serializer review compared the documented argument contract on the base and reviewed
+revisions. The upstream suite passed all 299 tests on the reviewed revision. A separate
+matrix expanded two upstream assertions to 12 input combinations and confirmed the intended
+behavior change in all 12. Another 104 control observations matched across revisions.
+
+Report this as one additional executed check with 12 comparison cases. Credit the upstream
+suite separately. An alternate-salt file-loading failure appeared on both revisions and was
+recorded as a pre-existing functional observation. The evidence supported scoped acceptance
+and established no new security finding.
+
+### Delivery validation from saved evidence
+
+A delivery check resolved all 20 relative artifact links, replayed the report from saved
+outputs successfully, and verified that the original evidence was unchanged. Record these
+results under report delivery. The target verification remains tied to the original tested
+revision. A fresh target run or repair retest requires its own execution evidence.
