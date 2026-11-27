@@ -369,3 +369,24 @@ The repaired module passed all 16 tests on a fresh working copy. The separate br
 service and live remote transport were outside the executed checks.
 
 [Inspect the two indexed review steps](../cases/case-59b8970214cf462c99cdddc262e449e8/case.json).
+
+## Reject malformed requests without stopping the server
+
+For a local HTTP service, check that invalid request input returns the documented client
+error. Send an ordinary asset request to the same process immediately afterward and verify
+that it still returns the expected content.
+
+In the OpenCode review, the original process failed to serve the invalid request. The repaired
+copy returned HTTP 400 and then served the ordinary asset successfully. Both targeted
+regression tests and all three local test groups passed on the repaired copy.
+
+## Preserve plain text in generated Markdown tables
+
+For a generator that renders external display names in Markdown tables, verify that ordinary
+names retain their text and that punctuation remains part of the intended cell. Use synthetic
+display values and inspect the rendered cell content and structure. Include a plain name and
+a name with a literal table separator as controls.
+
+In the OpenCode review, the baseline failed the new rendering assertions. The repaired
+copy passed all 22 tests, and the same suite passed after applying the repair to a fresh
+snapshot. The suite result covers the local generator and its tests.
